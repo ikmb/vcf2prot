@@ -38,7 +38,7 @@ TRANS_SEQ_LINE1
 
 ### Compilation from source ### 
 
-<p> 1- Install Rust from [here](https://www.rust-lang.org) </p>
+<p> 1- Install Rust from [here](https://www.rust-lang.org/) </p>
 
 <p> 2- Clone the current repository </p>
 
