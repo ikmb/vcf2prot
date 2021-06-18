@@ -1,0 +1,9 @@
+pub mod instruction; 
+pub mod transcript_instructions;
+pub mod haplotype_instruction;  
+pub mod proband_instructions; 
+pub mod sequence_tape; 
+pub mod personalized_genome; 
+pub mod task; 
+pub mod engines;
+pub mod gir; 
