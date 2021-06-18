@@ -1,4 +1,4 @@
-![IKMB_LOGO](/Media/IKMB_LOGO.png)
+![IKMB_LOGO](/media/IKMB_LOGO.png)
 
 # PPGG: Personalized Proteome Generation using Graphical Processing Cards (GPUs) #
 
@@ -38,7 +38,7 @@ TRANS_SEQ_LINE1
 
 ### Compilation from source ### 
 
-<p> 1- Install Rust from [here](https://www.rust-lang.org)</p>
+<p> 1- Install Rust from [here](https://www.rust-lang.org) </p>
 
 <p> 2- Clone the current repository </p>
 
@@ -72,4 +72,4 @@ For further questions, please feel free to open an issue here or send an email t
 ### Funding ###
 The project was funded by the German Research Foundation (DFG) (Research Training Group 1743, ‘Genes, Environment and Inflammation’) 
 
-![IKMB_LOGO](/Media/RTG1743.png)
+![IKMB_LOGO](/media/RTG1743.png)
