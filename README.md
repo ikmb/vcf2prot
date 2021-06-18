@@ -12,7 +12,7 @@ To Be added later
 
 ### Usage ### 
 
-<p> Two mandatory inputs are needed by the program, the first is the VCF containing the consequences calling and the second is a FASTA file containing reference sequences. </p>
+<p> Two mandatory inputs are needed by the tool, the first is the VCF containing the consequences calling and the second is a FASTA file containing reference sequences. </p>
 
 #### NOTE ####  
 <p> The program assumes the FASTA file to have the following structure </p>
