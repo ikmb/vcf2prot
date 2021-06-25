@@ -12,7 +12,6 @@ pub struct ParsedInput
     pub engine:Engine, 
     pub compute_state:bool,
     pub is_verbose:bool,
-    pub write_e_map:bool,
     pub write_i_map:bool
 }
 impl ParsedInput
@@ -58,9 +57,8 @@ impl ParsedInput
         /* write_e_map:bool, write_i_map:bool */
         let compute_state=args.is_present("stats"); 
         let is_verbose=args.is_present("verbose");
-        let write_e_map=args.is_present("write_early_map"); 
         let write_i_map=args.is_present("write_int_map");          
-        ParsedInput{path2vcf,path2fasta,res_path,engine,compute_state,is_verbose,write_e_map,write_i_map}
+        ParsedInput{path2vcf,path2fasta,res_path,engine,compute_state,is_verbose,write_i_map}
     }
 }
 
@@ -109,14 +107,6 @@ pub fn parse_command_line()->ArgMatches
             .required(false)
             .takes_value(false)
             .about("If set, stats are computed and are written to the output directory along with the fasta file"))
-    .arg(Arg::new("write_early_map")
-            .short('e')
-            .long("write_early_map")
-            .required(false)
-            .takes_value(false)
-            .about("Write an early map containing the observed mutation per patient to sub directory in the provided output\
-             directory, the directory has a predefined name of 'early_maps'. Inside the directory a JSON file containing the\
-             early map of each patient is written"))
     .arg(Arg::new("write_int_map")
         .short('i')
         .long("write_int_map")

@@ -1,4 +1,4 @@
-/// The module contains function to compute statstical summaries 
+/// The module contains function to compute statistical summaries 
 use std::collections::HashMap; 
 use rayon::prelude::*; 
 use crate::data_structures::Map; 

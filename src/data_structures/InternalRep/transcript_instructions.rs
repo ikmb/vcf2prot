@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use super::instruction::Instruction;
 
-/// A representation for a collection of mutation in a transcript  
+/// A representation for a collection of mutation in a transcript, where mutations have been already encoded into instructions 
 #[derive(Debug,Clone,Serialize,Deserialize)]
 pub struct TranscriptInstruction
 {
@@ -18,14 +18,13 @@ pub struct TranscriptInstruction
 }
 impl TranscriptInstruction
 {
+    /// create a new instruction from a transcriptname and vector of instruction containing the mutation in the transcript and the reference length
     pub fn new(transcript_name:String, ref_len:usize, instructions:Vec<instruction::Instruction>)->Self
     {
         TranscriptInstruction{transcript_name,ref_len,instructions}
     }
-    pub fn get_num_instructions(&self)->usize
-    {
-        self.instructions.len()
-    }
+    /// Create a new instance from the alt-Transcript instance along with a reference hashmap 
+    /// of sequence names 
     pub fn from_alt_transcript(mut alt_transcript:vcf_ds::AltTranscript, ref_seqs:&HashMap<String,String>)->Result<Self,String>
     {
         alt_transcript.sort_alterations();// sor alteration 
@@ -40,14 +39,22 @@ impl TranscriptInstruction
                                                     .collect::<Vec<instruction::Instruction>>();
         Ok(TranscriptInstruction::new(transcript_name,ref_len,instructions))
     }
+    /// return the number of instruction in the transcript 
+    pub fn get_num_instructions(&self)->usize
+    {
+        self.instructions.len()
+    }
+    /// return the transcript name 
     pub fn get_transcript_name(&self)->&String
     {
         &self.transcript_name
     }
+    /// return a mutable reference to the instance vector of instructions 
     pub fn get_mut_instruction(&mut self)->&mut Vec<Instruction>
     {
         &mut self.instructions
     }
+    /// Compute the size, i.e. the number of chars, in the alternative stream array 
     pub fn compute_alt_stream_size(&self)->usize
     {
         let mut counter=0; 
@@ -141,7 +148,20 @@ impl TranscriptInstruction
         println!("Reference length is: {} while the expected size is: {}",self.ref_len, &size);
         size
     }
-    pub fn get_g_rep(&self,ref_seqs:&HashMap<String,String>)->gir::GIR
+    /// Return an GIR  of the instances 
+    /// ## Example
+    ///```  
+    /// let name="ENST00000406869".to_string(); 
+    /// let mutations=vec!["*missense|MAD1L1|ENST00000406869|protein_coding|-|10V>10H|1936821C>T".to_string()]; 
+    /// let alt_transcript= vcf_ds::AltTranscript::new(name, mutations);
+    /// println!("{:#?}",alt_transcript); 
+    /// let mut reference=HashMap::new(); 
+    /// reference.insert("ENST00000406869".to_string(),"MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string());
+    /// let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
+    /// let test_gir=res.get_g_rep(&reference); 
+    /// println!("{:#?}",test_gir); 
+    ///```
+    pub fn get_g_rep(&self, ref_seqs:&HashMap<String,String>)->gir::GIR
     {
         // handle the case with start-lost and 
         if self.instructions.iter().any(|ins| ins.get_code()=='0' || ins.get_code()=='U')
@@ -180,6 +200,30 @@ impl TranscriptInstruction
         gir::GIR::new(vec_tasks, annotations,alt_array,ref_stream,res_array)
 
     }
+    /// Takes an instruction and returns two tasks, the first is the  execution task for the instruction
+    /// and the second is the taskdescribe the copying of the reference untill the end of the sequence or
+    /// untill the next instruction.
+    /// ## Example
+    ///```
+    /// let name="ENST00000406869".to_string(); 
+    /// let mutations=vec![
+    ///    "inframe_insertion|MAD1L1|ENST00000406869|protein_coding|-|5G>5GTEST|1936821C>T".to_string(),
+    ///    "inframe_insertion|MAD1L1|ENST00000406869|protein_coding|-|10V>10VECT|1936821C>T".to_string(),
+    /// ]; 
+    /// let alt_transcript= vcf_ds::AltTranscript::new(name, mutations);
+    /// println!("{:#?}",alt_transcript); 
+    /// let mut reference=HashMap::new(); 
+    /// reference.insert("ENST00000406869".to_string(),"MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string());
+    /// let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
+    /// let test_gir=res.get_g_rep(&reference); 
+    /// println!("{:#?}",test_gir); 
+    /// let (res_array, _)=test_gir.execute(Engine::ST);
+    /// let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
+    /// println!("Input Sequence is:  ==>{:#?}",&ref_string);
+    /// let res_string=res_array.iter().collect::<String>();
+    /// println!("Result sequence is: ==>{:#?}",res_string);
+    /// assert_eq!(ref_string.len()+ 7 as usize, res_string.len());
+    ///```
     fn to_task(instruction:&instruction::Instruction, vec_instruction:&Vec<instruction::Instruction>, 
                     alt_stream: &mut Vec<char>, vec_tasks: &Vec<Task>, ref_len:usize)->(Task,Task)
     {
