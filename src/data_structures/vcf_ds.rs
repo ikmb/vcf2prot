@@ -317,7 +317,19 @@ pub struct AltTranscript
     ///```    
     pub fn sort_alterations(&mut self)
     {
-        self.alts.sort(); 
+        self.alts.sort_unstable_by(|mut1, mut2| mut1.mut_info.mut_aa_position.partial_cmp(&mut2.mut_info.mut_aa_position).unwrap()); 
+        let mut min =0; 
+        /*for elem in self.alts.iter()
+        {
+            if elem.mut_info.mut_aa_position >= min
+            {
+                min = elem.mut_info.mut_aa_position;
+            }
+            else 
+            {
+                panic!("The array is not sorted, WTF :(, Position is: {} while min is {} ",elem.mut_info.mut_aa_position , min ); 
+            }
+        }*/
     }
  }
 

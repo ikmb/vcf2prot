@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use std::mem::swap;
+use std::panic;
 use std::usize;
 use crate::data_structures::InternalRep::gir; 
 use crate::data_structures::InternalRep::instruction;
@@ -92,6 +94,7 @@ impl TranscriptInstruction
         {
             match ins.get_code()
             {
+                'U' | '0'=> expected_size -= self.ref_len as i32,
                 'F' => expected_size += ins.get_data().len()  as i32 - (self.ref_len as i32 -ins.get_position() as i32), 
                 'R' => 
                 {
@@ -101,6 +104,7 @@ impl TranscriptInstruction
                     }
                 },
                 'G' => expected_size -= self.ref_len as i32 - ins.get_position() as i32, 
+                'X' => expected_size -= self.ref_len as i32 - ins.get_position() as i32, 
                 'M' => (), 
                 'N' => (),
                 'L' => expected_size += ins.get_data().len() as i32,
@@ -168,13 +172,17 @@ impl TranscriptInstruction
     /// println!("{:#?}",test_gir); 
     ///```
     pub fn get_g_rep(&self, ref_seqs:&HashMap<String,String>)->gir::GIR
-    {
-        // handle the case with start-lost and 
+    {        
+        // handle the case with start-lost and 'U' code
         if self.instructions.iter().any(|ins| ins.get_code()=='0' || ins.get_code()=='U') || self.instructions.len() ==0
         {
             let mut annotations=HashMap::new();
             annotations.insert(self.transcript_name.clone(), (0 as usize,0 as usize));
             return gir::GIR::new(Vec::new(),annotations,Vec::new(),Vec::new(),Vec::new()); 
+        }
+        for ins in self.instructions.iter()
+        {
+            if ins.get_code()=='U'{panic!("This should not happen :( :(")}
         }
         // allocate arrays:
         //-----------------
@@ -240,6 +248,7 @@ impl TranscriptInstruction
             'F' => TranscriptInstruction::get_task_from_frameshift(instruction, alt_stream, vec_tasks),
             'R' => TranscriptInstruction::get_task_from_frameshift(instruction, alt_stream, vec_tasks),
             'G' => TranscriptInstruction::get_task_from_stop_gained(instruction, alt_stream, vec_tasks),
+            'X' => TranscriptInstruction::get_task_from_s_stop_gained(instruction,alt_stream, vec_tasks),
             'L' => TranscriptInstruction::get_task_from_stop_lost(instruction, alt_stream, vec_tasks),
             'I' => TranscriptInstruction::get_task_from_inframe_insersion(instruction, alt_stream, vec_tasks), 
             'J' => TranscriptInstruction::get_task_from_inframe_insersion(instruction, alt_stream, vec_tasks), 
@@ -302,9 +311,22 @@ impl TranscriptInstruction
                 }
                 else
                 {
-                    Task::new(0, ins.get_position()+1 as usize,
-                next_ins.get_position() - (1 as usize) - ins.get_position(),
-                last_task.get_start_pos_res()+last_task.get_length())
+                    let res=panic::catch_unwind( ||
+                    {
+                        Task::new(0, ins.get_position()+1 as usize,
+                    next_ins.get_position() - (1 as usize) - ins.get_position(),
+                    last_task.get_start_pos_res()+last_task.get_length())
+                    }); 
+                    match res {
+                        Ok(task)=>task,
+                        Err(err_msg)=>
+                        {
+                            println!("Instructions are : {:#?}",instructions); 
+                            panic!("The following error: {:#?} cause by: {}, {}",
+                        err_msg,next_ins.get_position(), ins.get_position())
+                        }
+                    }
+                    
                 }
             }
         }
@@ -351,6 +373,11 @@ impl TranscriptInstruction
 
     }
     fn get_task_from_stop_gained(_instruction:&instruction::Instruction, _alt_stream:&mut Vec<char>,
+        _vec_tasks:&Vec<Task>)->Task
+    {
+        Task::new(2, 0, 0,0)
+    }
+    fn get_task_from_s_stop_gained(_instruction:&instruction::Instruction, _alt_stream:&mut Vec<char>,
         _vec_tasks:&Vec<Task>)->Task
     {
         Task::new(2, 0, 0,0)

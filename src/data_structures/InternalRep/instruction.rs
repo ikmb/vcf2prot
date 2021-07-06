@@ -250,7 +250,7 @@ impl Instruction
                 data.remove(data.len()-1);   
                 data
             }
-            MutatedString::NotSeq => panic!("Something went wrong, interpreting: {:#?}, failed",&mutation)
+            MutatedString::NotSeq => return Instruction::generate_phi_instruction()
         }; 
         let len=data.len();// Becuase we have the first amino acid in the mutated sequences already, for example, 115SL>115S
         // the length of deletion is 1.
@@ -331,58 +331,88 @@ impl Instruction
     fn interpret_s_missense_and_inframe_altering(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
         let mut n_inst=Instruction::interpret_s_frameshift(mutation,vec_mut);
-        n_inst.update_code('K'); 
-        n_inst
+        match n_inst.get_code()
+        {
+            'E'=>n_inst,
+            _=>{n_inst.update_code('K'); n_inst}
+        }
     }
     fn interpret_s_frameshift_and_stop_retained(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
         let mut n_inst=Instruction::interpret_s_frameshift(mutation,vec_mut);
-        n_inst.update_code('Q'); 
-        n_inst
+        match n_inst.get_code()
+        {
+            'E'=>n_inst,
+            _=>{n_inst.update_code('Q'); n_inst}
+        }
     }
     fn interpret_s_stop_gained_and_inframe_altering(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
         let mut n_inst=Instruction::interpret_s_stop_gained(mutation,vec_mut);
-        n_inst.update_code('A'); 
-        n_inst
-
+        match n_inst.get_code()
+        {
+            'E'=>n_inst,
+            _=>{n_inst.update_code('A'); n_inst}
+        }
     }
     fn interpret_frameshift_and_stop_retained(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
         let mut n_inst=Instruction::interpret_frameshift(mutation,vec_mut);
-        n_inst.update_code('B'); 
-        n_inst
+        match n_inst.get_code()
+        {
+            'E'=>n_inst,
+            _=>{n_inst.update_code('B'); n_inst}
+        }
     }
     fn interpret_inframe_deletion_and_stop_retained(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
         let mut n_inst=Instruction::interpret_stop_gained(mutation,vec_mut);
-        n_inst.update_code('P');
-        n_inst
+        match n_inst.get_code()
+        {
+            'E'=>n_inst,
+            _=>{n_inst.update_code('P'); n_inst}
+        }
     }
     fn interpret_inframe_insertion_and_stop_retained(mutation:&Mutation)->Self
     {
         let mut n_inst=Instruction::generate_phi_instruction();
-        n_inst.update_code('Z');
-        n_inst.update_start_pos(mutation.mut_info.mut_aa_position as usize);
-        n_inst
+        match n_inst.get_code()
+        {
+            'E'=>n_inst,
+            _=>
+            {
+                n_inst.update_code('Z');
+                n_inst.update_start_pos(mutation.mut_info.mut_aa_position as usize);
+                n_inst
+            }
+        }
     }
     fn interpret_stop_gained_and_inframe_altering(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
         let mut n_inst=Instruction::interpret_stop_gained(mutation,vec_mut);
-        n_inst.update_code('T');
-        n_inst
+        match n_inst.get_code()
+        {
+            'E'=>n_inst,
+            _=>{n_inst.update_code('T'); n_inst}
+        }
     }
     fn interpret_stop_lost_and_frameshift(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
         let mut n_inst=Instruction::interpret_stop_lost(mutation,vec_mut);
-        n_inst.update_code('W');
-        n_inst
+        match n_inst.get_code()
+        {
+            'E'=>n_inst,
+            _=>{n_inst.update_code('W'); n_inst}
+        }
     }
     fn interpret_missense_and_inframe_altering(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
         let mut n_inst=Instruction::interpret_frameshift(mutation,vec_mut);
-        n_inst.update_code('Y');
-        n_inst
+        match n_inst.get_code()
+        {
+            'E'=>n_inst,
+            _=>{n_inst.update_code('Y'); n_inst}
+        }
     }
     fn interpret_start_lost_and_splice_region(mutation:&Mutation, vec_mut:&Vec<Mutation>)->Self
     {
