@@ -18,7 +18,7 @@ pub fn get_early_map(probands:Probands, mut records:VCFRecords)->Vec<EarlyMap>
 pub fn early_to_intermediate_repr(mut vec_of_early_maps:Vec<EarlyMap>)->Vec<IntMap>
 {
     vec_of_early_maps.par_iter_mut()
-                    .map(|early_map|build_int_map_from_early(early_map))
+                    .map(|early_map| build_int_map_from_early(early_map))
                     .collect::<Vec<IntMap>>()
 }
 /// Build an intermediate map instance, IntMap from an early map instance 

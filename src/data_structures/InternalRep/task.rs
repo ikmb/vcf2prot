@@ -73,14 +73,12 @@ impl Task
     }
     pub fn shift_start_pos_stream(&mut self, num:&usize)
     {
-        self.start_pos+=num; 
+        self.start_pos+=*num; 
     }
     pub fn shift_start_pos_res(&mut self, num:&usize)
     {
-        self.start_pos_res+=num; 
+        self.start_pos_res+=*num; 
     }
-
-
 }
 #[cfg(test)]
 pub mod test_task
@@ -98,12 +96,8 @@ pub mod test_task
                                 .collect::<Vec<char>>(); 
         let mut test_results=vec!['x';10];
         // define the input streams 
-        println!("{:#?}",test_stream_ref);
-        println!("{:#?}",test_stream_alt);
-        println!("{:#?}",test_results);
         let task=Task::new(0,1,1,8); 
         task.execute(&mut test_results, &mut test_stream_ref, &mut test_stream_alt);
-        println!("{:#?}",test_results);
         let mut expected_res=vec!['x';10];
         expected_res[8]='B'; 
         assert_eq!(*test_results,*expected_res);
@@ -116,7 +110,5 @@ pub mod test_task
         expected_res[6]='G'; 
         expected_res[7]='H'; 
         assert_eq!(*test_results,*expected_res);
-        println!("{:#?}",expected_res);
-        println!("{:#?}",test_results);
     }
 }

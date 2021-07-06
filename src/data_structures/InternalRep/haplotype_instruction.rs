@@ -56,30 +56,34 @@ impl HaplotypeInstruction
         };
         // compute some counter 
         let mut ref_counter=0; let mut alt_counter=0; let mut res_counter=0; 
+        let mut len_vec=Vec::with_capacity(1000); 
         // loop-and-reindex 
         for g_rep_e in vec_g_rep
         {
             // consume the resources 
             let res=g_rep_e.consumer_and_get_resources();
-            // reindex and push the tasks 
+
+            // re-index and push the tasks 
             for task in res.0
             {
-                g_rep.push(HaplotypeInstruction::update_task(task,&ref_counter,&alt_counter,&ref_counter));               
+                len_vec.push(task.get_length());
+                g_rep.push(HaplotypeInstruction::update_task(task, &ref_counter, &alt_counter,&res_counter));
             }
             // move the alternative and resource array 
-            alt_array.extend(res.3); 
-            reference_array.extend(res.2);
+            let (len_alt, len_ref, len_res)=(res.2.len(),res.3.len(),res.4.len()); 
+            alt_array.extend(res.2); 
+            reference_array.extend(res.3);
             // update the annotation map
             for (key,mut value) in res.1
             {
                 value.0+=res_counter;
-                value.1+=res_counter+res.4.len();
+                value.1+=res_counter;
                 annotation.insert(key, value);
             }
             // update the counters 
-            ref_counter+=reference_array.len(); 
-            alt_counter+=alt_array.len(); 
-            res_counter+=res.4.len(); 
+            ref_counter+=len_ref; 
+            alt_counter+=len_alt; 
+            res_counter+=len_res; 
         }
         // return the results 
         GIR::new(g_rep, annotation, alt_array, reference_array, results_array)

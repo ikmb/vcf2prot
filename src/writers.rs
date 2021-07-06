@@ -1,4 +1,4 @@
-use std::path::Path; 
+use std::path::{Path, PathBuf}; 
 use std::collections::HashMap; 
 use crate::data_structures::Constants;
 use crate::data_structures::Map;
@@ -70,11 +70,17 @@ pub fn write_intmap2json(path2write:&Path, vec_intmap: &Vec<Map::IntMap> )->Resu
 ///```
 pub fn write_num_number_mutation_per_proband(path2file:&Path,stats_table:HashMap<String,u64>)->Result<(),String>
 {
-    let mut file_handle=match File::create(path2file) 
+    // set the path 2 buffer 
+    let mut pathbuf=PathBuf::from(path2file); 
+    pathbuf.push("number_of_mutations_per_proband"); 
+    pathbuf.set_extension("tsv"); 
+    // create the file
+    let mut file_handle=match File::create(pathbuf) 
     {
         Ok(file)=>file,
         Err(err_msg)=>return Err(format!("Creating the file: {:#?} failed due to the following error: {}",path2file, err_msg))    
     };
+    // write the file 
     write!(&mut file_handle,"Proband Name \t Number of mutations\n").unwrap();
     for (key,state) in stats_table.iter()
     {
@@ -91,11 +97,17 @@ pub fn write_num_number_mutation_per_proband(path2file:&Path,stats_table:HashMap
 ///```
 pub fn write_type_mutations_per_patient(path2file:&Path,stats_table:HashMap<String,Vec<u64>>)->Result<(),String>
 {
-    let mut file_handle= match File::create(path2file) 
+    // create the path to store the files 
+    let mut pathbuf=PathBuf::from(path2file); 
+    pathbuf.push("type_of_mutations_per_patient"); 
+    pathbuf.set_extension("tsv");
+    // create a mutable handle to write the results 
+    let mut file_handle= match File::create(&pathbuf) 
     {
         Ok(file)=>file,
-        Err(err_msg)=>return Err(format!("Creating the file: {:#?} failed due to the following error: {}",path2file, err_msg))    
+        Err(err_msg)=>return Err(format!("Creating the file: {:#?} failed due to the following error: {}", pathbuf, err_msg))    
     };
+    // write the files 
     write!(&mut file_handle,"Proband Name\t").unwrap();
     for mutation in Constants::SUP_TYPE.iter()
     {
@@ -120,10 +132,15 @@ pub fn write_type_mutations_per_patient(path2file:&Path,stats_table:HashMap<Stri
 ///```
 pub fn write_number_of_mutations_per_transcript(path2file:&Path,stats_table:HashMap<String,u64>)->Result<(),String>
 {
-    let mut file_handle= match File::create(path2file) 
+    // Create the path to store the files 
+    let mut pathbuf=PathBuf::from(path2file); 
+    pathbuf.push("number_of_mutations_per_transcript"); 
+    pathbuf.set_extension("tsv");
+    // create a file handle
+    let mut file_handle= match File::create(&pathbuf) 
     {
         Ok(file)=>file,
-        Err(err_msg)=>return Err(format!("Creating the file: {:#?} failed due to the following error: {}",path2file, err_msg))    
+        Err(err_msg)=>return Err(format!("Creating the file: {:#?} failed due to the following error: {}",pathbuf, err_msg))    
     };
     write!(&mut file_handle,"Transcript Name \t Number of mutations\n").unwrap();
     for (key,state) in stats_table.iter()

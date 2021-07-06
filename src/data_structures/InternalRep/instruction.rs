@@ -1,4 +1,5 @@
-use crate::data_structures::mutation_ds::*; 
+use crate::data_structures::{Constants, mutation_ds::*, vcf_ds::AltTranscript}; 
+use rayon::vec;
 use serde::{Deserialize, Serialize};
 // the automatic derivatization of traits 
 #[derive(Debug,Clone,Serialize,Deserialize,PartialEq)]
@@ -42,32 +43,32 @@ impl Instruction
     }
     /// this is going to be the main translator of the language, it takes as input the mutation type 
     /// an returns an instruction Representing the interpreted code 
-    pub fn from_mutation(mutation:&Mutation)->Self
+    pub fn from_mutation(mutation:&Mutation, vec_mut:&Vec<Mutation>)->Self
     {
         match &mutation.mut_type
         {
-            MutationType::MisSense=>Instruction::interpret_missense(mutation), 
-            MutationType::SMisSense=>Instruction::interpret_s_missense(mutation),
-            MutationType::FrameShift=>Instruction::interpret_frameshift(mutation),
-            MutationType::SFrameShift=>Instruction::interpret_s_frameshift(mutation),
-            MutationType::InframeInsertion=>Instruction::interpret_inframe_insertion(mutation),
-            MutationType::SInframeInsertion=>Instruction::interpret_s_inframe_insertion(mutation),
-            MutationType::InframeDeletion=>Instruction::interpret_inframe_deletion(mutation),
-            MutationType::SInframeDeletion=>Instruction::interpret_s_inframe_deletion(mutation),
-            MutationType::StartLost=>Instruction::interpret_start_lost(mutation),
-            MutationType::StopLost=>Instruction::interpret_stop_lost(mutation),
-            MutationType::StopGained=>Instruction::interpret_stop_gained(mutation),
-            MutationType::SStopGained=>Instruction::interpret_s_stop_gained(mutation), 
-            MutationType::SMisSenseAndInframeAltering=>Instruction::interpret_s_missense_and_inframe_altering(mutation), 
-            MutationType::SFrameShiftAndStopRetained=>Instruction::interpret_s_frameshift_and_stop_retained(mutation),
-            MutationType::SStopGainedAndInframeAltering=>Instruction::interpret_s_stop_gained_and_inframe_altering(mutation), 
-            MutationType::FrameShiftAndStopRetained=>Instruction::interpret_frameshift_and_stop_retained(mutation ), 
-            MutationType::InframeDeletionAndStopRetained=>Instruction::interpret_inframe_deletion_and_stop_retained(mutation),
+            MutationType::MisSense=>Instruction::interpret_missense(mutation,vec_mut), 
+            MutationType::SMisSense=>Instruction::interpret_s_missense(mutation,vec_mut),
+            MutationType::FrameShift=>Instruction::interpret_frameshift(mutation,vec_mut),
+            MutationType::SFrameShift=>Instruction::interpret_s_frameshift(mutation,vec_mut),
+            MutationType::InframeInsertion=>Instruction::interpret_inframe_insertion(mutation,vec_mut),
+            MutationType::SInframeInsertion=>Instruction::interpret_s_inframe_insertion(mutation,vec_mut),
+            MutationType::InframeDeletion=>Instruction::interpret_inframe_deletion(mutation, vec_mut),
+            MutationType::SInframeDeletion=>Instruction::interpret_s_inframe_deletion(mutation, vec_mut),
+            MutationType::StartLost=>Instruction::interpret_start_lost(mutation,vec_mut),
+            MutationType::StopLost=>Instruction::interpret_stop_lost(mutation,vec_mut),
+            MutationType::StopGained=>Instruction::interpret_stop_gained(mutation,vec_mut),
+            MutationType::SStopGained=>Instruction::interpret_s_stop_gained(mutation,vec_mut), 
+            MutationType::SMisSenseAndInframeAltering=>Instruction::interpret_s_missense_and_inframe_altering(mutation,vec_mut), 
+            MutationType::SFrameShiftAndStopRetained=>Instruction::interpret_s_frameshift_and_stop_retained(mutation,vec_mut),
+            MutationType::SStopGainedAndInframeAltering=>Instruction::interpret_s_stop_gained_and_inframe_altering(mutation,vec_mut), 
+            MutationType::FrameShiftAndStopRetained=>Instruction::interpret_frameshift_and_stop_retained(mutation, vec_mut), 
+            MutationType::InframeDeletionAndStopRetained=>Instruction::interpret_inframe_deletion_and_stop_retained(mutation,vec_mut),
             MutationType::InframeInsertionAndStopRetained=>Instruction::interpret_inframe_insertion_and_stop_retained(mutation),
-            MutationType::StopGainedAndInframeAltering=>Instruction::interpret_stop_gained_and_inframe_altering(mutation),
-            MutationType::StopLostAndFrameShift=>Instruction::interpret_stop_lost_and_frameshift(mutation), 
-            MutationType::MissenseAndInframeAltering=>Instruction::interpret_missense_and_inframe_altering(mutation),
-            MutationType::StartLostAndSpliceRegion=>Instruction::interpret_start_lost_and_splice_region(mutation),        
+            MutationType::StopGainedAndInframeAltering=>Instruction::interpret_stop_gained_and_inframe_altering(mutation,vec_mut),
+            MutationType::StopLostAndFrameShift=>Instruction::interpret_stop_lost_and_frameshift(mutation,vec_mut), 
+            MutationType::MissenseAndInframeAltering=>Instruction::interpret_missense_and_inframe_altering(mutation,vec_mut),
+            MutationType::StartLostAndSpliceRegion=>Instruction::interpret_start_lost_and_splice_region(mutation,vec_mut),        
         }
     }
     /// return the code of the instruction
@@ -116,7 +117,7 @@ impl Instruction
         let s_state=false;
         Instruction{code, s_state, pos, len, data}
     }
-    fn interpret_missense(mutation:&Mutation)->Self
+    fn interpret_missense(mutation:&Mutation,_vec_alt_tram:&Vec<Mutation>)->Self
     {   
         let code='M'; 
         let pos=mutation.mut_info.mut_aa_position as usize; // the position of the altered amino acid 
@@ -135,14 +136,25 @@ impl Instruction
         let s_state=false;
         Instruction{code, s_state, pos,len, data}
     }
-    fn interpret_s_missense(mutation:&Mutation)->Self
+    fn interpret_s_missense(mutation:&Mutation,vec_alt_tram:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_missense(mutation);
-        n_inst.update_code('N'); 
-        n_inst.update_s_state(true); 
-        n_inst
+        match Instruction::validate_s_state(mutation,vec_alt_tram)
+        {
+            true=>
+            {
+                let mut n_inst=Instruction::interpret_missense(mutation,vec_alt_tram);
+                let pos=
+                n_inst.update_code('N'); 
+                n_inst.update_s_state(true); 
+                n_inst
+            },
+            false=>
+            {
+                Instruction::generate_phi_instruction()
+            }
+        }
     }
-    fn interpret_inframe_insertion(mutation:&Mutation)->Self
+    fn interpret_inframe_insertion(mutation:&Mutation,_vec_alt_tram:&Vec<Mutation>)->Self
     {
         let code='I'; 
         let pos=mutation.mut_info.mut_aa_position as usize; // the position of the altered amino acid
@@ -161,14 +173,24 @@ impl Instruction
         let s_state=false;
         Instruction{code, s_state, pos,len, data}
     }
-    fn interpret_s_inframe_insertion(mutation:&Mutation)->Self
+    fn interpret_s_inframe_insertion(mutation:&Mutation,vec_alt_tram:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_inframe_insertion(mutation);
-        n_inst.update_code('J'); 
-        n_inst.update_s_state(true); 
-        n_inst
+        match Instruction::validate_s_state(mutation,vec_alt_tram)
+        {
+            true=>
+            {
+                let mut n_inst=Instruction::interpret_inframe_insertion(mutation,vec_alt_tram);
+                n_inst.update_code('J'); 
+                n_inst.update_s_state(true); 
+                n_inst
+            }
+            false=>
+            {
+                Instruction::generate_phi_instruction()
+            }
+        }
     }
-    fn interpret_inframe_deletion(mutation:&Mutation)->Self
+    fn interpret_inframe_deletion(mutation:&Mutation,_vec_mut:&Vec<Mutation>)->Self
     {
         let code='D'; 
         let pos=mutation.mut_info.mut_aa_position as usize; // the position of the altered amino acid
@@ -198,14 +220,24 @@ impl Instruction
         let s_state=false;
         Instruction::new(code, s_state, pos, len - data.len(), data)
     }
-    fn interpret_s_inframe_deletion(mutation:&Mutation)->Self
+    fn interpret_s_inframe_deletion(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_inframe_deletion(mutation);
-        n_inst.update_code('C'); 
-        n_inst.update_s_state(true); 
-        n_inst
+        match Instruction::validate_s_state(mutation,vec_mut)
+        {
+            true=>
+            {
+                let mut n_inst=Instruction::interpret_inframe_deletion(mutation,vec_mut);
+                n_inst.update_code('C'); 
+                n_inst.update_s_state(true); 
+                n_inst
+            },
+            false=>
+            {
+                Instruction::generate_phi_instruction()
+            }
+        }
     }
-    fn interpret_frameshift(mutation:&Mutation)->Self
+    fn interpret_frameshift(mutation:&Mutation, _vec_mut:&Vec<Mutation>)->Self
     {
         let code='F'; 
         let pos=mutation.mut_info.mut_aa_position as usize; // the position of the altered amino acid
@@ -225,14 +257,24 @@ impl Instruction
         let s_state=false;
         Instruction{code, s_state, pos, len, data}
     }
-    fn interpret_s_frameshift(mutation:&Mutation)->Self
+    fn interpret_s_frameshift(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_frameshift(mutation);
-        n_inst.update_code('R'); 
-        n_inst.update_s_state(true); 
-        n_inst
+        match Instruction::validate_s_state(mutation,vec_mut)
+        {
+            true=>
+            {
+                let mut n_inst=Instruction::interpret_frameshift(mutation,vec_mut);
+                n_inst.update_code('R'); 
+                n_inst.update_s_state(true); 
+                n_inst
+            },
+            false =>
+            {
+                Instruction::generate_phi_instruction()
+            }
+        }
     }
-    fn interpret_stop_gained(mutation:&Mutation)->Self
+    fn interpret_stop_gained(mutation:&Mutation, vec_mut:&Vec<Mutation>)->Self
     {
         let code='G'; 
         let pos=mutation.mut_info.mut_aa_position as usize; // the position of the altered amino acid 
@@ -241,14 +283,24 @@ impl Instruction
         let s_state=false;
         Instruction{code, s_state, pos, len, data}
     }
-    fn interpret_s_stop_gained(mutation:&Mutation)->Self
+    fn interpret_s_stop_gained(mutation:&Mutation, vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_stop_gained(mutation);
-        n_inst.update_code('X'); 
-        n_inst.update_s_state(true); 
-        n_inst
+        match Instruction::validate_s_state(mutation,vec_mut)
+        {
+            true=>
+            {
+                let mut n_inst=Instruction::interpret_stop_gained(mutation,vec_mut);
+                n_inst.update_code('X'); 
+                n_inst.update_s_state(true); 
+                n_inst
+            },
+            false=>
+            {
+                Instruction::generate_phi_instruction()
+            }
+        }
     }
-    fn interpret_stop_lost(mutation:&Mutation)->Self
+    fn interpret_stop_lost(mutation:&Mutation, _vec_mut:&Vec<Mutation>)->Self
     {
         let code='L'; 
         let pos=mutation.mut_info.mut_aa_position as usize; // the position of the altered amino acid 
@@ -267,7 +319,7 @@ impl Instruction
         let s_state=false;
         Instruction{code, s_state, pos, len, data}
     }
-    fn interpret_start_lost(_mutation:&Mutation)->Self
+    fn interpret_start_lost(_mutation:&Mutation, _vec_mut:&Vec<Mutation>)->Self
     {
         let code='0'; 
         let len=0;
@@ -276,34 +328,34 @@ impl Instruction
         let s_state=false;
         Instruction{code, s_state, pos, len, data}
     }
-    fn interpret_s_missense_and_inframe_altering(mutation:&Mutation)->Self
+    fn interpret_s_missense_and_inframe_altering(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_s_frameshift(mutation);
+        let mut n_inst=Instruction::interpret_s_frameshift(mutation,vec_mut);
         n_inst.update_code('K'); 
         n_inst
     }
-    fn interpret_s_frameshift_and_stop_retained(mutation:&Mutation)->Self
+    fn interpret_s_frameshift_and_stop_retained(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_s_frameshift(mutation);
+        let mut n_inst=Instruction::interpret_s_frameshift(mutation,vec_mut);
         n_inst.update_code('Q'); 
         n_inst
     }
-    fn interpret_s_stop_gained_and_inframe_altering(mutation:&Mutation)->Self
+    fn interpret_s_stop_gained_and_inframe_altering(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_s_stop_gained(mutation);
+        let mut n_inst=Instruction::interpret_s_stop_gained(mutation,vec_mut);
         n_inst.update_code('A'); 
         n_inst
 
     }
-    fn interpret_frameshift_and_stop_retained(mutation:&Mutation)->Self
+    fn interpret_frameshift_and_stop_retained(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_frameshift(mutation);
+        let mut n_inst=Instruction::interpret_frameshift(mutation,vec_mut);
         n_inst.update_code('B'); 
         n_inst
     }
-    fn interpret_inframe_deletion_and_stop_retained(mutation:&Mutation)->Self
+    fn interpret_inframe_deletion_and_stop_retained(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_stop_gained(mutation);
+        let mut n_inst=Instruction::interpret_stop_gained(mutation,vec_mut);
         n_inst.update_code('P');
         n_inst
     }
@@ -314,29 +366,40 @@ impl Instruction
         n_inst.update_start_pos(mutation.mut_info.mut_aa_position as usize);
         n_inst
     }
-    fn interpret_stop_gained_and_inframe_altering(mutation:&Mutation)->Self
+    fn interpret_stop_gained_and_inframe_altering(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_stop_gained(mutation);
+        let mut n_inst=Instruction::interpret_stop_gained(mutation,vec_mut);
         n_inst.update_code('T');
         n_inst
     }
-    fn interpret_stop_lost_and_frameshift(mutation:&Mutation)->Self
+    fn interpret_stop_lost_and_frameshift(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_stop_lost(mutation);
+        let mut n_inst=Instruction::interpret_stop_lost(mutation,vec_mut);
         n_inst.update_code('W');
         n_inst
     }
-    fn interpret_missense_and_inframe_altering(mutation:&Mutation)->Self
+    fn interpret_missense_and_inframe_altering(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_frameshift(mutation);
+        let mut n_inst=Instruction::interpret_frameshift(mutation,vec_mut);
         n_inst.update_code('Y');
         n_inst
     }
-    fn interpret_start_lost_and_splice_region(mutation:&Mutation)->Self
+    fn interpret_start_lost_and_splice_region(mutation:&Mutation, vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_start_lost(mutation);
+        let mut n_inst=Instruction::interpret_start_lost(mutation,vec_mut);
         n_inst.update_code('U');
         n_inst
+    }
+    fn validate_s_state(mutation:&Mutation,vec_alt_tram:&Vec<Mutation>)->bool
+    {
+        let index=vec_alt_tram.iter()
+                .position(|elem|elem==mutation).unwrap(); 
+        let mut state=true; 
+        for mutation in vec_alt_tram[..index].iter()
+        {
+            if mutation.mut_type == MutationType::StopGained{state=false; break;}
+        }
+        state
     }
 }
 #[cfg(test)]

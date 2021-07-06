@@ -34,9 +34,15 @@ impl TranscriptInstruction
             Some(sequence)=>sequence.len(),
             None=>return Err(format!("The provided transcript name: {} is not in the reference sequence", &transcript_name))
         };
-        let instructions=alt_transcript.alts.iter()
-                                                    .map(|mutation|instruction::Instruction::from_mutation(mutation))
-                                                    .collect::<Vec<instruction::Instruction>>();
+        let mut instructions= Vec::with_capacity(alt_transcript.alts.len()); 
+        for mutation in alt_transcript.alts.iter()
+        {
+            let instruction=instruction::Instruction::from_mutation(mutation,&alt_transcript.alts);
+            if instruction.get_code()!='E'
+            {
+                instructions.push(instruction)
+            }
+        }
         Ok(TranscriptInstruction::new(transcript_name,ref_len,instructions))
     }
     /// return the number of instruction in the transcript 
@@ -141,11 +147,11 @@ impl TranscriptInstruction
                 'T' => expected_size-= self.ref_len as i32 - ins.get_position() as i32,
                 'W' => expected_size+= ins.get_data().len() as i32,
                 'Y' => expected_size+= ins.get_data().len()  as i32 - (self.ref_len as i32 -ins.get_position() as i32)  +1 as i32,
+                '0' => expected_size =-1 * self.ref_len as i32,
                 _=>panic!("instruction: {:#?} is not supported", ins),
             }
         }
         let size = (self.ref_len as i32 + expected_size) as usize;
-        println!("Reference length is: {} while the expected size is: {}",self.ref_len, &size);
         size
     }
     /// Return an GIR  of the instances 
@@ -164,7 +170,7 @@ impl TranscriptInstruction
     pub fn get_g_rep(&self, ref_seqs:&HashMap<String,String>)->gir::GIR
     {
         // handle the case with start-lost and 
-        if self.instructions.iter().any(|ins| ins.get_code()=='0' || ins.get_code()=='U')
+        if self.instructions.iter().any(|ins| ins.get_code()=='0' || ins.get_code()=='U') || self.instructions.len() ==0
         {
             let mut annotations=HashMap::new();
             annotations.insert(self.transcript_name.clone(), (0 as usize,0 as usize));
@@ -290,9 +296,16 @@ impl TranscriptInstruction
             }, 
             _=>
             {
-                Task::new(0, ins.get_position()+1 as usize,
+                if next_ins.get_position() == ins.get_position()
+                {
+                    Task::new(2, 0, 0,0)
+                }
+                else
+                {
+                    Task::new(0, ins.get_position()+1 as usize,
                 next_ins.get_position() - (1 as usize) - ins.get_position(),
                 last_task.get_start_pos_res()+last_task.get_length())
+                }
             }
         }
     }

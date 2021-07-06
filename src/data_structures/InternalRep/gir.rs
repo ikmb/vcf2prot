@@ -75,8 +75,6 @@ impl GIR
                 
             },
             _=>panic!("Not yet, not yet for parallel code")
-
         }
     }
-
 }

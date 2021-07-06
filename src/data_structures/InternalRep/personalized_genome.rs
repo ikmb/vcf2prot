@@ -54,14 +54,14 @@ impl PersonalizedGenome
         // write the content of the first sequence tape
         for (key,_) in self.seq_tape2.get_annotation().iter()
         {
-            write!(&mut file_handle,">{}\n{}\n", key, self.seq_tape1.get_seq(key).unwrap()).unwrap();
+            write!(&mut file_handle,">{}\n{}\n", key, self.seq_tape2.get_seq(key).unwrap()).unwrap();
         }
         Ok(())
     }
     pub fn from_proband_instruction(mut proband_instruction:ProbandInstruction, engine:Engine, ref_seq:&HashMap<String,String>)->Self
     {
         let proband_name=proband_instruction.proband_name; 
-        let ( res_1,annotations1)=proband_instruction.haplotype1_instruction.get_g_rep(ref_seq, engine.clone()).execute(engine.clone()); 
+        let (res_1,annotations1)=proband_instruction.haplotype1_instruction.get_g_rep(ref_seq, engine.clone()).execute(engine.clone()); 
         let (res_2,annotations2)=proband_instruction.haplotype2_instruction.get_g_rep(ref_seq, engine.clone()).execute(engine.clone());
         let seq_tape1=SequenceTape::new(res_1.iter().collect::<String>(), annotations1).unwrap(); 
         let seq_tape2=SequenceTape::new(res_2.iter().collect::<String>(), annotations2).unwrap();

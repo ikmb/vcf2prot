@@ -24,15 +24,29 @@ use crate::data_structures::Constants;
 pub fn split_csq_string(input_string:&String)->Result<Vec<String>,String>
 {
     let num_match=input_string.matches('|').count();
-    if num_match !=6 
+    let res = input_string.split('|').map(|elem| elem.into()).collect::<Vec<String>>(); 
+    match num_match
     {
-        return Err(format!("In correct number of fields, expected 6, recieved {}",num_match));
-    }
-    else
-    {
-        let index:Vec<usize>=vec![0,2,5];
-        let res = input_string.split('|').map(|elem| elem.into()).collect::<Vec<String>>(); 
-        Ok(index.iter().map(|i| res[*i].clone()).collect::<Vec<String>>())
+        6=>
+        {
+            let index:Vec<usize>=vec![0,2,5];
+            Ok(index.iter().map(|i| res[*i].clone()).collect::<Vec<String>>())
+        }, 
+        _=>
+        {
+            match res[0].as_str()
+            {
+                "start_lost"=>
+                {
+                    let mut results=Vec::with_capacity(3); 
+                    results.push(res[0].clone());
+                    results.push(res[2].clone());
+                    results.push("1M>1*".to_string()); 
+                    Ok(results)
+                },
+                _=>Err(format!("In correct number of fields, expected 6, received {}",num_match))
+            }
+        }
     }
 }
 /// The function takes the mutation amino acid field, e.g. "32Q>32*" and returned a Result enum either containing an Ok or Err type.
