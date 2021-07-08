@@ -1,3 +1,5 @@
+use std::{sync::Arc, usize};
+
 // use a caret to load the data 
 
 #[derive(Debug,Clone,Copy,PartialEq)]
@@ -46,7 +48,7 @@ impl Task
         {
             results_tape[self.start_pos_res..end_bound_res].clone_from_slice(&alt_tape[self.start_pos..end_bound_stream]); 
         }
-    }
+    }    
     pub fn get_mut_start_pos(&mut self)->&mut usize
     {
         &mut self.start_pos
@@ -70,6 +72,16 @@ impl Task
     pub fn get_execution_stream(&self)->&u8
     {
         &self.exe_code
+    }
+    #[inline]
+    pub fn get_stream(&self)->u8
+    {
+        self.exe_code
+    }
+    #[inline]
+    pub fn get_start_pos(self)->usize
+    {
+        self.start_pos
     }
     pub fn shift_start_pos_stream(&mut self, num:&usize)
     {
