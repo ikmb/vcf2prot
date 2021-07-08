@@ -86,7 +86,6 @@ impl GIR
                 let (exec_code,start_pos,length,start_pos_res,mut res_array,
                     ref_array,alt_array,  annotation )= self.consume_and_produce_produce_content(); 
                 
-                let exec_code =exec_code.into_iter().map(|elem| elem as usize).collect::<Vec<_>>(); 
                 let err_code; 
                 unsafe
                 {
@@ -111,7 +110,7 @@ impl GIR
         }
     }
 
-    fn consume_and_produce_produce_content(mut self)->(Vec<u8>,Vec<usize>,Vec<usize>, 
+    fn consume_and_produce_produce_content(mut self)->(Vec<usize>,Vec<usize>,Vec<usize>, 
         Vec<usize>, Vec<char>, Vec<char>, Vec<char>, HashMap<String,(usize,usize)>)
     {
         let mut exec_code=Vec::with_capacity(self.g_rep.len()); 
@@ -120,12 +119,12 @@ impl GIR
         let mut start_pos_res=Vec::with_capacity(self.g_rep.len()); 
         for task in self.g_rep.iter()
         {
-            exec_code.push(task.get_stream()); 
+            exec_code.push(task.get_stream() as usize); 
             start_pos.push(task.get_start_pos()); 
             length.push(task.get_length()); 
             start_pos_res.push(task.get_start_pos_res())
         }
-        let ( res_array,  ref_array,  alt_array, annotation)=(self.res_array, self.res_array, self.alt_stream, self.annotation); 
+        let ( res_array,  ref_array,  alt_array, annotation)=(self.res_array, self.ref_stream, self.alt_stream, self.annotation); 
         (exec_code,start_pos,length,start_pos_res,res_array,ref_array,alt_array,annotation)
     }
 
