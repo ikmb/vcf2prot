@@ -98,6 +98,16 @@ cargo build
 ```
 <p> 5- Access the binary executable from the target directory </p>
 
+### Troubleshooting ###
+
+#### Problem #### 
+
+<p> error while loading shared libraries: libcudart.so.11.0: cannot open shared object file: No such file or directory </p>
+
+#### solution #### 
+
+<p> This problem will be encountered in case any of the two environmental variable, CUDA_HOME and LD_LIBRARY_PATH, are not defined or set. For a permanent solution please update your .bashrc to have these two variables exported.</p>
+
 ### Citation ###
 
 TBD
