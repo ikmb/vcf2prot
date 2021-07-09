@@ -87,10 +87,10 @@ cd ppg
 
 <p> 5. Use any text editor and update the following information in the build script, *build.rs* which is located the at the root directory, the following the 8th</p>
 
-´´´
+```
     println!("cargo:rustc-link-search=native=/opt/cuda/11.0/lib64/"); // 8th line in the current version
     println!("cargo:rustc-link-search=native=/path two cuda lib64 directory"); // 8th line in the updated version
-´´´
+```
 <p> 4- build the project </p>
 
 ```
