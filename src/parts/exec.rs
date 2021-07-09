@@ -28,14 +28,13 @@ pub fn execute(vec_int_repr:Vec<IntMap>, exec_engine:Engine, ref_seq:&HashMap<St
             .map(|proband_map|PersonalizedGenome::from_proband_instruction(proband_map,exec_engine.clone(),ref_seq))
             .collect::<Vec<PersonalizedGenome>>()
         },
-        Engine::MT=>
+        Engine::MT | Engine::GPU =>
         {
             vec_int_repr.into_par_iter()
             .map(|proband_map|ProbandInstruction::from_intmap(proband_map, exec_engine.clone(),ref_seq))
             .map(|probandMap|PersonalizedGenome::from_proband_instruction(probandMap,exec_engine.clone(),ref_seq))
             .collect::<Vec<PersonalizedGenome>>()
         },
-        _=>panic!("Unknown engine: {:#?}",exec_engine)
     }
 }
 /// A function to compute the state from the vec_maps, it launches 3 threads to compute each metric on parallel

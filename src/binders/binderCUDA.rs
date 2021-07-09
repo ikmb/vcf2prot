@@ -1,6 +1,5 @@
 use libc::{c_int, size_t};
 
-#[link(name="kernel_wrapper", kind="static")]
 extern "C" 
 {
     pub fn kernel_wrapper(res_array:*mut char, ref_stream: *const char, alt_stream: *const char, 
