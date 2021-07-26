@@ -39,12 +39,11 @@ pub fn write_personalized_genomes(mut vec_genomes:Vec<PersonalizedGenome>, exec_
             vec_genomes.iter()
             .for_each(|genome|genome.write(&output_dir).unwrap())
         },
-        Engine::MT=>
+        Engine::MT | Engine::GPU=>
         {
             vec_genomes.par_iter_mut()
             .for_each(|genome|genome.write(&output_dir).unwrap())
         }
-        _=>panic!("Unknown Engine: {:#?}",exec_engines)
     }
 }
 

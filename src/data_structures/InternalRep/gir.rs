@@ -85,7 +85,10 @@ impl GIR
             {
                 let (exec_code,start_pos,length,start_pos_res,mut res_array,
                     ref_array,alt_array,  annotation )= self.consume_and_produce_produce_content(); 
-                
+                // cast as u8; define the results array 
+                let mut res_array=res_array.into_iter().map(|val|val as u8).collect::<Vec<_>>(); 
+                let ref_array=ref_array.into_iter().map(|val|val as u8).collect::<Vec<_>>(); 
+                let alt_array=alt_array.into_iter().map(|val|val as u8).collect::<Vec<_>>(); 
                 let err_code; 
                 unsafe
                 {
@@ -105,6 +108,7 @@ impl GIR
                     5=>panic!("Copying the results array to the host failed"),
                     _=>panic!("Unknown error was encountered")
                 }
+                let res_array=res_array.into_iter().map(|elem| elem as char).collect::<Vec<_>>(); 
                 (res_array, annotation)
             }
         }

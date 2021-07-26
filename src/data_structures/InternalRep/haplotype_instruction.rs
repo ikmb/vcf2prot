@@ -1,4 +1,4 @@
-use std::{collections::HashMap, usize};
+use std::{collections::HashMap, panic, usize};
 use crate::data_structures::vcf_ds::AltTranscript;
 use super::{engines::Engine, task::Task, transcript_instructions::TranscriptInstruction}; 
 use rayon::prelude::*; 
@@ -24,19 +24,27 @@ impl HaplotypeInstruction
             Engine::ST=>
             {
                 let vec_transcriot_ins= alt_trans_vec.into_iter()
-                .map(|alt_transcript| TranscriptInstruction::from_alt_transcript(alt_transcript, ref_seq).unwrap())
+                .map(|alt_transcript| 
+                {
+                    let name = alt_transcript.name.clone(); 
+                    match panic::catch_unwind(||TranscriptInstruction::from_alt_transcript(alt_transcript, ref_seq).unwrap())
+                    {
+                        Ok(res)=>res,
+                        Err(err_msg) => panic!("From Transcript: {}, the following error was encountered {:#?}",
+                        name, err_msg
+                        )
+                    }
+                })
                 .collect::<Vec<_>>();
                 HaplotypeInstruction::new(vec_transcriot_ins)
             }
-            Engine::MT=>
+            Engine::MT | Engine::GPU=>
             {
                 let vec_transcriot_ins= alt_trans_vec.into_par_iter()
                 .map(|alt_transcript| TranscriptInstruction::from_alt_transcript(alt_transcript, ref_seq).unwrap())
                 .collect::<Vec<_>>();
                 HaplotypeInstruction::new(vec_transcriot_ins)
             },
-            _=>panic!("Unknown engine: {:#?}",engine)
-
         }
     }
     pub fn get_g_rep(&mut self,ref_seq:&HashMap<String,String>, engine:Engine)->GIR
@@ -51,8 +59,7 @@ impl HaplotypeInstruction
         let vec_g_rep= match engine
         {
             Engine::ST=>self.instructions.iter().map(|ins|ins.get_g_rep(ref_seq)).collect::<Vec<_>>(),
-            Engine::MT=>self.instructions.par_iter().map(|ins|ins.get_g_rep(ref_seq)).collect::<Vec<_>>(),
-            _=>panic!("Unknown engine: {:#?}",engine)            
+            Engine::MT | Engine::GPU =>self.instructions.par_iter().map(|ins|ins.get_g_rep(ref_seq)).collect::<Vec<_>>(),
         };
         // compute some counter 
         let mut ref_counter=0; let mut alt_counter=0; let mut res_counter=0; 

@@ -180,10 +180,6 @@ impl TranscriptInstruction
             annotations.insert(self.transcript_name.clone(), (0 as usize,0 as usize));
             return gir::GIR::new(Vec::new(),annotations,Vec::new(),Vec::new(),Vec::new()); 
         }
-        for ins in self.instructions.iter()
-        {
-            if ins.get_code()=='U'{panic!("This should not happen :( :(")}
-        }
         // allocate arrays:
         //-----------------
         let mut vec_tasks=Vec::with_capacity(2*self.instructions.len()); 
@@ -283,7 +279,7 @@ impl TranscriptInstruction
                 let last_task_type=['K','Q','A','B','P','Z','T','W','Z','T','W','Z','G','F','R','L'].iter().any(|c|*c==instruction.get_code()); 
                 match last_task_type
                 {
-                    true => panic!("Instruction: {:#?} must be the last mutation in a transcript",instruction),
+                    true => panic!("Instruction: {:#?} must be the last mutation in a transcript, current vector of instructions is: {:#?}",instruction,vec_instruction),
                     false => TranscriptInstruction::add_till_next_ins(instruction, vec_instruction,&ins_task)
                 }
             }
@@ -299,9 +295,20 @@ impl TranscriptInstruction
             'D' | 'C'=>
             {
                 let stat_pos=ins.get_position()+ins.get_length() +1 as usize; 
-                Task::new(0, stat_pos, 
-                next_ins.get_position()- stat_pos, 
-                last_task.get_start_pos_res()+last_task.get_length())
+                let res= panic::catch_unwind(||
+                    {
+                        Task::new(0, stat_pos, 
+                            next_ins.get_position()- stat_pos, 
+                            last_task.get_start_pos_res()+last_task.get_length())
+                    }
+                );
+                match res
+                {
+                    Ok(res)=>res, 
+                    Err(err)=>panic!("This error was encountered: {:#?} while generating a task from: {:#?}, {:#?}, {:#?},{:#?},\
+                     The current instruction is: {:#?} while all instructions are: {:#?}",
+                            err, stat_pos,next_ins.get_position(),last_task.get_start_pos_res(),last_task.get_length(), ins,instructions )
+                }
             }, 
             _=>
             {

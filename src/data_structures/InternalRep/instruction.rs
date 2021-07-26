@@ -426,8 +426,10 @@ impl Instruction
                 .position(|elem|elem==mutation).unwrap(); 
         let mut state=true; 
         for mutation in vec_alt_tram[..index].iter()
-        {
-            if mutation.mut_type == MutationType::StopGained{state=false; break;}
+        { 
+            if mutation.mut_type == MutationType::StopGained || mutation.mut_type == MutationType::FrameShift
+            {state=false; break;}
+            
         }
         state
     }

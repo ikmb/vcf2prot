@@ -7,7 +7,7 @@ use rayon::prelude::*;
 /// of VCF records 
 pub fn get_early_map(probands:Probands, mut records:VCFRecords)->Vec<EarlyMap>
 {
-    // the conseuqnece vector per patient 
+    // the consequence vector per patient 
     let mutation_per_proband=records.get_csq_per_patient(probands.get_num_probands()); 
     (probands.get_probands(),mutation_per_proband).into_par_iter()
     .map(|(proband,(vec_mut_one,vec_mut_two))|{

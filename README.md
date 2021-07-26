@@ -2,19 +2,20 @@
 
 # PPGG: Personalized Proteome Generation using Graphical Processing Cards (GPUs) #
 
-### Project Aim ### 
+## Project Aim ##
 
 Accelerate the generation of personalized proteomes from a Variant calling format (VCF) file and a reference proteome using graphical processing units (GPUs).   
 
-### Motivation ### 
+### Motivation ###
 
-To Be added later 
+To Be added later
 
-### Usage ### 
+### Usage ###
 
 <p> Two mandatory inputs are needed by the tool, the first is the VCF containing the consequences calling and the second is a FASTA file containing reference sequences. </p>
 
-#### NOTE ####  
+#### NOTE ####
+
 <p> The program assumes the FASTA file to have the following structure </p>
 
 ```
@@ -36,7 +37,7 @@ TRANS_SEQ_LINE1
 ./PPGG_rust -f input_mutation_info.vcf -r reference_sequences.fasta -o personalized_proteomes_dir -sv  
 ```
 
-## Compilation from source ## 
+## Compilation from source ##
 
 ### CPU Version ###
 
@@ -100,11 +101,11 @@ cargo build
 
 ### Troubleshooting ###
 
-#### Problem #### 
+#### Problem ####
 
 <p> error while loading shared libraries: libcudart.so.11.0: cannot open shared object file: No such file or directory </p>
 
-#### solution #### 
+#### solution ####
 
 <p> This problem will be encountered in case any of the two environmental variable, CUDA_HOME and LD_LIBRARY_PATH, are not defined or set. For a permanent solution please update your .bashrc to have these two variables exported.</p>
 
@@ -113,7 +114,7 @@ cargo build
 TBD
 
 ### Contact ###
-For further questions, please feel free to open an issue here or send an email to the developers at h.elabd@ikmb.uni-kiel.de
+For further questions, please feel free to open an issue here or send an email to the developers at h.elabd@ikmb.uni-kiel.de or through twitter @HeshamElAbd16
 
 ### Funding ###
 The project was funded by the German Research Foundation (DFG) (Research Training Group 1743, ‘Genes, Environment and Inflammation’)
