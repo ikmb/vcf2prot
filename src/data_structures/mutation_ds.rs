@@ -156,8 +156,13 @@ pub struct Mutation
 }
 impl Mutation
 {
-    pub fn new(info_vec:Vec<String>)->Result<Mutation,String>
+    pub fn new(info_vec:Result<Vec<String>,String>)->Result<Mutation,String>
     {
+        let info_vec=match info_vec
+        {
+            Ok(res)=>res,
+            Err(err_msg)=>return Err(format!("Failed to parse the mutation with the following error: {}",err_msg))
+        };
         if info_vec.len()!=3
         {
             return Err(format!("Info_vec must be of size 3, however, your input is of size {}",info_vec.len()));

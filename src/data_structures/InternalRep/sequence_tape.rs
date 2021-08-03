@@ -66,11 +66,13 @@ impl SequenceTape
         }
         Ok(())
     }
+    /// ## Summary 
     /// return the hash map containing the annotation hash map 
     pub fn get_annotation(&self)->&HashMap<String,(usize,usize)>
     {
         &self.annotations
     }
+    /// ## Summary 
     /// return the sequence corresponding to the provided sequence name 
     pub fn get_seq(&self,seq_name:&String)->Result<&str,String>
     {

@@ -44,7 +44,11 @@ pub fn split_csq_string(input_string:&String)->Result<Vec<String>,String>
                     results.push("1M>1*".to_string()); 
                     Ok(results)
                 },
-                _=>Err(format!("In correct number of fields, expected 6, received {}",num_match))
+                _=>
+                {
+                    println!("In correct number of fields, expected 6, received {} and the input string is: {}, skipping this mutation ...",num_match,input_string); 
+                    Err(format!("In correct number of fields, expected 6, received {} and the input string is: {}",num_match,input_string))
+                }
             }
         }
     }
@@ -221,8 +225,16 @@ pub fn parse_fields(mut fields:String)->String
 ///```
 pub fn remove_leading_zeros(mut fields:String)->String
 {
-    fields=fields.trim_end_matches(|char| char=='0' || char ==',').to_string(); 
-    if fields.is_empty()
+    let mut split_result=fields.split(",")
+                .map(|elem| elem.to_string())
+                .collect::<Vec<String>>(); 
+
+    while split_result.len()!=0 && split_result.last().unwrap()=="0"
+    {
+        split_result.remove(split_result.len()-1);
+    }
+    //fields=fields.trim_end_matches(|char| char=='0' || char ==',').to_string(); 
+    if split_result.len()==0
     {
         return Constants::DEF_CONSEQ.to_string();
     }
@@ -230,6 +242,7 @@ pub fn remove_leading_zeros(mut fields:String)->String
     {
         if fields.contains('-'){panic!("An invalid bit mask was encountered: {}. Most likely an outdated version of csq has been used. Check this commit @ Github for more details: https://github.com/samtools/bcftools/commit/1f1e7667ffc1235f31a82e2093f037338acbb4e7",fields,);}
     }
+    fields=split_result.join(",");
     fields
 }
 /// a one-liner function for generating the type of mutation from the consequence string. 

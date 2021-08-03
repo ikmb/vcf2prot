@@ -1,3 +1,4 @@
+// load libraries and caret 
 use std::{collections::HashMap, panic, usize};
 use crate::data_structures::vcf_ds::AltTranscript;
 use super::{engines::Engine, task::Task, transcript_instructions::TranscriptInstruction}; 
@@ -5,6 +6,9 @@ use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use crate::data_structures::InternalRep::gir::GIR; 
 
+/// ## Summary
+/// An abstraction for a collection on instruction in the same Haplotype of a proband
+/// the class derives the Debug, Clone, Serialize and Deserialize traits  
 #[derive(Debug,Clone,Serialize,Deserialize)]
 pub struct HaplotypeInstruction
 {
@@ -12,11 +16,24 @@ pub struct HaplotypeInstruction
 }
 impl HaplotypeInstruction
 {
+    /// ## Summary  
+    /// Create a new instance using a vector of transcript instruction, i.e. the building block for the instance is a TranscriptInstruction
+    /// ##Example 
+    /// ```rust
+    /// // let's load the modules 
+    /// use ppgg_rust::data_structures::{haplotype_instruction::TranscriptInstruction,
+    ///                                 transcript_instruction::TranscriptInstruction}
+    /// // define an empty vec of transcript instance 
+    /// let vec_ins: Vec<TranscriptInstruction> = Vec::new(); 
+    /// let hap_ins= HaplotypeInstruction::new(); 
+    /// println!("Haplotype instance is: {:#?}",hap_ins); 
+    /// ```
     pub fn new(instructions:Vec<TranscriptInstruction>)->Self
     {
         HaplotypeInstruction{instructions}   
     }
-
+    /// ## Summary 
+    /// Generate an instance from a vector of AltTranscript, a reference sequence and an execution engine
     pub fn from_vec_t_ins(alt_trans_vec:Vec<AltTranscript>, engine:Engine, ref_seq:&HashMap<String,String>)->Self
     {
         match engine
@@ -27,26 +44,36 @@ impl HaplotypeInstruction
                 .map(|alt_transcript| 
                 {
                     let name = alt_transcript.name.clone(); 
-                    match panic::catch_unwind(||TranscriptInstruction::from_alt_transcript(alt_transcript, ref_seq).unwrap())
+                    match TranscriptInstruction::from_alt_transcript(alt_transcript, ref_seq)
                     {
                         Ok(res)=>res,
-                        Err(err_msg) => panic!("From Transcript: {}, the following error was encountered {:#?}",
-                        name, err_msg
-                        )
+                        Err(err_msg) => TranscriptInstruction::emtpy_t_instruction()
                     }
                 })
+                .filter(|elem| *elem.get_transcript_name() != "")
                 .collect::<Vec<_>>();
                 HaplotypeInstruction::new(vec_transcriot_ins)
             }
             Engine::MT | Engine::GPU=>
             {
                 let vec_transcriot_ins= alt_trans_vec.into_par_iter()
-                .map(|alt_transcript| TranscriptInstruction::from_alt_transcript(alt_transcript, ref_seq).unwrap())
-                .collect::<Vec<_>>();
+                .map(|alt_transcript| 
+                    {
+                        let name = alt_transcript.name.clone(); 
+                        match TranscriptInstruction::from_alt_transcript(alt_transcript, ref_seq)
+                        {
+                            Ok(res)=>res,
+                            Err(err_msg) => TranscriptInstruction::emtpy_t_instruction()
+                        }
+                    })
+                    .filter(|elem| *elem.get_transcript_name() != "")
+                    .collect::<Vec<_>>();
                 HaplotypeInstruction::new(vec_transcriot_ins)
             },
         }
     }
+    /// ## Summary
+    /// Generate a G Representation from a ref_seq and an execution engine   
     pub fn get_g_rep(&mut self,ref_seq:&HashMap<String,String>, engine:Engine)->GIR
     {
         // Allocate resources 
@@ -68,8 +95,12 @@ impl HaplotypeInstruction
         for g_rep_e in vec_g_rep
         {
             // consume the resources 
-            let res=g_rep_e.consumer_and_get_resources();
-
+            let res=match g_rep_e
+            {
+                Ok(res)=>res.consumer_and_get_resources(),
+                Err(err_msg)=>{println!("While creating instruction for a haplotype, the following error was encountered,{:#?}, skipping this transcript ...\
+                Please check your input VCF file, otherwise feel free to contact the developer at: h.elabd@ikmb.uni-kiel.de or at the project webpage: https://github.com/ikmb/ppg", err_msg);continue;},
+            };
             // re-index and push the tasks 
             for task in res.0
             {
@@ -95,6 +126,8 @@ impl HaplotypeInstruction
         // return the results 
         GIR::new(g_rep, annotation, alt_array, reference_array, results_array)
     }
+    /// ## Summary
+    /// Update the task index by shifting, i.e. adjusting the position of the task indices 
     fn update_task(mut task:Task,ref_counter:&usize,alt_counter:&usize,res_counter:&usize)->Task
     {
         task=match task.get_execution_stream()
@@ -114,6 +147,8 @@ impl HaplotypeInstruction
         task.shift_start_pos_res(res_counter);
         task
     }
+    /// ## Summary 
+    /// compute the size of the results array 
     fn get_size_results_array(&self)->usize
     {
         self.instructions.iter()
@@ -122,6 +157,8 @@ impl HaplotypeInstruction
         .iter()
         .sum::<usize>()
     }
+    /// ## Summary 
+    /// compute the size of the alternative array 
     fn get_size_alt_array(&self)->usize
     {
         self.instructions.iter()
@@ -130,6 +167,8 @@ impl HaplotypeInstruction
         .iter()
         .sum::<usize>()
     }
+    /// ## Summary 
+    /// compute the size of the reference array 
     fn get_size_ref_array(&self, ref_seq:&HashMap<String,String>)->usize
     {
         self.instructions.iter()
@@ -138,6 +177,8 @@ impl HaplotypeInstruction
         .iter()
         .sum::<usize>()
     }
+    /// ## Summary 
+    /// compute the number of expected tasks in the instances by summing over the number of tasks in each transcript instruction 
     fn get_expected_number_of_tasks(&self)->usize
     {
         self.instructions.iter()

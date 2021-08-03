@@ -94,6 +94,7 @@ impl BitMask
     }
     fn parse_single_field(mut bitmask:u32)->(Vec<usize>,Vec<usize>)
     {
+        let debug_copy=bitmask.clone();
         let mut haplotype_one=Vec::with_capacity(16);
         let mut haplotype_two=Vec::with_capacity(16);
         let mut haplo1;
@@ -117,10 +118,12 @@ impl BitMask
             bitmask=bitmask>>2;
             index+=1; 
         }
+        //println!("Input is: {} and results is {:?},{:?}",debug_copy,haplotype_one,haplotype_two);
         (haplotype_one,haplotype_two)
     }
     fn parse_concat_values(bitmask_vec:&mut Vec<u32>)->(Vec<usize>,Vec<usize>)
     {
+        let debug_copy=bitmask_vec.clone(); 
         let mut haplotype_one=Vec::with_capacity(16*bitmask_vec.len());
         let mut haplotype_two=Vec::with_capacity(16*bitmask_vec.len());
         let mut haplo1;
@@ -149,6 +152,7 @@ impl BitMask
             }
             index_fields+=15; 
         }
+        //println!("Input is: {:?} and results is {:?},{:?}",debug_copy,haplotype_one,haplotype_two);
         (haplotype_one,haplotype_two)
     }
 }

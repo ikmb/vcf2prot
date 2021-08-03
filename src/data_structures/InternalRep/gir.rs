@@ -1,3 +1,4 @@
+// load the modules and crate library 
 use std::cmp;
 use std::collections::HashMap; 
 use std::mem::swap;
@@ -10,13 +11,14 @@ use crossbeam;
 use num_cpus; 
 use crate::binders::binderCUDA; 
 
-/// GIRL: Genomic intermediate representation language (GIRL)
+/// GIRL: Genomic intermediate representation language (GIRL) which us derived from sequence intermediate representation (SIR)
 /// a generic representation for sequence editing tasks, it is composite of 
 /// 1- a vector of tasks, see(Tasks for more details)
 /// 2- an hashmap containing the bodundires of the resulting hashmap array 
 /// 3- alt_stream: a vector of chars containing alterations, i.e. mutated amino acids 
 /// 4- ref_stream: a vector of chars containing the reference stream
 /// 5- res_array: a vector of chars containing the resulting arrays
+/// the struct derives the Debug and the clone traits 
 #[derive(Debug,Clone)]
 pub struct GIR
 {
@@ -28,33 +30,136 @@ pub struct GIR
 }
 impl GIR
 {
-    /// create a new instance using the main 5 units needed for representation 
+    /// ## Summary 
+    /// Create a new instance using the main 5 units needed for representation 
+    /// ## Examples 
+    /// ```rust
+    /// // let's load the need modules first 
+    /// use ppgg_rust::data_structures::internal_representation::task; 
+    /// use std::collections::HashMap; 
+    /// // let's define some place holders for a task 
+    /// let g_rep:Vec<Task>=Vec::new(); 
+    /// let annotation:HashMap<String,(usize,usize)>=HashMap::new(); 
+    /// let alt_stream:Vec<char>=Vec::new(); 
+    /// let ref_stream:Vec<char>=Vec::new(); 
+    /// let res_array:Vec<char> =Vec::new(); 
+    /// let res=GIR::new(g_rep, annotation, alt_stream, ref_stream, res_array); 
+    /// println!("The generated GIRL is: {:#?}",res);
+    ///```
     pub fn new(g_rep:Vec<Task>, annotation:HashMap<String,(usize,usize)>, 
             alt_stream:Vec<char>, ref_stream:Vec<char>, res_array:Vec<char> )->Self
     {
         GIR{g_rep,annotation,alt_stream,ref_stream,res_array}
     }
-    /// return a reference to the instance vector of tasks 
-    pub fn get_taks(&self)->&Vec<Task>
+    /// ## Summary
+    /// Return a reference to the instance vector of tasks
+    /// ## Examples 
+    /// ```rust
+    /// // let's load the need modules first 
+    /// use ppgg_rust::data_structures::internal_representation::task; 
+    /// use std::collections::HashMap; 
+    /// // let's define some place holders for a task 
+    /// let g_rep:Vec<Task>=Vec::new(); 
+    /// let annotation:HashMap<String,(usize,usize)>=HashMap::new(); 
+    /// let alt_stream:Vec<char>=Vec::new(); 
+    /// let ref_stream:Vec<char>=Vec::new(); 
+    /// let res_array:Vec<char> =Vec::new(); 
+    /// let res=GIR::new(g_rep, annotation, alt_stream, ref_stream, res_array); 
+    /// // return a reference to the instance vector of tasks 
+    /// let task = res.get_tasks();
+    /// println!("The instance's tasks are: {:?}",task);
+    ///´´´
+    pub fn get_tasks(&self)->&Vec<Task>
     {
         &self.g_rep
     }
-    /// consume the instance and return move its vector of tasks to the caller  
+    /// ## Summary 
+    /// Consume the instance and move its vector of tasks to the caller  
+    /// ## Examples 
+    /// ```rust
+    /// // let's load the need modules first 
+    /// use ppgg_rust::data_structures::internal_representation::task; 
+    /// use std::collections::HashMap; 
+    /// // let's define some place holders for a task 
+    /// let g_rep:Vec<Task>=Vec::new(); 
+    /// let annotation:HashMap<String,(usize,usize)>=HashMap::new(); 
+    /// let alt_stream:Vec<char>=Vec::new(); 
+    /// let ref_stream:Vec<char>=Vec::new(); 
+    /// let res_array:Vec<char> =Vec::new(); 
+    /// let res=GIR::new(g_rep, annotation, alt_stream, ref_stream, res_array); 
+    /// // return a reference to the instance vector of tasks 
+    /// let task = res.consume_and_get_tasks();
+    /// println!("The instance's tasks are: {:?}",task);
+    /// //println!("This line will cause an error if printed as res has been consumed: {:#?}",res);
+    ///´´´
     pub fn consume_and_get_tasks(self)->Vec<Task>
     {
         self.g_rep
     }
-    /// consume the instance and return its compoanant as a tuple of elements  
+    /// ## Summary 
+    /// Consume the instance and return its component as a tuple of elements  
+    /// ## Examples 
+    /// ```rust
+    /// // let's load the need modules first 
+    /// use ppgg_rust::data_structures::internal_representation::task; 
+    /// use std::collections::HashMap; 
+    /// // let's define some place holders for a task 
+    /// let g_rep:Vec<Task>=Vec::new(); 
+    /// let annotation:HashMap<String,(usize,usize)>=HashMap::new(); 
+    /// let alt_stream:Vec<char>=Vec::new(); 
+    /// let ref_stream:Vec<char>=Vec::new(); 
+    /// let res_array:Vec<char> =Vec::new(); 
+    /// let res=GIR::new(g_rep, annotation, alt_stream, ref_stream, res_array); 
+    /// // return a reference to the instance vector of tasks 
+    /// let task = res.consume_and_get_tasks();
+    /// println!("The instance's tasks are: {:?}",task);
+    /// //println!("This line will cause an error if printed as res has been consumed: {:#?}",res);
     pub fn consumer_and_get_resources(self)->(Vec<Task>,HashMap<String,(usize,usize)>,Vec<char>,Vec<char>,Vec<char>)
     {
         (self.g_rep,self.annotation,self.alt_stream,self.ref_stream,self.res_array)
     }
-    /// return a hash map containing the annotations associated in the reference array  
+    /// ## Summary 
+    /// Return a hash map containing the annotations associated in the reference array 
+    /// ## Examples 
+    /// ```rust
+    /// // let's load the need modules first 
+    /// use ppgg_rust::data_structures::internal_representation::task; 
+    /// use std::collections::HashMap; 
+    /// // let's define some place holders for a task 
+    /// let g_rep:Vec<Task>=Vec::new(); 
+    /// let annotation:HashMap<String,(usize,usize)>=HashMap::new(); 
+    /// let alt_stream:Vec<char>=Vec::new(); 
+    /// let ref_stream:Vec<char>=Vec::new(); 
+    /// let res_array:Vec<char> =Vec::new(); 
+    /// let res=GIR::new(g_rep, annotation, alt_stream, ref_stream, res_array); 
+    /// // return a reference to the instance vector of tasks 
+    /// let annotations = res.get_annotation();
+    /// println!("The instance's annotation is: {:?}",annotations);
+    ///```
     pub fn get_annotation(&self)->&HashMap<String,(usize,usize)>
     {
         &self.annotation
     }
-    /// return the max index in the tasks vector 
+    /// ## Summary 
+    /// Return the max index in the tasks vector
+    /// ## Examples 
+    /// ```rust
+    /// // let's load the need modules first 
+    /// use ppgg_rust::data_structures::internal_representation::task; 
+    /// use std::collections::HashMap; 
+    /// // let's define some place holders for a task 
+    /// let g_rep:Vec<Task>=Vec::new(); 
+    /// let annotation=HashMap::new(); 
+    /// // let's add some annotations to the code 
+    /// annotations.insert("Sequence_1".to_string(), (0 as usize,25 as usize));
+    /// annotations.insert("Sequence_2".to_string(), (25 as usize, 50 as usize))
+    /// let alt_stream:Vec<char>=Vec::new(); 
+    /// let ref_stream:Vec<char>=Vec::new(); 
+    /// let res_array:Vec<char> =Vec::new(); 
+    /// let res=GIR::new(g_rep, annotation, alt_stream, ref_stream, res_array); 
+    /// // return a reference to the instance vector of tasks 
+    /// assert_eq!(res.get_results_max(),50 as usize);
+    ///``` 
     pub fn get_results_max(&self)->usize
     {
         let mut max_length=0; 
@@ -67,10 +172,37 @@ impl GIR
         }
         max_length
     }
+    /// ## Summary 
     /// execute and consume the representation to return a vector of chars containing the edited sequences 
     /// along with a hashmap containing index of features in the results vector 
+    /// ## Example 
+    /// ```rust
+    /// // let's load the need modules first 
+    /// use ppgg_rust::data_structures::internal_representation::{task,engines}; 
+    /// use std::collections::HashMap;
+    /// // let's define some dummy example data
+    /// let g_rep=Vec::new(); 
+    /// let g_rep.push(task::Task::new(0/* execution_code is zero, i.e. reference stream */,
+    ///                 0 /* start copying from position 0 */,
+    ///                 4 /* copies 4 amino acids*/, 
+    ///                 0 /* insert at position 0 in the reference array */)); 
+    /// let g_rep.push(task::Task::new(1 /* execution_code is 1, i.e. alternative stream */,
+    ///                 0 /* start copying from position 0 */,
+    ///                 1 /* copies 1 amino acids*/, 
+    ///                 4 /* insert at position 0 in the reference array */)); 
+    /// let annotation=HashMap::new(); 
+    /// annotation.insert("Seq_1".to_string(),(0 as usize,5 as usize)); 
+    /// let alt_stream=vec!['G']; 
+    /// let ref_stream=vec!['T','E','S','T']; 
+    /// let res_array:Vec<char> =Vec::with_capacity(5); 
+    /// let res=GIR::new(g_rep, annotation, alt_stream, ref_stream, res_array); 
+    /// // execute the GIR with a single threaded engine 
+    /// let (res_char_array, res_hashmap)=res.execute(engines::Engine::from_str("st")); 
+    /// println!("Results array: {:#?}",res_char_array); 
+    /// println!("Result hashmap is: {:#?}", res_hashmap);
+    ///``` 
     pub fn execute(mut self, engine:Engine)->(Vec<char>,HashMap<String,(usize,usize)>)
-    {
+    {        
         match engine 
         {
             Engine::ST | Engine::MT =>
@@ -112,8 +244,48 @@ impl GIR
                 (res_array, annotation)
             }
         }
-    }
-
+    }   
+    /// ## Summary  ,ref_array,alt_array,annotation)
+    /// Consume the instance and return the following arrays:
+    /// 1. A vector of usize containing the execution code 
+    /// 2. A vector of usize containing the start positions in reference
+    /// 3. A vector of usize containing the length of each instruction  
+    /// 4. A char array containing the results array
+    /// 5. A char array containing the reference array 
+    /// 6. A char array containing the alternative array 
+    /// 7. A hashmap array containing a map between a string and a tuple of two usize integers 
+    /// ## Example 
+    /// ```rust
+    /// // let's load the need modules first 
+    /// use ppgg_rust::data_structures::internal_representation::{task,engines}; 
+    /// use std::collections::HashMap;
+    /// // let's define some dummy example data
+    /// let g_rep=Vec::new(); 
+    /// let g_rep.push(task::Task::new(0/* execution_code is zero, i.e. reference stream */,
+    ///                 0 /* start copying from position 0 */,
+    ///                 4 /* copies 4 amino acids*/, 
+    ///                 0 /* insert at position 0 in the reference array */)); 
+    /// let g_rep.push(task::Task::new(1 /* execution_code is 1, i.e. alternative stream */,
+    ///                 0 /* start copying from position 0 */,
+    ///                 1 /* copies 1 amino acids*/, 
+    ///                 4 /* insert at position 0 in the reference array */)); 
+    /// let annotation=HashMap::new(); 
+    /// annotation.insert("Seq_1".to_string(),(0 as usize,5 as usize)); 
+    /// let alt_stream=vec!['G']; 
+    /// let ref_stream=vec!['T','E','S','T']; 
+    /// let res_array:Vec<char> =Vec::with_capacity(5); 
+    /// let res=GIR::new(g_rep, annotation, alt_stream, ref_stream, res_array); 
+    /// // execute the GIR with a single threaded engine 
+    /// let (exec_code,start_pos,length,start_pos_res,res_array,ref_array,alt_array,annotation)=res.consume_and_produce_produce_content(); 
+    /// println!("The execution code is {:#?}",exec_code); 
+    /// println!("The execution code is {:#?}",start_pos);
+    /// println!("The length is {:#?}",length); 
+    /// println!("The start position in results is {:#?}",start_pos_res);  
+    /// println!("The results array is {:#?}",res_array);  
+    /// println!("The reference array is {:#?}",ref_array);  
+    /// println!("The alternative array is {:#?}",alt_array);  
+    /// println!("The annotation map is {:#?}",annotation);  
+    ///``` 
     fn consume_and_produce_produce_content(mut self)->(Vec<usize>,Vec<usize>,Vec<usize>, 
         Vec<usize>, Vec<char>, Vec<char>, Vec<char>, HashMap<String,(usize,usize)>)
     {
@@ -131,26 +303,4 @@ impl GIR
         let ( res_array,  ref_array,  alt_array, annotation)=(self.res_array, self.ref_stream, self.alt_stream, self.annotation); 
         (exec_code,start_pos,length,start_pos_res,res_array,ref_array,alt_array,annotation)
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

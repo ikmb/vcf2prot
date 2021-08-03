@@ -1,5 +1,5 @@
 use libc::{c_int, size_t};
-
+/// A wrapper for C-linker and the executioner of the CUDA kernel  
 extern "C" 
 {
     pub fn kernel_wrapper(res_array:*mut u8, ref_stream: *const u8, alt_stream: *const u8, 

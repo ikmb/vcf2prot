@@ -96,7 +96,14 @@ pub fn get_unique_transcript(vec_mut:&Vec<String>)->Vec<String>
 {
     let mut uniuqe_muts=vec_mut
                                 .iter()
-                                .map(|field|text_parser::split_csq_string(field).unwrap()[1].clone())
+                                .filter_map(|field|
+                                    {
+                                        match text_parser::split_csq_string(field)
+                                        {
+                                            Ok(res)=>Some(res[1].clone()),
+                                            Err(err)=>None,
+                                        }
+                                    })
                                 .collect::<Vec<String>>(); 
     uniuqe_muts.sort(); 
     uniuqe_muts.dedup(); 

@@ -58,6 +58,8 @@ impl PersonalizedGenome
         }
         Ok(())
     }
+    /// ## Summary
+    /// create a new summary from a proband instruction, a reference proteome and an execution engine 
     pub fn from_proband_instruction(mut proband_instruction:ProbandInstruction, engine:Engine, ref_seq:&HashMap<String,String>)->Self
     {
         let proband_name=proband_instruction.proband_name; 

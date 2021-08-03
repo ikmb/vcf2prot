@@ -12,12 +12,14 @@ pub struct Task
 }
 impl Task 
 {
+    /// ## Summary 
     /// Construct a new task 
     pub fn new(exe_code:u8, start_pos:usize,length:usize,
         start_pos_res:usize )->Self
     {
         Task{exe_code,start_pos,length,start_pos_res}
     }
+    /// ## Summary
     /// Execute the task of the two input streams ans the resulting vector of chars 
     /// ## Example  
     ///```     
@@ -48,27 +50,39 @@ impl Task
         {
             results_tape[self.start_pos_res..end_bound_res].clone_from_slice(&alt_tape[self.start_pos..end_bound_stream]); 
         }
-    }    
+    }
+    /// ## Summary
+    /// get a mutable reference to the start position 
     pub fn get_mut_start_pos(&mut self)->&mut usize
     {
         &mut self.start_pos
     }
+    /// ## Summary
+    /// get a mutable reference to the instance's length 
     pub fn get_mut_length(&mut self)->&mut usize
     {
         &mut self.length
     }
+    /// ## Summary
+    ///  return the instance's length 
     pub fn get_length(&self)->usize
     {
         self.length
     }
+    /// ## Summary
+    ///  return the instance's start pos in the results array 
     pub fn get_start_pos_res(&self)->usize
     {
         self.start_pos_res
     }
+    /// ## Summary
+    ///  return a mutable reference to the start position in the results array 
     pub fn get_mut_start_pos_res(&mut self)->&mut usize
     {
         &mut self.start_pos_res
     }
+    /// ## Summary
+    ///  return the execution stream 
     pub fn get_execution_stream(&self)->&u8
     {
         &self.exe_code
