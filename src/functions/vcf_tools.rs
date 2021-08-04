@@ -1,26 +1,43 @@
-use crate::data_structures::{Map::{EarlyMap, IntMap}, vcf_ds::{AltTranscript, Probands, VCFRecords}}; 
+use crate::data_structures::{InternalRep::engines::Engine, Map::{EarlyMap, IntMap}, vcf_ds::{AltTranscript, Probands, VCFRecords}}; 
 use crate::functions::text_parser; 
 use rayon::prelude::*;
 
 
+/// ## Summary 
 /// create a vector of early maps on parallele using probands name and a mutable a collection 
 /// of VCF records 
-pub fn get_early_map(probands:Probands, mut records:VCFRecords)->Vec<EarlyMap>
+pub fn get_early_map(probands:Probands, mut records:VCFRecords, engine:Engine)->Vec<EarlyMap>
 {
     // the consequence vector per patient 
-    let mutation_per_proband=records.get_csq_per_patient(probands.get_num_probands()); 
+    let mutation_per_proband=records.get_csq_per_patient(probands.get_num_probands(),engine.clone()); 
+
     (probands.get_probands(),mutation_per_proband).into_par_iter()
     .map(|(proband,(vec_mut_one,vec_mut_two))|{
         EarlyMap::new(proband,vec_mut_one,vec_mut_two)})
     .collect::<Vec<EarlyMap>>()
 }
+/// ## Summary 
 /// Process a collection of early maps to a collection of Intermediate maps on Parallel.
-pub fn early_to_intermediate_repr(mut vec_of_early_maps:Vec<EarlyMap>)->Vec<IntMap>
+pub fn early_to_intermediate_repr(mut vec_of_early_maps:Vec<EarlyMap>,engine:Engine)->Vec<IntMap>
 {
-    vec_of_early_maps.par_iter_mut()
+    match engine 
+    {
+        Engine::ST=>
+        {
+            vec_of_early_maps.iter_mut()
                     .map(|early_map| build_int_map_from_early(early_map))
                     .collect::<Vec<IntMap>>()
+        },
+        Engine::MT | Engine::GPU =>
+        {
+            vec_of_early_maps.par_iter_mut()
+                    .map(|early_map| build_int_map_from_early(early_map))
+                    .collect::<Vec<IntMap>>()
+        }
+    }
+    
 }
+/// ## Summary 
 /// Build an intermediate map instance, IntMap from an early map instance 
 pub fn build_int_map_from_early(early_map:&EarlyMap)->IntMap
 {
@@ -31,6 +48,7 @@ pub fn build_int_map_from_early(early_map:&EarlyMap)->IntMap
     let alt_transcripts2=group_muts_per_transcript(mutations2); 
     IntMap::new(early_map.get_proband_name().clone(),alt_transcripts1,alt_transcripts2)
 }
+/// ## Summary 
 /// Group all mutations in each transcript to a vector of AltTranscript, where each element in the generated transcript
 /// contain all the mutations observed in a single transcript.
 /// ## Example
@@ -75,7 +93,9 @@ pub fn group_muts_per_transcript(vec_mut:&Vec<String>)->Vec<AltTranscript>
     }
     res
 }
+/// ## Summary 
 /// Extract the set of uniuqe transcripts in a collection of mutations 
+/// ##Example 
 ///```
 /// use ppgg_rust::functions::vcf_tools::get_unique_transcript; 
 /// let mutations=vec!["*missense|MAD1L1|Transcript1|protein_coding|-|1R>1H|1936821C>T".to_string(),

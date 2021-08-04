@@ -21,16 +21,22 @@ pub struct TranscriptInstruction
 }
 impl TranscriptInstruction
 {
-    /// create a new instruction from a transcriptname and vector of instruction containing the mutation in the transcript and the reference length
+    /// ## Summary 
+    /// Create a new instruction from a transcript name and vector of instruction containing 
+    /// the mutation in the transcript and the reference length
     pub fn new(transcript_name:String, ref_len:usize, instructions:Vec<instruction::Instruction>)->Self
     {
         TranscriptInstruction{transcript_name,ref_len,instructions}
     }
-    pub fn emtpy_t_instruction()->Self
+    /// ## Summary 
+    /// Create a new instruction from a transcript name and vector of instruction containing 
+    /// the mutation in the transcript and the reference length
+    pub fn empty_t_instruction()->Self
     {
         let ins_vec:Vec<instruction::Instruction>=Vec::new(); 
         TranscriptInstruction{transcript_name:"".to_string(),ref_len:1,instructions:ins_vec}
     }
+    /// ## Summary 
     /// Create a new instance from the alt-Transcript instance along with a reference hashmap 
     /// of sequence names 
     pub fn from_alt_transcript(mut alt_transcript:vcf_ds::AltTranscript, ref_seqs:&HashMap<String,String>)->Result<Self,String>
@@ -58,21 +64,25 @@ impl TranscriptInstruction
         }
         Ok(TranscriptInstruction::new(transcript_name,ref_len,instructions))
     }
-    /// return the number of instruction in the transcript 
+    /// ## Summary 
+    /// Return the number of instruction in the transcript 
     pub fn get_num_instructions(&self)->usize
     {
         self.instructions.len()
     }
-    /// return the transcript name 
+    /// ## Summary 
+    /// Return the transcript name 
     pub fn get_transcript_name(&self)->&String
     {
         &self.transcript_name
     }
-    /// return a mutable reference to the instance vector of instructions 
+    /// ## Summary 
+    /// Return a mutable reference to the instance vector of instructions 
     pub fn get_mut_instruction(&mut self)->&mut Vec<Instruction>
     {
         &mut self.instructions
     }
+    /// ## Summary 
     /// Compute the size, i.e. the number of chars, in the alternative stream array 
     pub fn compute_alt_stream_size(&self)->usize
     {
@@ -286,8 +296,8 @@ impl TranscriptInstruction
             'G' => TranscriptInstruction::get_task_from_stop_gained(instruction, alt_stream, vec_tasks),
             'X' => TranscriptInstruction::get_task_from_s_stop_gained(instruction,alt_stream, vec_tasks),
             'L' => TranscriptInstruction::get_task_from_stop_lost(instruction, alt_stream, vec_tasks),
-            'I' => TranscriptInstruction::get_task_from_inframe_insersion(instruction, alt_stream, vec_tasks), 
-            'J' => TranscriptInstruction::get_task_from_inframe_insersion(instruction, alt_stream, vec_tasks), 
+            'I' => TranscriptInstruction::get_task_from_inframe_insertion(instruction, alt_stream, vec_tasks), 
+            'J' => TranscriptInstruction::get_task_from_inframe_insertion(instruction, alt_stream, vec_tasks), 
             'D' => TranscriptInstruction::get_task_from_inframe_deletion(instruction, alt_stream, vec_tasks),
             'C' => TranscriptInstruction::get_task_from_inframe_deletion(instruction, alt_stream, vec_tasks),
             'K' => TranscriptInstruction::get_task_from_frameshift(instruction,alt_stream, vec_tasks),
@@ -327,6 +337,8 @@ impl TranscriptInstruction
         };        
         Ok((ins_task,last_ins))   
     }
+    /// ## Summary 
+    /// add an instruction to copy the data until the next instruction in the vector of mutations
     fn add_till_next_ins(ins:&instruction::Instruction, instructions:&Vec<instruction::Instruction>, last_task:&Task)->Task
     {
         let position=instructions.iter().position(|inst_cmp|inst_cmp==ins).unwrap();
@@ -379,6 +391,9 @@ impl TranscriptInstruction
             }
         }
     }
+    /// ## Summary 
+    /// Add the last instruction, i.e. adds an instruction that describing copying from the last mutation instruction 
+    /// in the transcript until the end of the transcript 
     fn add_last_instruction(ref_seq:usize, instruction:&instruction::Instruction, pos_res_array:usize)->Task
     {
         match instruction.get_code()
@@ -393,6 +408,8 @@ impl TranscriptInstruction
             ref_seq-instruction.get_position_ref()-1 as usize, pos_res_array)
         }        
     }
+    /// ## Summary 
+    /// returns a Task from a missense mutation encoded as an instruction 
     fn get_task_from_missense(instruction:&instruction::Instruction, alt_stream:&mut Vec<char>,
         vec_tasks:&Vec<Task>)->Task
     {
@@ -406,6 +423,8 @@ impl TranscriptInstruction
         }; 
         Task::new(1, pos_altstream, 1,pos_result)
     }
+    /// ## Summary 
+    /// returns a Task from a frameshift mutation encoded as an instruction 
     fn get_task_from_frameshift(instruction:&instruction::Instruction, alt_stream:&mut Vec<char>,
         vec_tasks:&Vec<Task>)->Task
     {
@@ -420,16 +439,22 @@ impl TranscriptInstruction
         Task::new(1, pos_altstream, instruction.get_length(),pos_result)
 
     }
+    /// ## Summary 
+    /// returns a Task from a stop-gained mutation encoded as an instruction 
     fn get_task_from_stop_gained(_instruction:&instruction::Instruction, _alt_stream:&mut Vec<char>,
         _vec_tasks:&Vec<Task>)->Task
     {
         Task::new(2, 0, 0,0)
     }
+    /// ## Summary 
+    /// returns a Task from an *stop-gained mutation encoded as an instruction 
     fn get_task_from_s_stop_gained(_instruction:&instruction::Instruction, _alt_stream:&mut Vec<char>,
         _vec_tasks:&Vec<Task>)->Task
     {
         Task::new(2, 0, 0,0)
     }
+    /// ## Summary 
+    /// returns a Task from a stop_lost mutation encoded as an instruction 
     fn get_task_from_stop_lost(instruction:&instruction::Instruction, alt_stream:&mut Vec<char>,
         vec_tasks:&Vec<Task>)->Task
     {
@@ -443,6 +468,8 @@ impl TranscriptInstruction
         alt_stream.extend(instruction.get_data().iter());
         Task::new(1, pos_altstream, instruction.get_data().len(),pos_result)
     }
+    /// ## Summary 
+    /// Build the base instruction for a transcript where the reference is copied until the first instruction 
     fn build_base_instruction(instruction:&instruction::Instruction)->Task
     {
         match instruction.get_code()
@@ -451,7 +478,9 @@ impl TranscriptInstruction
             _=> Task::new(0, 0, instruction.get_position_ref(), 0)
         }
     }
-    fn get_task_from_inframe_insersion(instruction:&instruction::Instruction, alt_stream:&mut Vec<char>,
+    /// ## Summary 
+    /// Returns a Task from an inframe_insertion mutation encoded as an instruction 
+    fn get_task_from_inframe_insertion(instruction:&instruction::Instruction, alt_stream:&mut Vec<char>,
         vec_tasks:&Vec<Task>)->Task
     {
         let pos_altstream= alt_stream.len(); 
@@ -460,6 +489,8 @@ impl TranscriptInstruction
         alt_stream.extend(instruction.get_data().iter());
         Task::new(1, pos_altstream, instruction.get_length(),pos_result)
     }
+    /// ## Summary 
+    /// Returns a Task from an inframe_deletion mutation encoded as an instruction 
     fn get_task_from_inframe_deletion(instruction:&instruction::Instruction, alt_stream:&mut Vec<char>,
         vec_tasks:&Vec<Task>)->Task
     {
@@ -469,6 +500,8 @@ impl TranscriptInstruction
         alt_stream.extend(instruction.get_data().iter());
         Task::new(1, pos_altstream,  instruction.get_data().len(),pos_result)
     }
+    /// ## Summary 
+    /// Returns a Task from a 2 instruction, see the instruction module for more details   
     fn get_task_from_instruction_2(instruction:&instruction::Instruction, alt_stream:&mut Vec<char>,
         vec_tasks:&Vec<Task>)->Task
     {
@@ -478,6 +511,8 @@ impl TranscriptInstruction
         alt_stream.extend(instruction.get_data().iter());
         Task::new(1, pos_altstream, instruction.get_length(),pos_result)
     }
+    /// ## Summary 
+    /// Returns a Task from a 3 instruction, see the instruction module for more details 
     fn get_task_from_instruction_3(instruction:&instruction::Instruction, alt_stream:&mut Vec<char>,
         vec_tasks:&Vec<Task>)->Task
     {

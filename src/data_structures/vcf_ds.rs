@@ -5,9 +5,10 @@ use crate::functions::text_parser;
 use crate::data_structures::{MaskDecoder::BitMask,
                             mutation_ds::Mutation
                             };
-
-use super::Constants; 
+use super::Constants;
+use super::InternalRep::engines::Engine; 
 use serde::{Deserialize, Serialize};
+use crossbeam::thread; 
 /// An abstraction for a collection of VCF Records, the struct owns the provided vector of strings,
 /// where each string is a record from the file.
 #[derive(Debug,Clone)]
@@ -64,12 +65,25 @@ impl VCFRecords
     /// let vcf_records=VCFRecords::new(records);
     /// assert_eq!(results,vcf_records.get_consequences_vector());
     ///```
-    pub fn get_consequences_vector(&self)->Vec<String>
+    pub fn get_consequences_vector(&self,engine:Engine)->Vec<String>
     {
-        self.records.par_iter()
+        match engine
+        {
+            Engine::ST=>
+            {
+                self.records.iter()
                     .map(|rec|rec.split("\t").collect::<Vec<&str>>()[7])
                     .map(|rec| rec.split("BCSQ=").collect::<Vec<&str>>()[1].to_string())
                     .collect::<Vec<String>>()
+            },
+            Engine::MT | Engine::GPU =>
+            {
+                self.records.par_iter()
+                    .map(|rec|rec.split("\t").collect::<Vec<&str>>()[7])
+                    .map(|rec| rec.split("BCSQ=").collect::<Vec<&str>>()[1].to_string())
+                    .collect::<Vec<String>>()
+            }
+        }
     }
     /// Returns a 2D Matrix that is implemented as a vector of vector of strings, where all the mutations observed in a patient is 
     /// collected into one vector, i.e. the inner vector, the outer vector represent the collection of all mutations.
@@ -105,68 +119,179 @@ impl VCFRecords
     /// assert_eq!(test_result4,vcf_records.get_patient_fields(8)[3]);
     /// assert_eq!(test_result5,vcf_records.get_patient_fields(8)[4]);
     ///```
-    pub fn get_patient_fields(&mut self, num_probands:usize)->Vec<Vec<String>>
+    /// ## Notes
+    /// This function is computational intensive, it ran in two modes:
+    /// first single thread model where work is executed sequentially and a multi-threaded mode
+    /// where work is split or distributed among thread, each thread work on a chunk of the array 
+    /// finally results are concatenated and returned. 
+    pub fn get_patient_fields(&mut self, num_probands:usize,engine:Engine)->Vec<Vec<String>>
     {
         let number_probands=&self.records[0].matches('\t').count()-8;
         let mut res:Vec<Vec<String>>=Vec::with_capacity(number_probands);
         for _ in 0..num_probands
         {
             res.push(Vec::with_capacity(self.records.len())); 
-        }        
-        for record in self.records.iter_mut()
+        }
+        match engine
         {
-            // parse records  
-            let mut fields=record
-                            .split("\t")
-                            .map(|field|field.to_string())
-                            .collect::<Vec<String>>();
-            let fields = fields.drain(9..).collect::<Vec<String>>();
-            //println!("fields are: {:#?}",fields);
-            //println!("Index is: {}, While number of proband is: {}",fields.len(),num_probands); 
-            // push to all vectors on parallele 
-            for idx in 0..fields.len()
+            Engine::ST => 
             {
-                res[idx].push(fields[idx].clone())
+                for record in &self.records
+                {
+                    // split records by \t  
+                    let mut fields=record.split('\t').collect::<Vec<_>>();
+                    // drain the first 8-element in a vector 
+                    fields.drain(0..9);
+                    // add the fields to each patient in the vector of patients 
+                    for idx in 0..fields.len()
+                    {
+                        res[idx].push(fields[idx].to_string())
+                    }
+                }
+                res
+            },
+            Engine::GPU | Engine::MT =>
+            {
+                let number_probands=&self.records[0].matches('\t').count()-8;
+                let chunk_size= self.records.len()/num_cpus::get(); 
+                let temp_res=self.records.chunks(chunk_size)
+                .map(|load|
+                {
+                    let mut res:Vec<Vec<String>>=Vec::with_capacity(number_probands);
+                    for _ in 0..num_probands
+                    {
+                        res.push(Vec::with_capacity(self.records.len())); 
+                    }
+                    for record in load
+                    {
+                        // split records by \t  
+                        let mut fields=record.split('\t').collect::<Vec<_>>();
+                        // drain the first 8-element in a vector 
+                        fields.drain(0..9);
+                        // add the fields to each patient in the vector of patients 
+                        for idx in 0..fields.len()
+                        {
+                            res[idx].push(fields[idx].to_string())
+                        }
+                    }
+                    res
+                })
+                .collect::<Vec<_>>();
+                for vec in temp_res
+                {
+                    let mut idx=0; 
+                    for pat_vec in vec
+                    {
+                        res[idx].extend(pat_vec);   
+                        idx+=1; 
+                    }
+                }
+                res
+            }
+        }        
+    }
+
+    pub fn get_csq_per_patient(&mut self,num_probands:usize,engine:Engine)->Vec<(Vec<String>,Vec<String>)>
+    {
+        let consequences=self.get_consequences_vector(engine.clone()); 
+        let probands_table=self.get_patient_fields(num_probands,engine.clone());
+        // we need to get the consequences of each vector 
+        match engine
+        {
+            Engine::ST =>
+            {
+                probands_table.iter()
+                .map(|donor|VCFRecords::decode_back(&consequences,donor, engine.clone()))
+                .collect::<Vec<(Vec<String>,Vec<String>)>>()   
+            },
+            Engine::MT | Engine::GPU =>
+            {
+                probands_table.par_iter()
+                .map(|donor|VCFRecords::decode_back(&consequences,donor,engine.clone()))
+                .collect::<Vec<(Vec<String>,Vec<String>)>>()   
             }
         }
-        res
     }
 
-    pub fn get_csq_per_patient(&mut self,num_probands:usize)->Vec<(Vec<String>,Vec<String>)>
-    {
-        let consequences=self.get_consequences_vector(); 
-        let probands_table=self.get_patient_fields(num_probands);
-        // we need to get the consequences of each vector 
-        probands_table.par_iter()
-        .map(|donor|VCFRecords::decode_back(&consequences,donor))
-        .collect::<Vec<(Vec<String>,Vec<String>)>>()   
-    }
-
-    pub fn decode_back(consequences:&Vec<String>,proband_fields:&Vec<String>)->(Vec<String>,Vec<String>)
+    pub fn decode_back(consequences:&Vec<String>,proband_fields:&Vec<String>,engine:Engine)->(Vec<String>,Vec<String>)
     {
         // get index of each conseuqences 
-        let mut bitmasks=proband_fields
-                            .par_iter()// now only for amoment 
+        let mut bitmasks= match engine 
+        {
+            Engine::ST=>
+            {
+                proband_fields
+                            .iter()
                             .map(|field| text_parser::get_bit_mask(field))
-                            .collect::<Vec<String>>();
+                            .collect::<Vec<String>>()
+            },
+            Engine::MT | Engine::GPU =>
+            {
+                proband_fields
+                            .par_iter()
+                            .map(|field| text_parser::get_bit_mask(field))
+                            .collect::<Vec<String>>()
+            }
+        };
         // get a vector of tuples at each position 
-        let results=(consequences,&mut bitmasks)
+        let results = match engine
+        {
+            Engine::ST => 
+            {
+                consequences.iter()
+                            .zip(bitmasks.iter_mut()) 
+                            .map(|(csq,bitmask)|VCFRecords::extract_effects(&csq,bitmask))
+                            .filter(|(elem1,elem2)|elem1.len()!=0 || elem2.len()!=0)
+                            .collect::<Vec<(Vec<String>,Vec<String>)>>()
+            },
+            Engine::MT | Engine::GPU =>
+            {
+                (consequences,&mut bitmasks)
                             .into_par_iter()
                             .map(|(csq,bitmask)|VCFRecords::extract_effects(&csq,bitmask))
                             .filter(|(elem1,elem2)|elem1.len()!=0 || elem2.len()!=0)
-                            .collect::<Vec<(Vec<String>,Vec<String>)>>(); 
-        
+                            .collect::<Vec<(Vec<String>,Vec<String>)>>()
+            }
+        };        
         // unroll the mutation into two vectors one for the first haplotype and one for the second 
-        let tuple_1_res=results.par_iter()
-                                                            .map(|elem|elem.0.clone())
-                                                            .flatten()
-                                                            .filter(|csq|Constants::SUP_TYPE.contains(&text_parser::get_type(csq)))
-                                                            .collect::<Vec<String>>();
-        let tuple_2_res=results.par_iter()
-                                                            .map(|elem|elem.1.clone())
-                                                            .flatten()
-                                                            .filter(|csq|Constants::SUP_TYPE.contains(&text_parser::get_type(csq)))
-                                                            .collect::<Vec<String>>(); 
+        let tuple_1_res=match engine 
+        {
+            Engine::ST=>
+            {
+                results.iter()
+                .map(|elem|elem.0.clone())
+                .flatten()
+                .filter(|csq|Constants::SUP_TYPE.contains(&text_parser::get_type(csq)))
+                .collect::<Vec<String>>()
+            },
+            Engine::MT | Engine::GPU =>
+            {
+                results.par_iter()
+                        .map(|elem|elem.0.clone())
+                        .flatten()
+                        .filter(|csq|Constants::SUP_TYPE.contains(&text_parser::get_type(csq)))
+                        .collect::<Vec<String>>()
+            }
+        }; 
+        let tuple_2_res=match engine 
+        {
+            Engine::ST=>
+            {
+                results.iter()
+                        .map(|elem|elem.1.clone())
+                        .flatten()
+                        .filter(|csq|Constants::SUP_TYPE.contains(&text_parser::get_type(csq)))
+                        .collect::<Vec<String>>()
+            },
+            Engine::MT | Engine::GPU =>
+            {
+                results.par_iter()
+                        .map(|elem|elem.1.clone())
+                        .flatten()
+                        .filter(|csq|Constants::SUP_TYPE.contains(&text_parser::get_type(csq)))
+                        .collect::<Vec<String>>()
+            }
+        };        
         (tuple_1_res,tuple_2_res)
     }
     /// A helper associated function that recieves as an input a CSQ string and a bit mask, results is: Tuple of size two, first element 

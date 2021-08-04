@@ -19,6 +19,7 @@ scoped_threadpool="0.1.6"
 num_cpus = "0.2"
 libc = "0.2.0"
 cc = "1.0"
+itertools="0.10.1"
 
 [build-dependencies]
 cc = "1.0"

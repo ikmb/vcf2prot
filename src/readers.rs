@@ -3,6 +3,7 @@ use std::fs;
 use rayon::prelude::*;
 use std::collections::HashMap; 
 use crate::data_structures::{vcf_ds,FastaFile,Constants}; 
+use crate::data_structures::InternalRep::engines::Engine;
 /// Building a VCF reader that reads an input VCF file and returns a results enums, 
 /// the Ok branch contains the probands name and the VCF records that contain the supported mutations
 /// while the Err branch contain an error string message.
@@ -17,16 +18,16 @@ use crate::data_structures::{vcf_ds,FastaFile,Constants};
 ///    Err(err_msg)=> panic!("Should not have failed!!, ".to_string())
 /// }; 
 ///``` 
-pub fn read_vcf(path2load:&Path)->Result<(vcf_ds::Probands,vcf_ds::VCFRecords),String>
+pub fn read_vcf(path2load:&Path, engine:Engine)->Result<(vcf_ds::Probands,vcf_ds::VCFRecords),String>
 {
     // Read the file
-    let mut lines= match vcf_helpers::read_file(path2load)
+    let mut lines= match vcf_helpers::read_file(path2load, engine.clone())
     {
         Ok(lines)=>lines,
         Err(err_msg)=>return Err(err_msg)
     };
     // Get the proband names  
-    let proband_names = match vcf_helpers::get_probands_names(&mut lines)
+    let proband_names = match vcf_helpers::get_probands_names(&mut lines, engine.clone())
     {
         Ok(lines)=>lines, 
         Err(err_msg)=>return Err(err_msg)
@@ -34,7 +35,7 @@ pub fn read_vcf(path2load:&Path)->Result<(vcf_ds::Probands,vcf_ds::VCFRecords),S
     // Remove the header file
     lines.retain(|line| !line.starts_with('#')); // remove all lines starting 
     // parse the records for QC
-    let records= match vcf_helpers::get_records(lines)
+    let records= match vcf_helpers::get_records(lines,engine.clone())
     {
         Ok(records)=>records,
         Err(err_msg)=>return Err(err_msg)
@@ -53,9 +54,9 @@ pub fn read_vcf(path2load:&Path)->Result<(vcf_ds::Probands,vcf_ds::VCFRecords),S
 /// assert_eq!(fasta_file.get_records().len(),3); 
 /// assert!(fasta_file.is_in_records(&"seq1".to_string()));
 ///``` 
-pub fn read_fasta_file(path2load:&Path)->Result<FastaFile::FastaFile,String>
+pub fn read_fasta_file(path2load:&Path,engine:Engine)->Result<FastaFile::FastaFile,String>
 {
-    let lines=match vcf_helpers::read_file(path2load)
+    let lines=match vcf_helpers::read_file(path2load,engine)
     {
         Ok(res)=>res,
         Err(err_msg)=>return Err(err_msg)
@@ -112,7 +113,7 @@ pub mod vcf_helpers
     ///     println!("{}",line)
     /// }
     ///``` 
-    pub fn read_file(path2load:&Path)->Result<Vec<String>, String>
+    pub fn read_file(path2load:&Path,engine:Engine)->Result<Vec<String>, String>
     {
         let file_string = match fs::read_to_string(&path2load) 
         {
@@ -127,7 +128,11 @@ pub mod vcf_helpers
         {
             return Err("\n Function: readers::vcf_helpers::read_file, the provided file is empty \n".to_string()); 
         }
-        Ok(file_string.lines().map(|line| line.to_owned()).collect::<Vec<String>>())
+        match engine
+        {
+            Engine::ST => Ok(file_string.lines().map(|line| line.to_owned()).collect::<Vec<String>>()),
+            Engine::MT | Engine::GPU => Ok(file_string.par_lines().map(|line| line.to_owned()).collect::<Vec<String>>())
+        }
     }
     /// Extract the probands name from the VCF file, return a vector of string contain the probands names
     /// ## Example 
@@ -139,7 +144,7 @@ pub mod vcf_helpers
     /// let res_vec=vcf_helpers::get_probands_names(&mut results).unwrap(); 
     /// for proband in res_vec.iter() {println!("{}",proband)} // print the probands name 
     ///``` 
-    pub fn get_probands_names(lines: &mut Vec<String>)->Result<Vec<String>,String>
+    pub fn get_probands_names(lines: &mut Vec<String>, engine:Engine)->Result<Vec<String>,String>
     {
         // extract the patient line  
         let results_line = match lines.iter_mut().find(|line | line.starts_with("#CHROM"))
@@ -157,8 +162,12 @@ pub mod vcf_helpers
         {
             results_line.pop();
         }
-        // split the lines using the \t seperator 
-        let mut res=results_line.split('\t').map(|field| field.to_string()).collect::<Vec<String>>();
+        // split the lines using the \t separator 
+        let mut res= match engine
+        {
+            Engine::ST=> results_line.split('\t').map(|field| field.to_string()).collect::<Vec<String>>(),
+            Engine::GPU | Engine::MT => results_line.par_split('\t').map(|field| field.to_string()).collect::<Vec<String>>()
+        };
         if res.len() <8
         {
             return Err(format!("The provided file does not contain the minimum number of columns, expected a minimum of 8, found: {}",res.len()));
@@ -168,17 +177,28 @@ pub mod vcf_helpers
         // check that there is at least one patient in the file 
         if res_clean.len()==0
         {
-            return Err("The file does not contain any patients!!, after removing the madatory ".to_string());
+            return Err("The file does not contain any patients!!, after removing the mandatory columns".to_string());
         }
         Ok(res_clean)
     }
-    // the wraper for the parallization using massage passing 
-    pub fn get_records(lines:Vec<String>)->Result<Vec<String>,String>
+    // the warper for the parallelization using massage passing 
+    pub fn get_records(lines:Vec<String>, engine:Engine)->Result<Vec<String>,String>
     {
-        let  res=lines.par_iter()
-                            .filter( |&line| return_if_supported(line))
-                            .map( |line| line.to_owned())
-                            .collect::<Vec<String>>(); 
+        let  res=match engine
+        {
+            Engine::ST=>
+            {
+                lines.into_iter()
+                            .filter( |line| return_if_supported(line))
+                            .collect::<Vec<String>>()   
+            },
+            Engine::MT | Engine::GPU => 
+            {
+                lines.into_par_iter()
+                            .filter( |line| return_if_supported(line))
+                            .collect::<Vec<String>>()
+            }
+        }; 
         if res.len()==0
         {
             return Err("Could not extract any records from the provided file!!".to_string());

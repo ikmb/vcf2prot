@@ -47,7 +47,7 @@ impl HaplotypeInstruction
                     match TranscriptInstruction::from_alt_transcript(alt_transcript, ref_seq)
                     {
                         Ok(res)=>res,
-                        Err(err_msg) => TranscriptInstruction::emtpy_t_instruction()
+                        Err(err_msg) => TranscriptInstruction::empty_t_instruction()
                     }
                 })
                 .filter(|elem| *elem.get_transcript_name() != "")
@@ -63,7 +63,7 @@ impl HaplotypeInstruction
                         match TranscriptInstruction::from_alt_transcript(alt_transcript, ref_seq)
                         {
                             Ok(res)=>res,
-                            Err(err_msg) => TranscriptInstruction::emtpy_t_instruction()
+                            Err(err_msg) => TranscriptInstruction::empty_t_instruction()
                         }
                     })
                     .filter(|elem| *elem.get_transcript_name() != "")

@@ -3,6 +3,11 @@ use super::vcf_ds::AltTranscript;
 use super::InternalRep::proband_instructions::ProbandInstruction;
 use serde::{Deserialize, Serialize};
 
+/// An abstraction for an intermediate representation map, i.e. an IntMap 
+/// an int map is composite of three components:
+/// 1. a proband name --> Which stores the name of the individuals 
+/// 2. mutations 1 --> Which is a vector of AltTranscript containing a collection of mutations per each transcript. 
+/// 3. mutations 2 --> which is a vector of AltTranscript containing a collection of mutations per each transcript. 
 #[derive(Debug,Clone,Serialize,Deserialize)]
 pub struct IntMap
 {
@@ -12,18 +17,29 @@ pub struct IntMap
 }
 impl IntMap
 {
+    /// ## Summary 
+    /// Create a new intMap 
     pub fn new(proband_name:String,mutations1:Vec<AltTranscript>,mutations2:Vec<AltTranscript>)->Self
     {
         IntMap{proband_name,mutations1,mutations2}
     }
+    /// ## Summary 
+    /// Returns a tuple of size two, the first contains a reference to the vector of alteration in the first haplotype  
+    /// the second contains a reference to the vector of alteration in the second haplotype  
     pub fn get_mutations_ref(&self)->(&Vec<AltTranscript>,&Vec<AltTranscript>)
     {
         (&self.mutations1,&self.mutations2)
     }
+    /// ## Summary 
+    /// Return a reference to the instance name 
     pub fn get_name(&self)->&String
     {
         &self.proband_name
     } 
+    /// ## Summary
+    /// Consume the reference and returns a tuple containing two vectors, the first is the vector of AltTranscript 
+    /// in the first haplotype and the second is the vector of alteration in the second haplotype, these vectors 
+    /// are moved from the current instance and hence the instance is invalid after this operation  
     pub fn consume_and_get_vecs(mut self)->(Vec<AltTranscript>,Vec<AltTranscript>)
     {
         (self.mutations1,self.mutations2)

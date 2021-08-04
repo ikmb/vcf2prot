@@ -1,7 +1,7 @@
 use crate::data_structures::Constants; 
 
-/// The Bitmask struct is a convient API for creating and handling bitmaks fields, used to index into the Consequences strings
-/// and extract the conseuqnece of the genomic alteration at a specific genomic location. 
+/// The Bitmask struct is an API for creating and handling bit-masks fields, used to index into the Consequences strings
+/// and extract the consequence of the genomic alteration at a specific genomic location. 
 ///
 #[derive(Debug,Clone)]
 pub struct BitMask
@@ -10,7 +10,7 @@ pub struct BitMask
 }
 impl BitMask
 {
-    /// Construct a new bitmask instance from a string containing the bitmask, the input string has been provided by the function
+    /// Construct a new bit-mask instance from a string containing the bit-mask, the input string has been provided by the function
     /// get_bit_mask defined at the functions::text_parser module  
     /// ## Example
     ///``` 
@@ -94,7 +94,6 @@ impl BitMask
     }
     fn parse_single_field(mut bitmask:u32)->(Vec<usize>,Vec<usize>)
     {
-        let debug_copy=bitmask.clone();
         let mut haplotype_one=Vec::with_capacity(16);
         let mut haplotype_two=Vec::with_capacity(16);
         let mut haplo1;
@@ -118,12 +117,10 @@ impl BitMask
             bitmask=bitmask>>2;
             index+=1; 
         }
-        //println!("Input is: {} and results is {:?},{:?}",debug_copy,haplotype_one,haplotype_two);
         (haplotype_one,haplotype_two)
     }
     fn parse_concat_values(bitmask_vec:&mut Vec<u32>)->(Vec<usize>,Vec<usize>)
     {
-        let debug_copy=bitmask_vec.clone(); 
         let mut haplotype_one=Vec::with_capacity(16*bitmask_vec.len());
         let mut haplotype_two=Vec::with_capacity(16*bitmask_vec.len());
         let mut haplo1;
@@ -152,7 +149,6 @@ impl BitMask
             }
             index_fields+=15; 
         }
-        //println!("Input is: {:?} and results is {:?},{:?}",debug_copy,haplotype_one,haplotype_two);
         (haplotype_one,haplotype_two)
     }
 }

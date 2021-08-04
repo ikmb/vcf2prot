@@ -9,6 +9,8 @@ use crossbeam::thread;
 
 // drive the public functions 
 //---------------------------
+/// ##Summary 
+/// A summary for the generated results. It contains three fields: 
 #[derive(Debug,Clone)]
 pub struct StatSummary
 {
@@ -16,6 +18,7 @@ pub struct StatSummary
     pub type_mutation_per_proband:HashMap<String,Vec<u64>>,
     pub number_of_mutations_per_transcript:HashMap<String,u64>,
 }
+/// ## Summary 
 /// The executioner for computing and generating a personalized proteome per patient 
 pub fn execute(vec_int_repr:Vec<IntMap>, exec_engine:Engine, ref_seq:&HashMap<String,String>)->Vec<PersonalizedGenome>
 {
@@ -37,6 +40,7 @@ pub fn execute(vec_int_repr:Vec<IntMap>, exec_engine:Engine, ref_seq:&HashMap<St
         }
     }
 }
+/// ## Summary 
 /// A function to compute the state from the vec_maps, it launches 3 threads to compute each metric on parallel
 pub fn compute_states(vec_maps:&Vec<IntMap>)->StatSummary
 {

@@ -9,13 +9,13 @@ fn main()
     {
         println!("Reading and loading the VCF file, starting time is: {}",Utc::now())
     }
-    let vec_int_repr=io::parse_vcf(Path::new(&args.path2vcf)).unwrap();
+    let vec_int_repr=io::parse_vcf(Path::new(&args.path2vcf),args.engine.clone()).unwrap();
     if args.is_verbose
     {
         println!("VCF file have been parsed and encoded into a vector of intermediate representations, finished at: {}",Utc::now()); 
         println!("Loading the Reference file, starting time is: {}",Utc::now()); 
     }
-    let ref_seq=io::read_fasta(Path::new(&args.path2fasta)); 
+    let ref_seq=io::read_fasta(Path::new(&args.path2fasta),args.engine.clone()); 
     if args.write_i_map
     {
         println!("Writing the intermediate representation map, starting at: {}", Utc::now());

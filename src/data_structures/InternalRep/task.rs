@@ -87,20 +87,28 @@ impl Task
     {
         &self.exe_code
     }
+    /// ## Summary
+    ///  return the execution stream 
     #[inline]
     pub fn get_stream(&self)->u8
     {
         self.exe_code
     }
+    /// ## Summary
+    ///  return the start position in the input stream 
     #[inline]
     pub fn get_start_pos(self)->usize
     {
         self.start_pos
     }
+    /// ## Summary
+    ///  shirt, i.e. change the start position in the stream 
     pub fn shift_start_pos_stream(&mut self, num:&usize)
     {
         self.start_pos+=*num; 
     }
+    /// ## Summary
+    ///  shirt, i.e. change the start position in the result array  
     pub fn shift_start_pos_res(&mut self, num:&usize)
     {
         self.start_pos_res+=*num; 

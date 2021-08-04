@@ -5,21 +5,24 @@ use crate::data_structures::Map;
 use crate::data_structures::mutation_ds::MutationType; 
 use std::str::FromStr;
 
-///
+/// ## Summary
+/// Compute the mutational load per patient from an input vector of intermediate representation 
 pub fn compute_number_mutation_per_proband(vec_intmaps:&Vec<Map::IntMap>)->HashMap<String,u64>
 {
     vec_intmaps.par_iter()
     .map(|int_map|stat_helper::number_mutations_per_proband(int_map))
     .collect::<HashMap<String,u64>>()
 }
-
+/// ## Summary
+/// Compute the number of each mutational type in the patient from an input vector of intermediate representations 
 pub fn compute_type_mutations_per_patient(vec_intmaps:&Vec<Map::IntMap>)->HashMap<String,Vec<u64>>
 {
     vec_intmaps.par_iter()
     .map(|int_map|stat_helper::compute_mutation_frequency(int_map))
     .collect::<HashMap<String,Vec<u64>>>()
 }
-
+/// ## Summary
+/// Compute the number of alterations or mutations per transcript from an input vector of intermediate representations 
 pub fn compute_number_of_mutations_per_transcript(vec_intmaps:&Vec<Map::IntMap>)->HashMap<String,u64>
 {
     let transcript_names=stat_helper::get_uniuqe_transcript(vec_intmaps);

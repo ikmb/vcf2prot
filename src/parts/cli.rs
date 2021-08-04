@@ -3,7 +3,9 @@ use core::panic;
 use std::{path::Path, str::FromStr};
 use crate::data_structures::InternalRep::engines::Engine; 
 
-#[derive(Debug)]
+/// ## Summary 
+/// A generic representation for the parsed input parameters used by the executable 
+#[derive(Debug,Clone)]
 pub struct ParsedInput
 {
     pub path2vcf:String, 
