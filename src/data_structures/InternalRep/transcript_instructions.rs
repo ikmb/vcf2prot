@@ -58,10 +58,10 @@ impl TranscriptInstruction
                 instructions.push(instruction)
             }
         }
-        if transcript_name=="ENST00000433931"
+        /*if transcript_name=="ENST00000433931"
         {
             println!("Current mutations are : {:#?} and it has been translated into the following instruction: {:#?}", debug_code,instructions)
-        }
+        }*/
         Ok(TranscriptInstruction::new(transcript_name,ref_len,instructions))
     }
     /// ## Summary 
@@ -191,10 +191,10 @@ impl TranscriptInstruction
             }
         }
         let size = (self.ref_len as i32 + expected_size) as usize;
-        if self.transcript_name=="ENST00000433931"
+        /*if self.transcript_name=="ENST00000433931"
         {
             println!("Transcript Name is: {}, Input protein length is: {}, mutations are: {:?} and computed results is: {}", self.transcript_name,self.ref_len, self.instructions,size);
-        }
+        }*/
         size
     }
     /// Return an GIR  of the instances 
@@ -248,10 +248,10 @@ impl TranscriptInstruction
             }           
         }
         // add the instruction to the array 
-        if self.transcript_name=="ENST00000433931".to_string()
+        /*if self.transcript_name=="ENST00000433931".to_string()
         {
             println!("Vector of tasks is: {:?}",vec_tasks);
-        }
+        }*/
         
         let mut annotations=HashMap::new();
         annotations.insert(self.transcript_name.clone(), (0  as usize, self.compute_expected_results_array_size())); 
