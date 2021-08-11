@@ -10,6 +10,12 @@ homepage = "https://github.com/ikmb/ppg"
 repository = "https://github.com/ikmb/ppg"
 keywords = ["cli", "genetics", "protein-sequences","Proteomics","VCF-files","VCF-converter","VCF-files","bioinformatics"]
 categories = ["command-line-utilities","data-structures","science","parsing"]
+exclude = [
+    "examples/*",
+    "automation_scripts/*",
+    ".github/*",
+    "Dockerfile"
+]
 
 [lib]
 name = "ppg"
@@ -35,3 +41,4 @@ flate2 = "1.0"
 
 [build-dependencies]
 cc = "1.0"
+
