@@ -1,5 +1,3 @@
-use core::panic;
-
 use rayon::prelude::*; 
 use crate::functions::text_parser; 
 use crate::data_structures::{MaskDecoder::BitMask,
@@ -8,7 +6,6 @@ use crate::data_structures::{MaskDecoder::BitMask,
 use super::Constants;
 use super::InternalRep::engines::Engine; 
 use serde::{Deserialize, Serialize};
-use crossbeam::thread; 
 /// An abstraction for a collection of VCF Records, the struct owns the provided vector of strings,
 /// where each string is a record from the file.
 #[derive(Debug,Clone)]

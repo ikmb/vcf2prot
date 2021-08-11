@@ -1,15 +1,9 @@
 // load the modules and crate library 
-use std::cmp;
 use std::collections::HashMap; 
-use std::mem::swap;
-use std::sync::{Arc, Mutex};
 use super::task::Task; 
 use super::engines::Engine; 
-use rayon::prelude::*; 
-use scoped_threadpool;
-use crossbeam; 
-use num_cpus; 
 use crate::binders::binderCUDA; 
+
 
 /// GIRL: Genomic intermediate representation language (GIRL) which us derived from sequence intermediate representation (SIR)
 /// a generic representation for sequence editing tasks, it is composite of 
@@ -201,12 +195,39 @@ impl GIR
     /// println!("Results array: {:#?}",res_char_array); 
     /// println!("Result hashmap is: {:#?}", res_hashmap);
     ///``` 
-    pub fn execute(mut self, engine:Engine)->(Vec<char>,HashMap<String,(usize,usize)>)
+    pub fn execute(self, engine:Engine)->(Vec<char>,HashMap<String,(usize,usize)>)
     {        
         match engine 
         {
             Engine::ST | Engine::MT =>
             {
+                match std::env::var("DEBUG_CPU_EXEC")
+                {
+                    Ok(_)=>
+                    {
+                        println!("Validating the execution tasks on the CPU engine ....");
+                        for idx in 1..self.g_rep.len()
+                        {
+                            if self.g_rep[idx].get_start_pos_res()!=self.g_rep[idx-1].get_start_pos_res() + self.g_rep[idx-1].get_length()
+                            {
+                                println!("************ CPU Execution Table *********");
+                                println!("index\tstream\tstart_position\tlength\tposition_results\t");
+                                for idx in 0..self.g_rep.len()
+                                {
+                                    println!(
+                                        "{}\t{}\t{}\t{}\t{}\t",idx,self.g_rep[idx].get_execution_stream(),
+                                        self.g_rep[idx].get_start_pos(),
+                                        self.g_rep[idx].get_length(),
+                                        self.g_rep[idx].get_start_pos_res()
+                                        );
+                                }
+                                panic!("Critical failure in the calculations was encountered: position: {} the sum {} does not equal previous inputs: {} and {} \n",
+                                idx,self.g_rep[idx].get_start_pos_res(),self.g_rep[idx-1].get_start_pos_res(),self.g_rep[idx-1].get_length());
+                            }
+                        }
+                    },
+                    Err(_)=>()
+                }
                 let mut res_array=self.res_array; 
                 let mut ref_stream=self.ref_stream;
                 let mut alt_stream=self.alt_stream;
@@ -215,13 +236,36 @@ impl GIR
             },
             Engine::GPU => 
             {
-                let (exec_code,start_pos,length,start_pos_res,mut res_array,
+                let (exec_code,start_pos,length,start_pos_res,res_array,
                     ref_array,alt_array,  annotation )= self.consume_and_produce_produce_content(); 
                 // cast as u8; define the results array 
                 let mut res_array=res_array.into_iter().map(|val|val as u8).collect::<Vec<_>>(); 
                 let ref_array=ref_array.into_iter().map(|val|val as u8).collect::<Vec<_>>(); 
                 let alt_array=alt_array.into_iter().map(|val|val as u8).collect::<Vec<_>>(); 
                 let err_code; 
+                // validate the execution before  
+                match std::env::var("DEBUG_GPU")
+                {
+                    Ok(_)=>
+                    {
+                        println!("Validating the execution tasks ....");
+                        for idx in 1..exec_code.len()
+                        {
+                            if start_pos_res[idx]!=start_pos_res[idx-1]+length[idx-1]
+                            {
+                                println!("************ GPU Execution Table *********");
+                                println!("index\tstream\tstart_position\tlength\tposition_results\t");
+                                for idx in 0..exec_code.len()
+                                {
+                                    println!("{}\t{}\t{}\t{}\t{}\t",idx,exec_code[idx],start_pos[idx],length[idx],start_pos_res[idx]);
+                                }
+                                panic!("Critical failure in the calculations was encountered: position: {} the sum {} does not equal previous inputs: {} and {} \n",
+                                idx,start_pos_res[idx],start_pos_res[idx-1],length[idx-1]);
+                            }
+                        }
+                    },
+                    Err(_)=>()
+                }
                 unsafe
                 {
                     err_code=binderCUDA::kernel_wrapper(res_array.as_mut_ptr(),
@@ -286,7 +330,7 @@ impl GIR
     /// println!("The alternative array is {:#?}",alt_array);  
     /// println!("The annotation map is {:#?}",annotation);  
     ///``` 
-    fn consume_and_produce_produce_content(mut self)->(Vec<usize>,Vec<usize>,Vec<usize>, 
+    fn consume_and_produce_produce_content(self)->(Vec<usize>,Vec<usize>,Vec<usize>, 
         Vec<usize>, Vec<char>, Vec<char>, Vec<char>, HashMap<String,(usize,usize)>)
     {
         let mut exec_code=Vec::with_capacity(self.g_rep.len()); 

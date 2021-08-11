@@ -132,10 +132,10 @@ def worker_function(path2chunK:str, path2ref:str, result_path:str)->None:
     try:
         if args.exe==None:
             sp.run(f"ppgg_rust -f {path2chunK} -r {path2ref}, -o {result_path} -g st",
-                                STEOUT=sp.DEVNULL,check=True)
+                                stdout=sp.DEVNULL,check=True)
         else:
             sp.run(f".{args.exe}/ppgg_rust -f {path2chunK} -r {path2ref}, -o {result_path} -g st",
-                                STEOUT=sp.DEVNULL,check=True)
+                                stdout=sp.DEVNULL,check=True)
     except sp.SubprocessError as exp:
         raise RuntimeError(f"Calling PPGG with the following chunk failed: {path2chunK}")
 

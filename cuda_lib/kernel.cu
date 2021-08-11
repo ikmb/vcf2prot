@@ -1,3 +1,5 @@
+#include "stdio.h"
+// Define the CUDA kernel 
 __global__
 void apply_instruction_set_to_reference_seq_gpu(char* res_array, char* ref_stream, char* alt_Stream, 
     size_t* exc_code, size_t* start_pos, size_t* length, size_t* start_pos_res, size_t num_task)
@@ -7,7 +9,7 @@ void apply_instruction_set_to_reference_seq_gpu(char* res_array, char* ref_strea
 
     for(int work_idx=thread_index; work_idx < num_task; work_idx +=step_size)
     { 
-        if(exc_code[work_idx]==0) // A copy based instruction
+        if(exc_code[work_idx]==0) // copying from the reference
         {
         // apply the copy based instruction for the whole length of the instruction
             for(int ins_count=0; ins_count!=length[work_idx];ins_count++)
@@ -15,7 +17,7 @@ void apply_instruction_set_to_reference_seq_gpu(char* res_array, char* ref_strea
                 res_array[start_pos_res[work_idx]+ins_count]=ref_stream[start_pos[work_idx]+ins_count]; 
             }
         }
-        else // an insertion based instruction
+        else // copying from the instruction 
         {
             for(int ins_count=0; ins_count!=length[work_idx];ins_count++)
             {
@@ -82,7 +84,7 @@ int kernel_wrapper(char* res_array, char* ref_stream, char* alt_stream, size_t* 
     // Launching the kernel 
     //----------------------
     unsigned int num_threads_per_block=1024; 
-    unsigned int number_blocks=(num_task/num_threads_per_block) +1 ; 
+    unsigned int number_blocks=(num_task/num_threads_per_block) +1; 
     apply_instruction_set_to_reference_seq_gpu<<<number_blocks,num_threads_per_block>>>
     (
         res_array_ptr, ref_stream_ptr, alt_stream_ptr, exc_code_ptr, 

@@ -35,7 +35,6 @@ pub fn early_to_intermediate_repr(mut vec_of_early_maps:Vec<EarlyMap>,engine:Eng
                     .collect::<Vec<IntMap>>()
         }
     }
-    
 }
 /// ## Summary 
 /// Build an intermediate map instance, IntMap from an early map instance 
@@ -121,7 +120,7 @@ pub fn get_unique_transcript(vec_mut:&Vec<String>)->Vec<String>
                                         match text_parser::split_csq_string(field)
                                         {
                                             Ok(res)=>Some(res[1].clone()),
-                                            Err(err)=>None,
+                                            Err(_)=>None,
                                         }
                                     })
                                 .collect::<Vec<String>>(); 

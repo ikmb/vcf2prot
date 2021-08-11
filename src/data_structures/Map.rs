@@ -1,6 +1,4 @@
-use std::collections::HashMap; 
 use super::vcf_ds::AltTranscript; 
-use super::InternalRep::proband_instructions::ProbandInstruction;
 use serde::{Deserialize, Serialize};
 
 /// An abstraction for an intermediate representation map, i.e. an IntMap 
@@ -40,7 +38,7 @@ impl IntMap
     /// Consume the reference and returns a tuple containing two vectors, the first is the vector of AltTranscript 
     /// in the first haplotype and the second is the vector of alteration in the second haplotype, these vectors 
     /// are moved from the current instance and hence the instance is invalid after this operation  
-    pub fn consume_and_get_vecs(mut self)->(Vec<AltTranscript>,Vec<AltTranscript>)
+    pub fn consume_and_get_vecs(self)->(Vec<AltTranscript>,Vec<AltTranscript>)
     {
         (self.mutations1,self.mutations2)
     }
@@ -92,8 +90,8 @@ impl EarlyMap
     ///```
     pub fn with_capacity(proband_name:String, expected_number:usize)->Self
     {
-        let mut mutations1:Vec<String>= Vec::with_capacity(expected_number);
-        let mut mutations2:Vec<String>= Vec::with_capacity(expected_number);
+        let mutations1:Vec<String>= Vec::with_capacity(expected_number);
+        let mutations2:Vec<String>= Vec::with_capacity(expected_number);
         EarlyMap{proband_name,mutations1,mutations2}
     }
     /// add a new mutation to the current instance

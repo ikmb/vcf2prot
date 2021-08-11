@@ -1,7 +1,5 @@
 // load the libraries and crates 
-use core::panic;
 use std::collections::HashMap;
-use std::fmt::write;
 use std::path::Path; 
 use rayon::prelude::*; 
 use crate::data_structures::InternalRep::engines::Engine;
@@ -34,19 +32,27 @@ pub fn read_fasta(path2load:&Path,engine:Engine)->HashMap<String,String>
 }
 /// ## Summary 
 /// Write the personalized genomes as fasta files to the disk 
-pub fn write_personalized_genomes(mut vec_genomes:Vec<PersonalizedGenome>, exec_engines:Engine, output_dir:String)
+pub fn write_personalized_genomes(mut vec_genomes:Vec<PersonalizedGenome>, exec_engines:Engine, output_dir:String,
+    use_single_thread:bool, write_all:bool, write_compressed:bool, ref_seq:&HashMap<String,String>)
 {
+    // this parameter has precedence over the engine and it forces the writing to be carried out in a single threaded manner
+    if use_single_thread
+    {
+        vec_genomes.iter()
+            .for_each(|genome|genome.write(&output_dir,&write_all,&write_compressed,&ref_seq).unwrap())
+    }
+    // if the use_single_thread is not there, then we fallback to the engine guided execution
     match exec_engines
     {
         Engine::ST=>
         {
             vec_genomes.iter()
-            .for_each(|genome|genome.write(&output_dir).unwrap())
+            .for_each(|genome|genome.write(&output_dir,&write_all,&write_compressed,&ref_seq).unwrap())
         },
         Engine::MT | Engine::GPU=>
         {
             vec_genomes.par_iter_mut()
-            .for_each(|genome|genome.write(&output_dir).unwrap())
+            .for_each(|genome|genome.write(&output_dir,&write_all,&write_compressed,&ref_seq).unwrap())
         }
     }
 }

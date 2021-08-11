@@ -1,10 +1,11 @@
-use ppgg_rust::{data_structures::Map::IntMap, parts::{cli,io,exec}, writers};
-use std::path::{self, Path, PathBuf}; 
+use ppgg_rust::parts::{cli,io,exec};
+use std::path::{Path, PathBuf}; 
 use ppgg_rust::writers::write_intmap2json; 
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 fn main()
 {
     let args = cli::ParsedInput::new(cli::parse_command_line());
+    cli::state_env_var(); // print the state of environmental variables 
     if args.is_verbose
     {
         println!("Reading and loading the VCF file, starting time is: {}",Utc::now())
@@ -45,7 +46,9 @@ fn main()
     {
         println!("Write the generated results, starting at: {}", Utc::now())
     }
-    io::write_personalized_genomes(vec_per_genomes, args.engine, args.res_path);
+    io::write_personalized_genomes(vec_per_genomes, args.engine, args.res_path,
+         args.write_single_thread.clone(),args.write_all.clone(),
+         args.write_compressed.clone(), &ref_seq);
     if args.is_verbose
     {
         println!("Execution finished at: {}", Utc::now());

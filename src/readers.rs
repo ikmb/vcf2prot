@@ -172,14 +172,14 @@ pub mod vcf_helpers
         {
             return Err(format!("The provided file does not contain the minimum number of columns, expected a minimum of 8, found: {}",res.len()));
         }
-        // remove the first 7 elements 
-        let res_clean=res.drain(9..).collect::<Vec<String>>(); 
+        // remove the first 8 elements 
+        res.drain(0..9); 
         // check that there is at least one patient in the file 
-        if res_clean.len()==0
+        if res.len()==0
         {
             return Err("The file does not contain any patients!!, after removing the mandatory columns".to_string());
         }
-        Ok(res_clean)
+        Ok(res)
     }
     // the warper for the parallelization using massage passing 
     pub fn get_records(lines:Vec<String>, engine:Engine)->Result<Vec<String>,String>

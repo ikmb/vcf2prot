@@ -66,6 +66,16 @@ mod stat_helper
                 }
             }
         }
+        for alt in mut_h2.iter()
+        {
+            for mutation in alt.get_alts().iter()
+            {
+                if mutation.mut_type==mut_type
+                {
+                    sum+=1
+                }
+            }
+        }
         sum
     }
     pub fn get_uniuqe_transcript(vec_intmaps:&Vec<Map::IntMap>)->Vec<String>

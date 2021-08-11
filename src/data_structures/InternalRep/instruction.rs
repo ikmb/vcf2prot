@@ -1,6 +1,7 @@
+use std::mem::needs_drop;
+
 // load the modules and crates 
-use crate::data_structures::{Constants, mutation_ds::*, vcf_ds::AltTranscript}; 
-use rayon::vec;
+use crate::data_structures::mutation_ds::*; 
 use serde::{Deserialize, Serialize};
 
 /// A simple for an instruction
@@ -227,7 +228,6 @@ impl Instruction
             true=>
             {
                 let mut n_inst=Instruction::interpret_missense(mutation,vec_mut);
-                let pos=
                 n_inst.update_code('N'); 
                 n_inst.update_s_state(true); 
                 n_inst
@@ -261,14 +261,66 @@ impl Instruction
         let code='I'; 
         let pos_ref=mutation.mut_info.ref_aa_position as usize; // the position of the reference 
         let pos_res=mutation.mut_info.mut_aa_position as usize; // the position of the result 
+        // check the correctness of the reference sequence 
+        match &mutation.mut_info.ref_aa
+        {
+            MutatedString::Sequence(seq_str)=>
+            {
+                let mut_str = seq_str.chars().collect::<Vec<char>>(); 
+                if mut_str.len() != 1 
+                {
+                    let code='2';
+                    let pos_res=mutation.mut_info.ref_aa_position as usize;
+                    let pos_ref=mutation.mut_info.mut_aa_position as usize; 
+                    let data= match &mutation.mut_info.mut_aa
+                    {
+                        MutatedString::Sequence(seq_str)=>seq_str.chars().collect::<Vec<char>>(),
+                        MutatedString::EndSequence(seq_str)=>
+                        {
+                            let mut data=seq_str.chars().collect::<Vec<char>>();
+                            data.remove(data.len()-1);   
+                            data
+                        }
+                        MutatedString::NotSeq => return Instruction::interpret_stop_gained(mutation,_vec_mut)
+                    };
+                    let ref_seq=match &mutation.mut_info.ref_aa
+                    {
+                    MutatedString::Sequence(seq_str)=>seq_str.chars().collect::<Vec<char>>(),
+                    MutatedString::EndSequence(seq_str)=>
+                    {
+                        let mut data=seq_str.chars().collect::<Vec<char>>();
+                        data.remove(data.len()-1);   
+                        data
+                    }
+                    MutatedString::NotSeq => return Instruction::interpret_stop_lost(mutation,_vec_mut)
+                    };
+                    if data.len()!=ref_seq.len()
+                    {
+                        let code='3';
+                        let pos_res=mutation.mut_info.ref_aa_position as usize;
+                        let pos_ref=mutation.mut_info.mut_aa_position as usize; 
+                        let len=ref_seq.len(); 
+                        let s_state=false; 
+                        return Instruction::new(code, s_state, pos_ref, pos_res, len, data) 
+                    }
+                    let len=data.len(); 
+                    let s_state=false;
+                    return Instruction::new(code, s_state, pos_ref, pos_res, len, data) 
+                } // this is an 2 instruction                  
+            }
+            MutatedString::EndSequence(_)=>
+            {
+                return Instruction::interpret_frameshift(mutation, _vec_mut); // interpret the mutation as a frame shift 
+            },
+            MutatedString::NotSeq =>panic!("In interpreting an inframe insertion the reference amino acids was just an asterisk,\
+             please check your input and contact the developer at h.elabd@ikmb.uni-kiel.de or at the project webpage: https://github.com/ikmb/ppg")
+        };
         let data= match &mutation.mut_info.mut_aa
         {
             MutatedString::Sequence(seq_str)=>seq_str.chars().collect::<Vec<char>>(),
-            MutatedString::EndSequence(seq_str)=>
+            MutatedString::EndSequence(_)=>
             {
-                let mut data=seq_str.chars().collect::<Vec<char>>();
-                data.remove(data.len()-1);   
-                data
+                return Instruction::interpret_frameshift(mutation, _vec_mut)
             }
             MutatedString::NotSeq =>return Instruction::interpret_stop_gained(mutation, _vec_mut)
         }; 
@@ -301,9 +353,16 @@ impl Instruction
             true=>
             {
                 let mut n_inst=Instruction::interpret_inframe_insertion(mutation,vec_mut);
-                n_inst.update_code('J'); 
-                n_inst.update_s_state(true); 
-                n_inst
+                match n_inst.get_code()
+                {
+                    'I'=>
+                    {
+                        n_inst.update_code('J'); 
+                        n_inst.update_s_state(true); 
+                        n_inst
+                    },
+                    _=>n_inst
+                }    
             }
             false=>
             {
@@ -348,12 +407,66 @@ impl Instruction
         }; 
         let data=match &mutation.mut_info.mut_aa
         {
-            MutatedString::Sequence(seq_str)=>seq_str.chars().collect::<Vec<char>>(),
+            MutatedString::Sequence(seq_str)=>
+            {
+                let mut_str=seq_str.chars().collect::<Vec<char>>();
+                if mut_str.len()==1
+                {
+                    mut_str // this is the normal sane case where a stretch of amino acids is replaced 
+                }
+                else 
+                {
+                    let code='2';
+                    let pos_res=mutation.mut_info.ref_aa_position as usize;
+                    let pos_ref=mutation.mut_info.mut_aa_position as usize; 
+                    let data= match &mutation.mut_info.mut_aa
+                    {
+                        MutatedString::Sequence(seq_str)=>seq_str.chars().collect::<Vec<char>>(),
+                        MutatedString::EndSequence(seq_str)=>
+                        {
+                            let mut data=seq_str.chars().collect::<Vec<char>>();
+                            data.remove(data.len()-1);   
+                            data
+                        }
+                        MutatedString::NotSeq => panic!("Something went wrong, interpreting: {:#?}, failed",&mutation)
+                    };
+                    let ref_seq=match &mutation.mut_info.ref_aa
+                    {
+                    MutatedString::Sequence(seq_str)=>seq_str.chars().collect::<Vec<char>>(),
+                    MutatedString::EndSequence(seq_str)=>
+                    {
+                        let mut data=seq_str.chars().collect::<Vec<char>>();
+                        data.remove(data.len()-1);   
+                        data
+                    }
+                    MutatedString::NotSeq => panic!("Something went wrong, interpreting: {:#?}, failed",&mutation)
+                    };
+                    if data.len()!=ref_seq.len()
+                    {
+                        let code='3';
+                        let pos_res=mutation.mut_info.ref_aa_position as usize;
+                        let pos_ref=mutation.mut_info.mut_aa_position as usize; 
+                        let len=ref_seq.len(); 
+                        let s_state=false; 
+                        return Instruction::new(code, s_state, pos_ref, pos_res, len, data) 
+                    }
+                    let len=data.len(); 
+                    let s_state=false;
+                    return Instruction::new(code, s_state, pos_ref, pos_res, len, data) 
+                } // this is an 2 instruction  
+            },
             MutatedString::EndSequence(seq_str)=>
             {
                 let mut data=seq_str.chars().collect::<Vec<char>>();
                 data.remove(data.len()-1);   
-                data
+                if data.len()==1
+                {
+                    data // this is also the sane case where we have a stretch of amino acids that will be replaced with one amino acid
+                }
+                else
+                {
+                    return Instruction::interpret_frameshift(mutation, _vec_mut); // interpret the mutation as a frame shift 
+                }
             }
             MutatedString::NotSeq => return Instruction::interpret_stop_gained(mutation, _vec_mut)
         }; 
@@ -430,7 +543,7 @@ impl Instruction
             }
             MutatedString::NotSeq => return Instruction::generate_phi_instruction()
         }; 
-        let len=data.len();// Becuase we have the first amino acid in the mutated sequences already, for example, 115SL>115S
+        let len=data.len();// Because we have the first amino acid in the mutated sequences already, for example, 115SL>115S
         // the length of deletion is 1.
         let s_state=false;
         Instruction{code, s_state, pos_ref, pos_res, len, data}
@@ -495,7 +608,7 @@ impl Instruction
     /// let ins=Instruction::interpret_stop_gained(&test_mutation, &vec_mut); 
     /// println!("The instruction is: {:#?}", ins); 
     /// ```
-    fn interpret_stop_gained(mutation:&Mutation, vec_mut:&Vec<Mutation>)->Self
+    fn interpret_stop_gained(mutation:&Mutation, _vec_mut:&Vec<Mutation>)->Self
     {
         let code='G'; 
         let pos_ref=mutation.mut_info.ref_aa_position as usize; // the position of the reference 
@@ -678,12 +791,7 @@ impl Instruction
             },
             _=>
             {
-                let mut n_inst=Instruction::interpret_s_frameshift(mutation,vec_mut);
-                match n_inst.get_code()
-                {
-                    'E'=>n_inst,
-                    _=>{n_inst.update_code('Q'); n_inst}
-                }
+                Instruction::interpret_s_frameshift(mutation,vec_mut)
             }
         }
     }
@@ -761,12 +869,24 @@ impl Instruction
     /// println!("The instruction is: {:#?}", ins); 
     /// ``` 
     fn interpret_inframe_deletion_and_stop_retained(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
-    {
+    {        
         let mut n_inst=Instruction::interpret_stop_gained(mutation,vec_mut);
         match n_inst.get_code()
         {
             'E'=>n_inst,
-            _=>{n_inst.update_code('P'); n_inst}
+            _=>
+            {
+                n_inst.update_code('P');
+                match &mutation.mut_info.ref_aa
+                {
+                    MutatedString::EndSequence(seq)=>
+                    {
+                        n_inst.len=seq.len()-1 as usize;
+                    },
+                    _=>()
+                }
+                n_inst
+            }
         }
     }
     // ## Summary 
@@ -848,11 +968,10 @@ impl Instruction
     /// ```  
     fn interpret_stop_lost_and_frameshift(mutation:&Mutation,vec_mut:&Vec<Mutation>)->Self
     {
-        let mut n_inst=Instruction::interpret_stop_lost(mutation,vec_mut);
-        match n_inst.get_code()
+        match &mutation.mut_info.ref_aa
         {
-            'E'=>n_inst,
-            _=>{n_inst.update_code('W'); n_inst}
+            MutatedString::NotSeq=>Instruction::interpret_stop_lost(mutation,vec_mut),
+            _=>Instruction::interpret_frameshift(mutation,vec_mut)   
         }
     }
     // ## Summary 
@@ -922,7 +1041,7 @@ impl Instruction
                     let s_state=false; 
                     return Instruction::new(code, s_state, pos_ref, pos_res, len, data) 
                 }
-                let len=0; 
+                let len=data.len(); 
                 let s_state=false;
                 Instruction::new(code, s_state, pos_ref, pos_res, len, data) 
             }
@@ -972,6 +1091,7 @@ impl Instruction
                 match mutation.mut_info.mut_aa 
                 {
                     MutatedString::NotSeq=>{state=false; break;},
+                    MutatedString::EndSequence(_)=>{state=false; break;}
                     _=>(),
                 }
             }

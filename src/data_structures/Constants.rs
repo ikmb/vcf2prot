@@ -1,6 +1,4 @@
 /// the module contain constant used throughout the library 
-use std::str::FromStr;
-use crate::data_structures::mutation_ds::MutationType; 
 pub static DEF_CONSEQ:&str =""; 
 pub static  SUP_TYPE:[&str; 22]=["missense","*missense","frameshift","*frameshift",
 "inframe_insertion","*inframe_insertion","inframe_deletion","*inframe_deletion",

@@ -1,14 +1,13 @@
 use std::collections::HashMap;
-use std::mem::swap;
+use std::collections::HashSet;
 use std::panic;
 use std::usize;
 use crate::data_structures::InternalRep::gir; 
 use crate::data_structures::InternalRep::instruction;
 use crate::data_structures::vcf_ds; 
 use crate::data_structures::InternalRep::task::Task;
-use chrono::format;
 use serde::{Deserialize, Serialize};
-
+use std::iter::FromIterator;
 use super::instruction::Instruction;
 
 /// A representation for a collection of mutation in a transcript, where mutations have been already encoded into instructions 
@@ -41,27 +40,126 @@ impl TranscriptInstruction
     /// of sequence names 
     pub fn from_alt_transcript(mut alt_transcript:vcf_ds::AltTranscript, ref_seqs:&HashMap<String,String>)->Result<Self,String>
     {
-        alt_transcript.sort_alterations();// sor alteration 
-        let debug_code=alt_transcript.clone();
-        let transcript_name=alt_transcript.name; 
+        alt_transcript.sort_alterations();// sort alteration 
+        let transcript_name=alt_transcript.name.clone(); 
         let ref_len=match ref_seqs.get(&transcript_name)
         {
             Some(sequence)=>sequence.len(),
             None=>return Err(format!("The provided transcript name: {} is not in the reference sequence", &transcript_name))
         };
         let mut instructions= Vec::with_capacity(alt_transcript.alts.len()); 
+        let mut ins_idx=Vec::with_capacity(alt_transcript.alts.len());
         for mutation in alt_transcript.alts.iter()
         {
             let instruction=instruction::Instruction::from_mutation(mutation,&alt_transcript.alts);
             if instruction.get_code()!='E'
             {
+                ins_idx.push(instruction.get_position_ref());
                 instructions.push(instruction)
             }
         }
-        /*if transcript_name=="ENST00000433931"
+        if instructions.len()==0
         {
-            println!("Current mutations are : {:#?} and it has been translated into the following instruction: {:#?}", debug_code,instructions)
-        }*/
+            return Err(format!("The provided transcript name: {} has {} mutations none of them is supported, skipping this transcript", &transcript_name,alt_transcript.alts.len()))
+        }
+        match std::env::var("INSPECT_INS_GEN")
+        {
+            Ok(_)=>
+            {
+                println!("Inspect the generation of instructions from transcript: {}",&transcript_name); 
+                println!("Checking for indexing errors ...."); 
+                let index = HashSet::<usize>::from_iter(ins_idx.into_iter());
+                // check that all instructions have unique start points 
+                //-----------------------------------------------------
+                if index.len()!=instructions.len()
+                {
+                    match std::env::var("PANIC_INSPECT_ERR")
+                    {
+                        Ok(_)=>
+                        {
+                            panic!("Critical error was encountered: for transcript: {} the following mutations were observed, {:#?} which translate to the following instructions: {:#?}\
+                            Nevertheless, some mutations at the same position were observed, skipping this mutations ...
+                            ",transcript_name,&alt_transcript.alts,&instructions);   
+                        },
+                        Err(_)=>
+                        {
+                            println!("Critical error was encountered: for transcript: {} the following mutations were observed, {:#?} which translate to the following instructions: {:#?}\
+                            Nevertheless, some mutations at the same position were observed, skipping this mutations ...
+                            ",transcript_name,&alt_transcript.alts,&instructions);   
+                            return Err("Encountered two mutation at the same time".to_string()); 
+                        }  
+                    }
+                }
+                println!("Checking for mutational overlaps ...");
+                // generate the pair of adjacent instructions
+                //-------------------------------------------
+                if instructions.len()>1
+                {
+                    let consequent_pairs=instructions[..instructions.len()-1]
+                            .iter()
+                            .enumerate()
+                            .map(|(idx,ins)|(ins,&instructions[idx+1]))
+                            .collect::<Vec<_>>(); 
+                    for (ins1,ins2) in consequent_pairs
+                    {
+                        if ins2.get_position_res()<=(ins1.get_position_res()+ins1.get_data().len()+1)
+                        {
+                            match std::env::var("PANIC_INSPECT_ERR")
+                            {
+                                Ok(_)=>
+                                {
+                                    panic!("Critical error was encountered: for transcript: {} the following mutations were observed, {:#?} which translate to the following instructions: {:#?}\
+                                    Nevertheless, some mutations overlap, skipping this mutations ...
+                                    ",transcript_name,&alt_transcript.alts,&instructions);   
+                                },
+                                Err(_)=>
+                                {
+                                    println!("Critical error was encountered: for transcript: {} the following mutations were observed, {:#?} which translate to the following instructions: {:#?}\
+                                    Nevertheless, some mutations overlap, skipping this mutations ...
+                                    ",transcript_name,&alt_transcript.alts,&instructions);   
+                                    return Err("Encountered two mutation at the same time".to_string()); 
+                                }  
+                            }
+                        }
+                        // add a conditional state for handling inframe_deletion 
+                        if ins1.get_code()=='C' || ins1.get_code()=='D'
+                        {
+                            if ins2.get_position_ref()<=(ins1.get_position_res()+ins1.get_length()+1) // for example a deletion at position 84 with length 5 (ins1) and ins2 is a mutation at site 88 
+                            {
+                                match std::env::var("PANIC_INSPECT_ERR")
+                                {
+                                    Ok(_)=>
+                                    {
+                                        panic!("Critical error was encountered: for transcript: {} the following mutations were observed, {:#?} which translate to the following instructions: {:#?}\
+                                        Nevertheless, some mutations overlap, skipping this mutations ...
+                                        ",transcript_name,&alt_transcript.alts,&instructions);   
+                                    },
+                                    Err(_)=>
+                                    {
+                                        println!("Critical error was encountered: for transcript: {} the following mutations were observed, {:#?} which translate to the following instructions: {:#?}\
+                                        Nevertheless, some mutations overlap, skipping this mutations ...
+                                        ",transcript_name,&alt_transcript.alts,&instructions);   
+                                        return Err("Encountered two mutation at the same time".to_string()); 
+                                    }  
+                                }
+                            }
+                        }                        
+                    }      
+                }
+            }
+            Err(_)=>()
+        }
+        match std::env::var("DEBUG_TXP")
+        {
+            Ok(txp_id)=>
+            {
+                if transcript_name==txp_id
+                {
+                    println!("Current mutations are : {:#?} and it has been translated into the following instruction: {:#?}", &alt_transcript,&instructions)
+                }
+            },
+            Err(_)=>()
+        }
         Ok(TranscriptInstruction::new(transcript_name,ref_len,instructions))
     }
     /// ## Summary 
@@ -119,14 +217,27 @@ impl TranscriptInstruction
                 'F' => expected_size += ins.get_data().len()  as i32 - (self.ref_len as i32 - ins.get_position_ref() as i32), 
                 'R' => 
                 {
-                    if !self.instructions.iter().any(|ins|ins.get_code()=='G' || ins.get_code()=='F')
+                    // get the index of the current instruction
+                    let index=self.instructions.iter().position(|i|i==ins).unwrap();
+
+                    if !self.instructions[..index].iter().any(|ins|ins.get_code()=='G' || ins.get_code()=='F')
                     {
-                        expected_size += self.ref_len as i32 - ins.get_position_ref() as i32 + ins.get_data().len() as i32
+                        expected_size += ins.get_data().len()  as i32 - (self.ref_len as i32 - ins.get_position_ref() as i32)
                     }
                 },
                 'G' | 'X' => expected_size -= self.ref_len as i32 - ins.get_position_ref() as i32, 
                 'M' | 'N' | '2' => (), 
-                'L' => expected_size += ins.get_data().len() as i32,
+                'L' =>
+                {
+                    if ins.get_position_ref()+1 as usize == self.ref_len ||  ins.get_position_ref() == self.ref_len
+                    {
+                        expected_size += ins.get_data().len() as i32
+                    }
+                    else
+                    {
+                        expected_size += ins.get_data().len()  as i32 - (self.ref_len as i32 - ins.get_position_ref() as i32)
+                    }
+                },
                 'I' => expected_size += ins.get_data().len() as i32 -1 as i32, // e.g. 125Y>125YRR,
                 'J' => 
                 {
@@ -180,21 +291,27 @@ impl TranscriptInstruction
                     }
                 },
                 'B' => expected_size-= self.ref_len as i32 - ins.get_position_ref() as i32 - ins.get_length() as i32,
-                'P' => expected_size-= ins.get_length() as i32, 
+                'P' => expected_size-= ins.get_length() as i32 ,
                 'Z' => (),
                 'T' => expected_size-= self.ref_len as i32 - ins.get_position_ref() as i32,
                 'W' => expected_size+= ins.get_data().len() as i32,
                 'Y' => expected_size+= ins.get_data().len()  as i32 - (self.ref_len as i32 -ins.get_position_ref() as i32)  +1 as i32, 
-                '0' => expected_size =-1 * self.ref_len as i32,
-                '3' => expected_size+= ins.get_length() as i32 - ins.get_data().len() as i32,
+                '3' => expected_size+= ins.get_data().len() as i32 - ins.get_length() as i32 ,
                 _=>panic!("instruction: {:#?} is not supported", ins),
             }
         }
         let size = (self.ref_len as i32 + expected_size) as usize;
-        /*if self.transcript_name=="ENST00000433931"
+        match std::env::var("DEBUG_TXP")
         {
-            println!("Transcript Name is: {}, Input protein length is: {}, mutations are: {:?} and computed results is: {}", self.transcript_name,self.ref_len, self.instructions,size);
-        }*/
+            Ok(txp_id)=>
+            {
+                if self.transcript_name==txp_id
+                {
+                    println!("Transcript Name is: {}, Input protein length is: {}, mutations are: {:?} and computed results is: {}", self.transcript_name,self.ref_len, self.instructions,size);
+                }
+            },
+            Err(_)=>()
+        }
         size
     }
     /// Return an GIR  of the instances 
@@ -228,7 +345,7 @@ impl TranscriptInstruction
         // push the instruction 
         //---------------------
         // base instruction
-        vec_tasks.push(TranscriptInstruction::build_base_instruction(&self.instructions[0])); 
+        vec_tasks.push(TranscriptInstruction::build_base_instruction(&self.instructions[0],&self.ref_len)); 
         // loop over all instructions
         for ins in self.instructions.iter()
         {
@@ -247,16 +364,61 @@ impl TranscriptInstruction
                 vec_tasks.push(task2);
             }           
         }
-        // add the instruction to the array 
-        /*if self.transcript_name=="ENST00000433931".to_string()
+        match std::env::var("DEBUG_TXP")
         {
-            println!("Vector of tasks is: {:?}",vec_tasks);
-        }*/
-        
+            Ok(txp_id)=>
+            {
+                if self.transcript_name==txp_id
+                {
+                    println!("Vector of tasks is: {:#?}",vec_tasks);
+                }
+            },
+            Err(_)=>()
+        }
+        // add the instruction to the array 
         let mut annotations=HashMap::new();
         annotations.insert(self.transcript_name.clone(), (0  as usize, self.compute_expected_results_array_size())); 
-        Ok(gir::GIR::new(vec_tasks, annotations,alt_array,ref_stream,res_array))
+        match std::env::var("INSPECT_TXP")
+        {
+            Ok(_)=>
+            {
+                let expected_size= res_array.len();
+                let mut counter=0; 
+                println!("Validating the generated instructions for transcript: {} ....", self.transcript_name);
+                for idx in 1..vec_tasks.len()
+                {
+                    if vec_tasks[idx].get_start_pos_res()!=vec_tasks[idx-1].get_start_pos_res() + vec_tasks[idx-1].get_length()
+                    {
+                        println!("************ CPU Execution Table *********");
+                        println!("index\tstream\tstart_position\tlength\tposition_results\t");
+                        for idx in 0..vec_tasks.len()
+                        {
+                            println!(
+                                "{}\t{}\t{}\t{}\t{}\t",idx,vec_tasks[idx].get_execution_stream(),
+                                vec_tasks[idx].get_start_pos(),
+                                vec_tasks[idx].get_length(),
+                                vec_tasks[idx].get_start_pos_res()
+                                );
+                        }
+                        panic!("Critical failure in the calculations was encountered: position: {} the sum {} does not equal previous inputs: {} and {} \n",
+                        idx,vec_tasks[idx].get_start_pos_res(),vec_tasks[idx-1].get_start_pos_res(),vec_tasks[idx-1].get_length());
+                    }
+                    counter+=vec_tasks[idx].get_length()
+                }
+                counter+=vec_tasks[0].get_length(); 
+                if expected_size != counter
+                {
+                    panic!("In transcript: {}, size mismatched between the expected size: {} and actual size: {}.",
+                    self.transcript_name, expected_size,counter); 
+                }
+            },
+            Err(_)=>()
+        }
 
+
+
+
+        Ok(gir::GIR::new(vec_tasks, annotations,alt_array,ref_stream,res_array))
     }
     /// Takes an instruction and returns two tasks, the first is the  execution task for the instruction
     /// and the second is the taskdescribe the copying of the reference untill the end of the sequence or
@@ -301,10 +463,9 @@ impl TranscriptInstruction
             'D' => TranscriptInstruction::get_task_from_inframe_deletion(instruction, alt_stream, vec_tasks),
             'C' => TranscriptInstruction::get_task_from_inframe_deletion(instruction, alt_stream, vec_tasks),
             'K' => TranscriptInstruction::get_task_from_frameshift(instruction,alt_stream, vec_tasks),
-            'Q' | 'Z' => Task::new(2, 0, 0,0), // a phi-instruction ,
+            'Q' | 'Z' | 'P'=> Task::new(2, 0, 0,0), // a phi-instruction ,
             'A' => TranscriptInstruction::get_task_from_stop_gained(instruction,alt_stream, vec_tasks),
             'B' => TranscriptInstruction::get_task_from_frameshift(instruction,alt_stream, vec_tasks),
-            'P' => TranscriptInstruction::get_task_from_inframe_deletion(instruction, alt_stream, vec_tasks),
             'T' => TranscriptInstruction::get_task_from_stop_gained(instruction,alt_stream, vec_tasks),
             'W' => TranscriptInstruction::get_task_from_stop_lost(instruction,alt_stream, vec_tasks),
             'Y' => TranscriptInstruction::get_task_from_frameshift(instruction,alt_stream, vec_tasks),
@@ -331,7 +492,7 @@ impl TranscriptInstruction
                 match last_task_type
                 {
                     true => return Err(format!("Instruction: {:?} must be the last mutation in a transcript, current vector of instructions is: {:?}",instruction,vec_instruction)),
-                    false => TranscriptInstruction::add_till_next_ins(instruction, vec_instruction,&ins_task)
+                    false => TranscriptInstruction::add_till_next_ins(instruction, vec_instruction,&ins_task, &ref_len)
                 }
             }
         };        
@@ -339,7 +500,7 @@ impl TranscriptInstruction
     }
     /// ## Summary 
     /// add an instruction to copy the data until the next instruction in the vector of mutations
-    fn add_till_next_ins(ins:&instruction::Instruction, instructions:&Vec<instruction::Instruction>, last_task:&Task)->Task
+    fn add_till_next_ins(ins:&instruction::Instruction, instructions:&Vec<instruction::Instruction>, last_task:&Task, ref_len:&usize)->Task
     {
         let position=instructions.iter().position(|inst_cmp|inst_cmp==ins).unwrap();
         let next_ins=&instructions[position+1 as usize];
@@ -347,22 +508,77 @@ impl TranscriptInstruction
         {
             'D' | 'C'=>
             {
-                let stat_pos=ins.get_position_ref()+ins.get_length() +1 as usize; 
-                let res= panic::catch_unwind(||
+                if next_ins.get_position_ref() == ins.get_position_ref()
+                {
+                    return Task::new(2, 0, 0,0)
+                }
+                else if (ins.get_position_ref() + ins.get_length())==next_ins.get_position_ref()
+                {
+                    return Task::new(2, 0, 0,0)
+                }
+                else if next_ins.get_code()=='L' && next_ins.get_position_ref()+1 as usize == *ref_len && (ins.get_position_ref()+ins.get_length() +1 as usize)==next_ins.get_position_ref() 
+                {
+                    let stat_pos=ins.get_position_ref()+ins.get_length() +1 as usize; 
+                    return Task::new(0, stat_pos, 1,last_task.get_start_pos_res()+last_task.get_length())
+            
+                }
+                else 
+                {
+                    let stat_pos=ins.get_position_ref()+ins.get_length() +1 as usize; 
+                    let res= panic::catch_unwind(||
                     {
                         Task::new(0, stat_pos, 
                             next_ins.get_position_ref()- stat_pos, 
                             last_task.get_start_pos_res()+last_task.get_length())
                     }
-                );
-                match res
-                {
-                    Ok(res)=>res, 
-                    Err(err)=>panic!("This error was encountered: {:#?} while generating a task from: {:#?}, {:#?}, {:#?},{:#?},\
-                     The current instruction is: {:#?} while all instructions are: {:#?}",
+                    );
+                    match res
+                    {
+                        Ok(res)=>res, 
+                        Err(err)=>panic!("This error was encountered: {:#?} while generating a task from: {:#?}, {:#?}, {:#?},{:#?},\
+                        The current instruction is: {:#?} while all instructions are: {:#?}",
                             err, stat_pos,next_ins.get_position_ref(),last_task.get_start_pos_res(),last_task.get_length(), ins,instructions )
+                    }   
                 }
             }, 
+            '2'  =>
+            {
+                if next_ins.get_position_ref() == ins.get_position_ref()
+                {
+                    return Task::new(2, 0, 0,0)
+                }
+                else if (ins.get_position_ref() + ins.get_length())==next_ins.get_position_ref()
+                {
+                    return Task::new(2, 0, 0,0)
+                }
+                else
+                {
+                    let start_pos=ins.get_position_ref() + ins.get_length();
+                    Task::new(0, 
+                        start_pos, 
+                    next_ins.get_position_ref() - start_pos, 
+                    last_task.get_start_pos_res()+last_task.get_length())
+                }
+            },
+            '3' =>
+            {
+                if next_ins.get_position_ref() == ins.get_position_ref()
+                {
+                    return Task::new(2, 0, 0,0)
+                }
+                else if (ins.get_position_ref() + ins.get_length())==next_ins.get_position_ref()
+                {
+                    return Task::new(2, 0, 0,0)
+                }
+                else
+                {
+                    let start_pos=ins.get_position_ref() + ins.get_length(); 
+                    Task::new(0, 
+                        start_pos, 
+                    next_ins.get_position_ref() - start_pos, 
+                    last_task.get_start_pos_res()+last_task.get_length())
+                }
+            },
             _=>
             {
                 if next_ins.get_position_ref() == ins.get_position_ref()
@@ -371,6 +587,21 @@ impl TranscriptInstruction
                 }
                 else
                 {
+                    if next_ins.get_code()=='L'
+                    {
+                        if next_ins.get_position_ref()+1 as usize ==*ref_len
+                        {
+                            return Task::new(0, ins.get_position_ref()+1 as usize,
+                        next_ins.get_position_ref() - ins.get_position_ref(),
+                        last_task.get_start_pos_res()+last_task.get_length())
+                        }
+                        else
+                        {
+                            return Task::new(0, ins.get_position_ref()+1 as usize,
+                        next_ins.get_position_ref() - (1 as usize) - ins.get_position_ref(),
+                        last_task.get_start_pos_res()+last_task.get_length())
+                        }
+                    }
                     let res=panic::catch_unwind( ||
                     {
                         Task::new(0, ins.get_position_ref()+1 as usize,
@@ -403,6 +634,11 @@ impl TranscriptInstruction
                 Task::new(0, instruction.get_position_ref()+instruction.get_length()+ 1 as usize, 
                 ref_seq-instruction.get_position_ref()-instruction.get_length() -1 as usize, 
                 pos_res_array)
+            },
+            '2' | '3' =>
+            {
+                Task::new(0, instruction.get_position_ref()+instruction.get_length(), 
+            ref_seq-instruction.get_position_ref()-instruction.get_length() as usize, pos_res_array)
             },
             _=> Task::new(0, instruction.get_position_ref()+1, 
             ref_seq-instruction.get_position_ref()-1 as usize, pos_res_array)
@@ -464,17 +700,33 @@ impl TranscriptInstruction
             _=>alt_stream.len()-1
         }; 
         let last_task=vec_tasks.last().unwrap(); 
-        let pos_result=last_task.get_start_pos_res() + last_task.get_length() ;
+        let pos_result=last_task.get_start_pos_res()+ last_task.get_length() ;
         alt_stream.extend(instruction.get_data().iter());
         Task::new(1, pos_altstream, instruction.get_data().len(),pos_result)
     }
     /// ## Summary 
     /// Build the base instruction for a transcript where the reference is copied until the first instruction 
-    fn build_base_instruction(instruction:&instruction::Instruction)->Task
+    fn build_base_instruction(instruction:&instruction::Instruction, ref_len:&usize)->Task
     {
         match instruction.get_code()
         {
-            'Z' | 'P' | 'Y' =>Task::new(0, 0, instruction.get_position_ref()+1, 0),
+            'Z' | 'Y'  => Task::new(0, 0, instruction.get_position_ref()+1, 0),
+            'L'=>
+            {
+                if instruction.get_position_ref()+1 as usize ==*ref_len
+                {
+                    Task::new(0, 0, instruction.get_position_ref()+1, 0)
+                }
+                // edit here 
+                else if instruction.get_position_ref()==*ref_len
+                {
+                    Task::new(0, 0, instruction.get_position_ref(), 0)
+                }
+                else 
+                {
+                    Task::new(0, 0, instruction.get_position_res(), 0)
+                }
+            },
             _=> Task::new(0, 0, instruction.get_position_ref(), 0)
         }
     }

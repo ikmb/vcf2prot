@@ -1,6 +1,6 @@
 use std::collections::HashMap; 
 use std::path::Path; 
-use std::fs; 
+use std::{fs, panic}; 
 use std::io::Write;
 /// An abstraction for a sequence tape, where more than one sequence are annotated in an head to tail fashion 
 /// and a has map that stores the sequence name and the boundries, i.e. the start and the end point in the sequence
@@ -78,9 +78,13 @@ impl SequenceTape
     {
         let res=match self.annotations.get(seq_name) {
             Some(res)=>res,
-            None=>return Err(format!("The provided sequence name: {}, is not defined in the current tabe",seq_name))
+            None=>return Err(format!("The provided sequence name: {}, is not defined in the current table",seq_name))
         };
-        let res_string=&self.seq_str[res.0..res.1];
+        let res_string=match panic::catch_unwind(||&self.seq_str[res.0..res.1])
+        {
+            Ok(res)=>res,
+            Err(why)=>panic!("The following error was encountered: {:?} \n, while the sequence is: {}\n",why,&self.seq_str), 
+        };
         Ok(res_string)
     }
     /// return the sequence corresponding to the maximum index of the tape

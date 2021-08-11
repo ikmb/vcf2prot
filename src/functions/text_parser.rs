@@ -1,6 +1,3 @@
-
-use std::ops::Index;
-
 use crate::data_structures::mutation_ds::{MutationInfo,MutatedString}; 
 use crate::data_structures::Constants; 
 /// The function takes the consequence string and returned a Result enum either containing an Ok or Err type.
@@ -29,6 +26,10 @@ pub fn split_csq_string(input_string:&String)->Result<Vec<String>,String>
     {
         6=>
         {
+            if res[3].as_str()!="protein_coding"
+            {
+                return Err("Skipping this transcript as it is not a protein coding transcript".to_string())   
+            }
             let index:Vec<usize>=vec![0,2,5];
             Ok(index.iter().map(|i| res[*i].clone()).collect::<Vec<String>>())
         }, 

@@ -87,7 +87,7 @@ impl FastaFile
             None=>false
         }
     }
-    pub fn consume_and_get_hash_map(mut self)->HashMap<String,String>
+    pub fn consume_and_get_hash_map(self)->HashMap<String,String>
     {
         self.fastarecords
     }

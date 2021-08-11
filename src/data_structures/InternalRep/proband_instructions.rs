@@ -22,7 +22,7 @@ impl ProbandInstruction
     }
     /// ## Summary 
     /// Create a new instance from an int map, an engine and a reference sequence
-    pub fn from_intmap(mut int_map:IntMap, engine:Engine, ref_seq:&HashMap<String,String>)->Self
+    pub fn from_intmap(int_map:IntMap, engine:Engine, ref_seq:&HashMap<String,String>)->Self
     {
         let proband_name=int_map.proband_name.clone();
         let (haplo1_vec,haplo2_vec)=int_map.consume_and_get_vecs(); 

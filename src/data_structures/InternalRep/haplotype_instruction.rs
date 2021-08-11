@@ -43,11 +43,10 @@ impl HaplotypeInstruction
                 let vec_transcriot_ins= alt_trans_vec.into_iter()
                 .map(|alt_transcript| 
                 {
-                    let name = alt_transcript.name.clone(); 
                     match TranscriptInstruction::from_alt_transcript(alt_transcript, ref_seq)
                     {
                         Ok(res)=>res,
-                        Err(err_msg) => TranscriptInstruction::empty_t_instruction()
+                        Err(_) => TranscriptInstruction::empty_t_instruction()
                     }
                 })
                 .filter(|elem| *elem.get_transcript_name() != "")
@@ -59,11 +58,10 @@ impl HaplotypeInstruction
                 let vec_transcriot_ins= alt_trans_vec.into_par_iter()
                 .map(|alt_transcript| 
                     {
-                        let name = alt_transcript.name.clone(); 
                         match TranscriptInstruction::from_alt_transcript(alt_transcript, ref_seq)
                         {
                             Ok(res)=>res,
-                            Err(err_msg) => TranscriptInstruction::empty_t_instruction()
+                            Err(_) => TranscriptInstruction::empty_t_instruction()
                         }
                     })
                     .filter(|elem| *elem.get_transcript_name() != "")
@@ -77,7 +75,7 @@ impl HaplotypeInstruction
     pub fn get_g_rep(&mut self,ref_seq:&HashMap<String,String>, engine:Engine)->GIR
     {
         // Allocate resources 
-        let mut results_array=vec!['.'; self.get_size_results_array()];
+        let results_array=vec!['.'; self.get_size_results_array()];
         let mut alt_array=Vec::with_capacity(self.get_size_alt_array()); 
         let mut reference_array=Vec::with_capacity(self.get_size_ref_array(ref_seq));
         let mut annotation=HashMap::new(); 
@@ -91,6 +89,7 @@ impl HaplotypeInstruction
         // compute some counter 
         let mut ref_counter=0; let mut alt_counter=0; let mut res_counter=0; 
         let mut len_vec=Vec::with_capacity(1000); 
+        //println!("**************** Checking the correctness of the re-indexing loop: ");
         // loop-and-reindex 
         for g_rep_e in vec_g_rep
         {
@@ -99,14 +98,20 @@ impl HaplotypeInstruction
             {
                 Ok(res)=>res.consumer_and_get_resources(),
                 Err(err_msg)=>{println!("While creating instruction for a haplotype, the following error was encountered,{:#?}, skipping this transcript ...\
-                Please check your input VCF file, otherwise feel free to contact the developer at: h.elabd@ikmb.uni-kiel.de or at the project webpage: https://github.com/ikmb/ppg", err_msg);continue;},
+                Please check your input VCF file, otherwise feel free to contact the developer at: h.elabd@ikmb.uni-kiel.de or at the project webpage: https://github.com/ikmb/ppg", err_msg);
+                continue;},
             };
             // re-index and push the tasks 
+            //println!("Transcript instructions before re-indexing are: {:#?}", &res.0);
+            //let mut debugged_collection=Vec::new();
             for task in res.0
             {
                 len_vec.push(task.get_length());
-                g_rep.push(HaplotypeInstruction::update_task(task, &ref_counter, &alt_counter,&res_counter));
+                let updated=HaplotypeInstruction::update_task(task, &ref_counter, &alt_counter,&res_counter);
+                //debugged_collection.push(updated.clone());
+                g_rep.push(updated);
             }
+            //println!("Transcript instructions after re-indexing are: {:#?}", &debugged_collection);
             // move the alternative and resource array 
             let (len_alt, len_ref, len_res)=(res.2.len(),res.3.len(),res.4.len()); 
             alt_array.extend(res.2); 
@@ -118,12 +123,16 @@ impl HaplotypeInstruction
                 value.1+=res_counter;
                 annotation.insert(key, value);
             }
+            //println!("Current length of the result counter is: {}, current instruction length is: {}, results length is: {}",
+            //    res_counter,len_res,res_counter+len_res
+            //    );
             // update the counters 
             ref_counter+=len_ref; 
             alt_counter+=len_alt; 
             res_counter+=len_res; 
         }
         // return the results 
+        //println!("************** Vector of Tasks \n {:#?}",g_rep);
         GIR::new(g_rep, annotation, alt_array, reference_array, results_array)
     }
     /// ## Summary

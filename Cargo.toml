@@ -1,6 +1,6 @@
 [package]
-name = "ppgg_rust"
-version = "0.1.0"
+name = "ppg"
+version = "0.1.4"
 authors = ["Hesham ElAbd"]
 edition = "2018"
 build="build.rs"
@@ -19,7 +19,7 @@ scoped_threadpool="0.1.6"
 num_cpus = "0.2"
 libc = "0.2.0"
 cc = "1.0"
-itertools="0.10.1"
+flate2 = "1.0"
 
 [build-dependencies]
 cc = "1.0"
