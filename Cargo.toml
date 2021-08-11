@@ -1,5 +1,5 @@
 [package]
-name = "ppg"
+name = "ppgg"
 version = "0.1.4"
 authors = ["Hesham ElAbd <h.elabd@ikmb.uni-kiel.de>"]
 license = "MIT OR Apache-2.0"
@@ -18,7 +18,7 @@ exclude = [
 ]
 
 [lib]
-name = "ppg"
+name = "ppgg"
 path = "src/lib.rs"
 
 [[bin]]
