@@ -149,82 +149,96 @@ of the row with the first indexing error is also printed to the standard output 
 
 <p> Compiling the following code will be produce a CPU only version, that means that providing the code with panic if the GPU is specified as an engine, i.e. the parameter -g is set to gpu. </p>
 
-<p> 1- Install Rust from https://www.rust-lang.org </p>
+1. Install Rust from the <a href= "https://www.rust-lang.org "> official website </a>  
 
-<p> 2- Clone the current repository </p>
+2. Clone the current repository
 
-```
+```bash
 git clone https://github.com/ikmb/ppg
 ```
 
-<p> 3- Change the direction to ppg</p>
+3. Change the direction to ppg
 
-```
+```bash
 cd ppg
 ```
 
-<p> 4- build the project </p>
+4. Change to the cpu-only branch
 
+```bash
+git checkout cpu-only
 ```
-cargo build 
+
+5. build the project
+
+```bash
+cargo build --release 
 ```
-<p> 5- Access the binary executable from the target directory </p> 
+
+6. Access the binary executable from the target directory
+
+```bash
+cd target/release
+./ppg -h # This print the help statement 
+```
+
+7. add the binary to your PATH
 
 ### GPU Version ###
 
-#### **Note** ####
-
 <p> The following GPU code is only compatible with CUDA and NVIDIA GPUs</p>
 
-<p> 1- Install Rust from https://www.rust-lang.org </p>
+1. Install Rust from the <a href= "https://www.rust-lang.org "> official website </a>  
 
-<p> 2- Clone the current repository or Download the source code using the project Github page</p>
+2. Clone the current repository or Download the source code using the project Github page
 
-```
+```bash
 git clone https://github.com/ikmb/ppg
 ```
 
-<p> 3- Change the direction to ppg</p>
+3. Change the direction to ppg
 
-```
+```bash
 cd ppg
 ```
-<p> 4. Please make sure the following environmental variable are set CUDA_HOME and LD_LIBRARY_PATH, please set the value of these according to your system. </p>
 
-<p> 5. Use any text editor and update the following information in the build script, *build.rs* which is located the at the root directory, the following the 8th</p>
+4. Please make sure the following environmental variable are set CUDA_HOME and LD_LIBRARY_PATH, please set the value of these according to your system. 
 
-```
+5. Use any text editor and update the following information in the build script, *build.rs* which is located the at the root directory, the following the 8th
+
+```rust
     println!("cargo:rustc-link-search=native=/opt/cuda/11.0/lib64/"); // 8th line in the current version
     println!("cargo:rustc-link-search=native=/path two cuda lib64 directory"); // 8th line in the updated version
 ```
-<p> 4- build the project </p>
 
+6. build the project 
+
+```bash
+cargo build --release 
 ```
-cargo build 
+
+5. Access the binary executable from the target directory
+
+```bash
+cd target/release
+./ppg -h # This print the help statement 
 ```
-<p> 5- Access the binary executable from the target directory </p>
 
-## Installing the code with Cargo ##
+## Troubleshooting ##
 
-
-## Installing the code with Bioconda ##
-
-
-### Troubleshooting ###
-
-#### Problem ####
+### Problem ###
 
 <p> error while loading shared libraries: libcudart.so.11.0: cannot open shared object file: No such file or directory </p>
 
-#### solution ####
+### solution ###
 
 <p> This problem will be encountered in case any of the two environmental variable, CUDA_HOME and LD_LIBRARY_PATH, are not defined or set. For a permanent solution please update your .bashrc to have these two variables exported.</p>
 
 
-### Contact ###
+## Contact ##
 For further questions, please feel free to open an issue here or send an email to the developers at h.elabd@ikmb.uni-kiel.de or through twitter @HeshamElAbd16
 
-### Funding ###
+## Funding ##
 The project was funded by the German Research Foundation (DFG) (Research Training Group 1743, ‘Genes, Environment and Inflammation’)
 
 ![IKMB_LOGO](/media/RTG1743.png)
