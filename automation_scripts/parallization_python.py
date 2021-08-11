@@ -27,8 +27,8 @@ except ModuleNotFoundError:
 start_time=time.ctime()
 ## define the user argument 
 #--------------------------
-parser=argparse.ArgumentParser(description="A wrapper for PPGG, can be used for extracting a batch of patient from a bcf.gz into a VCF file \
-    and call PPGG on the generate batch to generated personalized proteome for each patient in the extracted batch. Different batches are executed concurrently\
+parser=argparse.ArgumentParser(description="A wrapper for ppg, can be used for extracting a batch of patient from a bcf.gz into a VCF file \
+    and call ppg on the generate batch to generated personalized proteome for each patient in the extracted batch. Different batches are executed concurrently\
         using a pool of processes")
 
 parser.add_argument("-f,--file",help="The path to the input bcf.gz file", default='?')
@@ -40,7 +40,7 @@ parser.add_argument("-t,--temp_dir", help="The path to a temp directory to store
 parser.add_argument("-w,--num_workers", help="number of worker processes, defaults to number of available CPU cores", 
                             default=os.cpu_count())
 parser.add_argument("-b, --batch_size",help="The number of patients in a batch, defaults to 100", default=100, type=int)
-parser.add_argument("-e,--exe", help="The path to PPGG executables",default=None)
+parser.add_argument("-e,--exe", help="The path to ppg executables",default=None)
 parser.add_argument('-k,--set_input_name_as_base',help="A boolean switch for controlling the writting output, if True, a directory with\
     same name as the input is created in the output directory and the temp directory, where files will be written.", default=False, action='store_true')
 ## Parse user provided arguments 
@@ -119,7 +119,7 @@ def extract_patient_from_bcf_compressed(path2file:str, patients: List[str], path
     return result_file
 
 def worker_function(path2chunK:str, path2ref:str, result_path:str)->None:
-    """Runs PPGG with the provided batch of probands on a separate process
+    """Runs ppg with the provided batch of probands on a separate process
 
     Args:
         path2chunK (str): The path to a vcf file containing the batch of samples used in the analysis 
@@ -127,21 +127,21 @@ def worker_function(path2chunK:str, path2ref:str, result_path:str)->None:
         result_path (str): The path to write the resulting FASTA file 
 
     Raises:
-        RuntimeError: incase calling PPGG failed
+        RuntimeError: incase calling ppg failed
     """
     try:
         if args.exe==None:
-            sp.run(f"ppgg_rust -f {path2chunK} -r {path2ref}, -o {result_path} -g st",
+            sp.run(f"ppg_rust -f {path2chunK} -r {path2ref}, -o {result_path} -g st",
                                 stdout=sp.DEVNULL,check=True)
         else:
-            sp.run(f".{args.exe}/ppgg_rust -f {path2chunK} -r {path2ref}, -o {result_path} -g st",
+            sp.run(f".{args.exe}/ppg_rust -f {path2chunK} -r {path2ref}, -o {result_path} -g st",
                                 stdout=sp.DEVNULL,check=True)
     except sp.SubprocessError as exp:
-        raise RuntimeError(f"Calling PPGG with the following chunk failed: {path2chunK}")
+        raise RuntimeError(f"Calling ppg with the following chunk failed: {path2chunK}")
 
 def personalization_task(path2file:str,patients:List[str], path2temp:str, path2ref:str, path2res:str)->None:
     """ Extract the genomic alteration of a batch of patients from a VCF file, write the results to a VCF file\
-         and call PPGG to generate the personalized Fasta sequences. 
+         and call ppg to generate the personalized Fasta sequences. 
 
     Args:
         path2file (str): the path the VCF file. 

@@ -7,7 +7,7 @@ use crate::data_structures::Constants;
 /// # Errors 
 /// incase the provided string does not have six pipe sperators
 ///``` 
-/// use ppgg_rust::functions::text_parser::split_csq_string;
+/// use ppg_rust::functions::text_parser::split_csq_string;
 /// let example_csq_string="stop_gained|RABGEF1|ENST00000484547|NMD|+|32Q>32*|66771993C>T".to_string();
 /// match split_csq_string(&example_csq_string)
 /// {
@@ -61,8 +61,8 @@ pub fn split_csq_string(input_string:&String)->Result<Vec<String>,String>
 /// # Errors 
 /// incase parsing the provided sequecne failed, a string coding for the error message will be retrained 
 ///```rust 
-/// use ppgg_rust::functions::text_parser;
-/// use ppgg_rust::data_structures::mutation_ds::{MutatedString,MutationInfo};
+/// use ppg_rust::functions::text_parser;
+/// use ppg_rust::data_structures::mutation_ds::{MutatedString,MutationInfo};
 /// let mut_string="32Q>32*".to_string();
 /// let res = text_parser::parse_amino_acid_field(&mut_string).expect("Generating the parse_amino_acid failed");
 /// let mut_info=MutationInfo
@@ -114,7 +114,7 @@ pub fn parse_amino_acid_field(input_string: &String)->Result<MutationInfo,String
 /// # Example
 ///``` 
 /// let test_example="35KTEST";
-/// use ppgg_rust::functions::text_parser::parse_amino_acid_seq_position; 
+/// use ppg_rust::functions::text_parser::parse_amino_acid_seq_position; 
 /// match parse_amino_acid_seq_position(test_example)
 /// {
 ///       Ok((pos,seq))=>println!("The position is: {}, while the sequence is: {}",pos,seq),
@@ -149,7 +149,7 @@ pub fn parse_amino_acid_seq_position(input_seq: &str)->Result<(u16,String),Strin
 /// more than one number are provided as input, for example, 1|1:1234,5,0,0,0 => 1234,5 will be the bitmask 
 /// # Example
 ///``` 
-/// use ppgg_rust::functions::text_parser;
+/// use ppg_rust::functions::text_parser;
 /// let mut test_case="0|1:0.432432:16,21:37:PASS:99:634,0,417:..:0.1989:10922"; 
 /// let mut results=text_parser::get_bit_mask(&test_case.to_string());
 /// assert_eq!(results,"10922$"); 
@@ -194,7 +194,7 @@ pub fn get_bit_mask(input_string:&String)->String
 /// if this fail, for whatever reasons, the function returns  Constants::DEF_CONSEQ, currently equal ""
 /// # Example
 ///``` 
-/// use ppgg_rust::functions::text_parser::parse_fields; 
+/// use ppg_rust::functions::text_parser::parse_fields; 
 /// let test_example="3";
 /// let results=parse_fields(test_example.to_string()); 
 /// assert_eq!(results,"3$"); 
@@ -219,7 +219,7 @@ pub fn parse_fields(mut fields:String)->String
 /// Trim leading zeros from a bitmask string, e.g. 3,5,0->3,5, this is a helper function used to remove the leadng zeros 
 /// # Example
 ///``` 
-/// use ppgg_rust::functions::text_parser::remove_leading_zeros; 
+/// use ppg_rust::functions::text_parser::remove_leading_zeros; 
 /// let test_example="3,5,0";
 /// let results=remove_leading_zeros(test_example.to_string()); 
 /// assert_eq!(results,"3,5"); 
@@ -249,7 +249,7 @@ pub fn remove_leading_zeros(mut fields:String)->String
 /// a one-liner function for generating the type of mutation from the consequence string. 
 /// ## Example 
 ///``` 
-/// use ppgg_rust::functions::text_parser::get_type; 
+/// use ppg_rust::functions::text_parser::get_type; 
 /// let test_case="*missense|ITPRID1|ENST00000409210|protein_coding|+|717C>717Y|31643796G>A".to_string(); 
 /// assert_eq!(*"*missense", *get_type(&test_case));
 ///```

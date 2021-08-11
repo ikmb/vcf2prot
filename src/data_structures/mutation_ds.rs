@@ -8,7 +8,7 @@ use crate::functions::text_parser;
 ///``` 
 /// let test_case="missense"; 
 /// use std::str::FromStr;
-/// use ppgg_rust::data_structures::mutation_ds::MutationType;
+/// use ppg_rust::data_structures::mutation_ds::MutationType;
 /// assert_eq!(MutationType::MisSense, MutationType::from_str(test_case).unwrap());
 ///``` 
 #[derive(Debug,Clone,PartialEq,Eq,Serialize,Deserialize)]
@@ -60,7 +60,7 @@ impl FromStr for MutationType
 /// ## Examples
 ///``` 
 /// use std::str::FromStr;
-/// use ppgg_rust::data_structures::mutation_ds::MutatedString;
+/// use ppg_rust::data_structures::mutation_ds::MutatedString;
 /// let cases=vec!["KLM","NOP*","*",""].iter().map(|case| case.to_string()).collect::<Vec<String>>();
 /// assert_eq!(MutatedString::Sequence(cases[0].clone()),MutatedString::from_str(&cases[0]).unwrap());
 /// assert_eq!(MutatedString::EndSequence(cases[1].clone()),MutatedString::from_str(&cases[1]).unwrap());
@@ -120,7 +120,7 @@ impl MutationInfo
     /// 4. mut_aa a *MutatedString*, representing the mutated amino acid sequence at the mutational site
     /// ## Examples 
     ///``` 
-    /// use ppgg_rust::data_structures::mutation_ds::MutationInfo; 
+    /// use ppg_rust::data_structures::mutation_ds::MutationInfo; 
     /// let ref_pos=32;
     /// let mut_pos=32;
     /// let ref_seq="*".to_string();

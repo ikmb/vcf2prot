@@ -17,7 +17,7 @@ impl SequenceTape
     /// create a new sequence map from a seuqnece tape and an annotation hash map 
     /// ## Example 
     ///``` 
-    /// use ppgg_rust::data_structures::InternalRep::sequence_tape::SequenceTape; 
+    /// use ppg_rust::data_structures::InternalRep::sequence_tape::SequenceTape; 
     /// use std::collections::HashMap; 
     /// let code_string="SEQ1_SEQ2_SEQ3_SEQ4_SEQ5_SEQ6".to_string(); 
     /// let mut res_map:HashMap<String,(usize,usize)>=HashMap::new();
@@ -43,7 +43,7 @@ impl SequenceTape
     /// ## Example 
     ///``` 
     /// use std::path::Path;
-    /// use ppgg_rust::data_structures::InternalRep::sequence_tape::SequenceTape; 
+    /// use ppg_rust::data_structures::InternalRep::sequence_tape::SequenceTape; 
     /// use std::collections::HashMap; 
     /// let code_string="SEQ1_SEQ2_SEQ3_SEQ4_SEQ5_SEQ6".to_string(); 
     /// let mut res_map:HashMap<String,(usize,usize)>=HashMap::new();
@@ -91,7 +91,7 @@ impl SequenceTape
     /// ## Example 
     ///``` 
     /// use std::collections::HashMap;  
-    /// use ppgg_rust::data_structures::InternalRep::sequence_tape::SequenceTape; 
+    /// use ppg_rust::data_structures::InternalRep::sequence_tape::SequenceTape; 
     /// let code_string="SEQ1_SEQ2_SEQ3_SEQ4_SEQ5_SEQ6".to_string(); 
     /// let mut res_map:HashMap<String,(usize,usize)>=HashMap::new();
     /// res_map.insert("1".to_string(), (0,4)); 

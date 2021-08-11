@@ -20,7 +20,7 @@ impl Task
     /// Execute the task of the two input streams ans the resulting vector of chars 
     /// ## Example  
     ///```     
-    /// use ppgg_rust::data_structures::InternalRep::task::Task; 
+    /// use ppg_rust::data_structures::InternalRep::task::Task; 
     /// let test_stream_ref="ABCFEFGH"
     /// .chars()
     /// .collect::<Vec<char>>(); 

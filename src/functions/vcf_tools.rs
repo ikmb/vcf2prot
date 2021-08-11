@@ -52,7 +52,7 @@ pub fn build_int_map_from_early(early_map:&EarlyMap)->IntMap
 /// contain all the mutations observed in a single transcript.
 /// ## Example
 ///```
-/// use ppgg_rust::functions::vcf_tools::group_muts_per_transcript; 
+/// use ppg_rust::functions::vcf_tools::group_muts_per_transcript; 
 /// let mutations=vec!["*missense|MAD1L1|Transcript1|protein_coding|-|1R>1H|1936821C>T".to_string(),
 ///                "*missense|MAD1L1|Transcript1|protein_coding|-|10R>10H|1936821C>T".to_string(),
 ///                "*missense|MAD1L1|Transcript2|protein_coding|-|100R>100H|1936821C>T".to_string(),
@@ -96,7 +96,7 @@ pub fn group_muts_per_transcript(vec_mut:&Vec<String>)->Vec<AltTranscript>
 /// Extract the set of uniuqe transcripts in a collection of mutations 
 /// ##Example 
 ///```
-/// use ppgg_rust::functions::vcf_tools::get_unique_transcript; 
+/// use ppg_rust::functions::vcf_tools::get_unique_transcript; 
 /// let mutations=vec!["*missense|MAD1L1|Transcript1|protein_coding|-|1R>1H|1936821C>T".to_string(),
 ///                "*missense|MAD1L1|Transcript1|protein_coding|-|10R>10H|1936821C>T".to_string(),
 ///                "*missense|MAD1L1|Transcript2|protein_coding|-|100R>100H|1936821C>T".to_string(),

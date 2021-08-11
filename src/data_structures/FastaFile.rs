@@ -4,8 +4,8 @@ use std::collections::HashMap;
 /// every sequence id with it's sequence. 
 /// ## Example 
 ///``` 
-/// use ppgg_rust::data_structures::FastaFile; 
-/// use ppgg_rust::readers::read_fasta_file; 
+/// use ppg_rust::data_structures::FastaFile; 
+/// use ppg_rust::readers::read_fasta_file; 
 /// use std::path::Path; 
 /// let path2file=Path::new("test_data/test_fasta_data1.fasta");
 /// let fasta_file=read_fasta_file(path2file).unwrap(); 
@@ -24,7 +24,7 @@ impl FastaFile
     /// ## Example 
     ///``` 
     /// use std::collections::HashMap; 
-    /// use ppgg_rust::data_structures::FastaFile; 
+    /// use ppg_rust::data_structures::FastaFile; 
     /// let mut test_map=HashMap::new(); 
     /// test_map.insert("seq1".to_string(),"test_seq".to_string()); 
     /// let fasta_file=FastaFile::FastaFile::new(test_map);
@@ -39,7 +39,7 @@ impl FastaFile
     /// ## Example 
     ///``` 
     /// use std::collections::HashMap; 
-    /// use ppgg_rust::data_structures::FastaFile;
+    /// use ppg_rust::data_structures::FastaFile;
     /// let mut test_map=HashMap::new(); 
     /// test_map.insert("seq1".to_string(),"test_seq".to_string()); 
     /// let fasta_file=FastaFile::FastaFile::new(test_map);
@@ -58,7 +58,7 @@ impl FastaFile
     /// ## Example 
     ///``` 
     /// use std::collections::HashMap; 
-    /// use ppgg_rust::data_structures::FastaFile;
+    /// use ppg_rust::data_structures::FastaFile;
     /// let mut test_map=HashMap::new(); 
     /// test_map.insert("seq1".to_string(),"test_seq".to_string()); 
     /// let fasta_file=FastaFile::FastaFile::new(test_map);
@@ -73,7 +73,7 @@ impl FastaFile
     /// ## Example 
     ///``` 
     /// use std::collections::HashMap; 
-    /// use ppgg_rust::data_structures::FastaFile;
+    /// use ppg_rust::data_structures::FastaFile;
     /// let mut test_map=HashMap::new(); 
     /// test_map.insert("seq1".to_string(),"test_seq".to_string()); 
     /// let fasta_file=FastaFile::FastaFile::new(test_map);

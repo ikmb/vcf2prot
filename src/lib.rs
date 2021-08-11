@@ -1,5 +1,5 @@
 /// # Project Description 
-///  The crate contains all the function and modules that were utilized to build PPGG (https://github.com/ikmb/ppg)
+///  The crate contains all the function and modules that were utilized to build ppg (https://github.com/ikmb/ppg)
 /// The crate is composite of 5 main modules:
 /// 1. Readers which provide a collection of function for reading Fasta and VCF files 
 /// 2. Data_structures which is the major engine of the crate, the different data structures provides 

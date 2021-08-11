@@ -72,7 +72,7 @@ impl ParsedInput
 
 pub fn parse_command_line()->ArgMatches
 {
-    App::new("PPGG")
+    App::new("ppg")
     .version("0.1.2")
     .author("Hesham ElAbd <h.elabd@ikmb.uni-kiel.de>")
     .about("A rust binary that takes as input a fasta file containing the reference proteome and\
@@ -136,7 +136,7 @@ pub fn parse_command_line()->ArgMatches
         .long("write_all_proteins")
         .required(false)
         .takes_value(false)
-        .about("An optional control flag to control the writing behavior of PPGG, if set PPGG will write the altered and the non-altered, i.e.\
+        .about("An optional control flag to control the writing behavior of ppg, if set ppg will write the altered and the non-altered, i.e.\
         reference sequences, to the fasta file of each proband. This might increase the size of the generated files considerably.\
         By default this option is switched off."))
     .arg(Arg::new("write_compressed")
@@ -144,7 +144,7 @@ pub fn parse_command_line()->ArgMatches
         .long("write_compressed")
         .required(false)
         .takes_value(false)
-        .about("An optional control flag to control the writing behavior of PPGG, if set PPGG will write the generated fasta files as g-zipped\
+        .about("An optional control flag to control the writing behavior of ppg, if set ppg will write the generated fasta files as g-zipped\
         files, i.e. with the extension .fasta.gz, this can be used to decrease the disk space needed by the generated files, especially, \
         when generating 1000s of files.By default this option is switched off. "))    
     .arg(Arg::new("write_single_thread")
@@ -152,7 +152,7 @@ pub fn parse_command_line()->ArgMatches
         .long("write_single_thread")
         .required(false)
         .takes_value(false)
-        .about("An optional control flag to control the writing behavior of PPGG, if set only one thread is used to write all generated fasta files,\
+        .about("An optional control flag to control the writing behavior of ppg, if set only one thread is used to write all generated fasta files,\
         by default, this is the case with a single thread engine, i.e. g st, however, this parameter can be used to overwrite this parameter and \
         to enable a single threaded writing of files when a multi-threaded or a GPU engines have been used for parsing and generating the sequences. "))       
     .get_matches()

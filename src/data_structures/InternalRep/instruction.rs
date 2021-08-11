@@ -43,7 +43,7 @@ impl Instruction
     /// start_lost&splice_region ->         U
     /// ```rust
     /// // load the modules 
-    /// use ppgg_rust::data_structures::InternalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::InternalRep::instruction::Instruction; 
     /// // define some example data 
     /// let code = 'M'; 
     /// let s_state = false; 
@@ -162,8 +162,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -208,8 +208,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutations that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -243,8 +243,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -333,8 +333,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -375,8 +375,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -479,8 +479,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -514,8 +514,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -553,8 +553,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -595,8 +595,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -623,8 +623,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -658,8 +658,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -696,8 +696,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -724,8 +724,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -751,8 +751,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -800,8 +800,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -828,8 +828,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -855,8 +855,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -894,8 +894,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -926,8 +926,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -953,8 +953,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -979,8 +979,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  
@@ -1052,8 +1052,8 @@ impl Instruction
     /// ## Example 
     /// ```rust
     /// // load instruction and mutation into scope
-    /// use ppgg_rust::data_structures::internalRep::instruction::Instruction; 
-    /// use ppgg_rust::data_structures::mutational_ds::Mutation; 
+    /// use ppg_rust::data_structures::internalRep::instruction::Instruction; 
+    /// use ppg_rust::data_structures::mutational_ds::Mutation; 
     /// // let's create a vector of mutation that represent the collection of mutations 
     /// let mut vec_mut = Vec::new(); 
     /// // create a mutation instance  

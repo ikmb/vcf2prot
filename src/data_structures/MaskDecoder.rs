@@ -14,8 +14,8 @@ impl BitMask
     /// get_bit_mask defined at the functions::text_parser module  
     /// ## Example
     ///``` 
-    /// use ppgg_rust::data_structures::MaskDecoder::BitMask;
-    /// use ppgg_rust::functions::text_parser; 
+    /// use ppg_rust::data_structures::MaskDecoder::BitMask;
+    /// use ppg_rust::functions::text_parser; 
     /// let mut test_case="0|1:0.432432:16,21:37:PASS:99:634,0,417:..:0.1989:10922"; 
     /// let mut results=text_parser::get_bit_mask(&test_case.to_string());
     /// assert_eq!(results,"10922$"); 
@@ -53,7 +53,7 @@ impl BitMask
     /// index of CSQ observed in the first haplotype and the second contains the CSQ observed in the second haplotype.
     /// ## Example
     ///``` 
-    /// use ppgg_rust::data_structures::MaskDecoder::BitMask; 
+    /// use ppg_rust::data_structures::MaskDecoder::BitMask; 
     /// let mut test_case="3,3,3,3".to_string();
     /// let mut test_bitmask=BitMask::from_string(&mut test_case);
     /// match test_bitmask.get_indices()

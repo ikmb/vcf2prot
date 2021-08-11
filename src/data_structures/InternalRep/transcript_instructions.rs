@@ -194,9 +194,9 @@ impl TranscriptInstruction
     /// Inspect the TranscriptInstruction instance and compute the size of the results array
     /// ## Experiment 
     ///```  
-    /// use ppgg_rust::data_structures::InternalRep::transcript_instructions::TranscriptInstruction; 
-    /// use ppgg_rust::data_structures::mutation_ds::Mutation; 
-    /// use ppgg_rust::data_structures::InternalRep::instruction;
+    /// use ppg_rust::data_structures::InternalRep::transcript_instructions::TranscriptInstruction; 
+    /// use ppg_rust::data_structures::mutation_ds::Mutation; 
+    /// use ppg_rust::data_structures::InternalRep::instruction;
     /// let test_case=vec!["frameshift".to_string(), "ENST00000510017".to_string(), "40VGLHFWTM*>40VDSTFGQC".to_string()];
     /// let test_mutation=Mutation::new(test_case).unwrap();
     /// let ins=instruction::Instruction::from_mutation(&test_mutation); 

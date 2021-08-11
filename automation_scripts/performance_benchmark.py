@@ -1,7 +1,7 @@
 #!/usr/bin/env python  
 """
 @author: Hesham ElAbd
-@brief: A simple performance script for benchmarking the rust implementation of SIR, PPGG
+@brief: A simple performance script for benchmarking the rust implementation of SIR, ppg
 @date: 11.08.2021
 """
 ## import the modules 
@@ -59,7 +59,7 @@ for num_pat in tqdm(num_patients):
                     sp.run(f"export DEBUG_GPU=TRUE &&\
                         export INSPECT_TXP=TRUE&&\
                         export INSPECT_INS_GEN=TRUE&&\
-                        ./ppgg_rust -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
+                        ./ppg_rust -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
                              -r {INPUT_REF}, -o {TEMP_RESULTS_PATH} -g {engine} -wv",
                                 stdout=sp.DEVNULL,check=True) # incase execution failed for whatever reason the whole script shall fail 
                     end_time=time.time()
@@ -68,7 +68,7 @@ for num_pat in tqdm(num_patients):
                     sp.run(f"export DEBUG_GPU=TRUE &&\
                         export INSPECT_TXP=TRUE&&\
                         export INSPECT_INS_GEN=TRUE&&\
-                        ./ppgg_rust -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
+                        ./ppg_rust -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
                              -r {INPUT_REF}, -o {TEMP_RESULTS_PATH} -g {engine} -wv",
                                 stdout=sp.DEVNULL,check=True)
                     end_time=time.time()

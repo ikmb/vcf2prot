@@ -10,7 +10,7 @@ use crate::data_structures::InternalRep::engines::Engine;
 ///  ## Example 
 ///``` 
 /// use std::path::Path;
-/// use ppgg_rust::readers;
+/// use ppg_rust::readers;
 /// let path=Path::new("/Users/heshamelabd/projects/test_data/dev_case_long_and_short.vcf");
 /// let (probands, records)= match readers::read_vcf(path)
 /// {
@@ -46,8 +46,8 @@ pub fn read_vcf(path2load:&Path, engine:Engine)->Result<(vcf_ds::Probands,vcf_ds
 /// Takes as an input the path to a fasta file and return a FastaFile or an error message 
 ///  ## Example 
 ///``` 
-/// use ppgg_rust::data_structures::FastaFile; 
-/// use ppgg_rust::readers::read_fasta_file; 
+/// use ppg_rust::data_structures::FastaFile; 
+/// use ppg_rust::readers::read_fasta_file; 
 /// use std::path::Path; 
 /// let path2file=Path::new("test_data/test_fasta_data1.fasta");
 /// let fasta_file=read_fasta_file(path2file).unwrap(); 
@@ -107,7 +107,7 @@ pub mod vcf_helpers
     ///``` 
     /// use std::path::Path; 
     /// let path = Path::new("/Users/heshamelabd/projects/test_data/dev_file.vcf"); 
-    /// let lines= ppgg_rust::readers::vcf_helpers::read_file(&path).unwrap();
+    /// let lines= ppg_rust::readers::vcf_helpers::read_file(&path).unwrap();
     /// for line in lines
     /// {
     ///     println!("{}",line)
@@ -138,7 +138,7 @@ pub mod vcf_helpers
     /// ## Example 
     ///``` 
     /// use std::path::Path; 
-    /// use ppgg_rust::readers::vcf_helpers; 
+    /// use ppg_rust::readers::vcf_helpers; 
     /// let file_path= Path::new("/Users/heshamelabd/projects/test_data/test_file2.vcf");
     /// let mut results = vcf_helpers::read_file(&file_path).unwrap(); 
     /// let res_vec=vcf_helpers::get_probands_names(&mut results).unwrap(); 
@@ -211,7 +211,7 @@ pub mod vcf_helpers
     /// that the line should not be skipped 
     /// ## Example 
     ///``` 
-    /// use ppgg_rust::readers::vcf_helpers; 
+    /// use ppg_rust::readers::vcf_helpers; 
     /// let test_line="7\t193407\t7_193407_C_A\tC\tA\t1495\tPASS\tAF=2.5e-05;AQ=1495;ExcessHet=3.0103;QD=14.24;AC=1;AN=32920;BCSQ=missense|FAM20C|ENST00000313766|protein_coding|+|13I>13F|193236A>T\t0|1:0.461538:6,7:13:PASS:99:209,0,186:.:.:10410".to_string();
     /// assert_eq!(true, vcf_helpers::return_if_supported(&test_line))
     ///``` 
@@ -250,7 +250,7 @@ pub mod vcf_helpers
     /// A helper function that inspect the input string and return True if it can be interpreted by the program or False otherwise 
     /// ## Example 
     ///``` 
-    /// use ppgg_rust::readers::vcf_helpers; 
+    /// use ppg_rust::readers::vcf_helpers; 
     /// let test_case1="missense|FAM20C|ENST00000313766|protein_coding|+|13I>13F|193236A>T";
     /// let test_case2="splice_region|FAM20C|ENST00000313766|protein_coding";
     /// let test_case3="@246435";

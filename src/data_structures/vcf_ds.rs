@@ -18,7 +18,7 @@ impl VCFRecords
     /// Create a new VCFRecords from a vector of strings  where each string represent a line in the VCF file 
     /// ## Example
     ///```
-    /// use ppgg_rust::data_structures::vcf_ds::VCFRecords; 
+    /// use ppg_rust::data_structures::vcf_ds::VCFRecords; 
     /// let test_case1=vec![
     ///        "1\t1\t1\t1\t1\t1\t1\t1\tField1\tField1.1\tField1.2\tField1.3\tField1.4\tField1.5\tField1.6\tField1.7".to_string(),
     ///        "1\t1\t1\t1\t1\t1\t1\t1\tField2\tField2.1\tField2.2\tField2.3\tField2.4\tField2.5\tField2.6\tField2.7".to_string(),
@@ -32,7 +32,7 @@ impl VCFRecords
     /// Return a reference 
     /// ## Example
     ///```
-    /// use ppgg_rust::data_structures::vcf_ds::VCFRecords; 
+    /// use ppg_rust::data_structures::vcf_ds::VCFRecords; 
     /// let test_case1=vec![
     ///        "1\t1\t1\t1\t1\t1\t1\t1\tField1\tField1.1\tField1.2\tField1.3\tField1.4\tField1.5\tField1.6\tField1.7".to_string(),
     ///        "1\t1\t1\t1\t1\t1\t1\t1\tField2\tField2.1\tField2.2\tField2.3\tField2.4\tField2.5\tField2.6\tField2.7".to_string(),
@@ -49,8 +49,8 @@ impl VCFRecords
     /// ## Example
     ///```
     /// use std::path::Path; 
-    /// use ppgg_rust::readers; 
-    /// use ppgg_rust::data_structures::vcf_ds::VCFRecords; 
+    /// use ppg_rust::readers; 
+    /// use ppg_rust::data_structures::vcf_ds::VCFRecords; 
     /// let case_path=Path::new("/Users/heshamelabd/projects/test_data/test_f1_mod_test_vcf_case.vcf"); 
     /// let res_path=Path::new("/Users/heshamelabd/projects/test_data/test_f1_mod_test_vcf_res.txt");
     /// let records=readers::vcf_helpers::read_file(case_path).unwrap(); 
@@ -86,7 +86,7 @@ impl VCFRecords
     /// collected into one vector, i.e. the inner vector, the outer vector represent the collection of all mutations.
     /// ## Example
     ///```
-    /// use ppgg_rust::data_structures::vcf_ds::VCFRecords; 
+    /// use ppg_rust::data_structures::vcf_ds::VCFRecords; 
     /// let test_case1=vec![
     ///    "1\t1\t1\t1\t1\t1\t1\t1\tField1\tField1.1\tField1.2\tField1.3\tField1.4\tField1.5\tField1.6\tField1.7".to_string(),
     ///    "1\t1\t1\t1\t1\t1\t1\t1\tField2\tField2.1\tField2.2\tField2.3\tField2.4\tField2.5\tField2.6\tField2.7".to_string(),
@@ -296,8 +296,8 @@ impl VCFRecords
     /// each of them are the effects as a specifc site.
     ///```
     /// use std::path::Path; 
-    /// use ppgg_rust::readers;
-    /// use ppgg_rust::data_structures::vcf_ds::VCFRecords; 
+    /// use ppg_rust::readers;
+    /// use ppg_rust::data_structures::vcf_ds::VCFRecords; 
     /// let case_path=Path::new("/Users/heshamelabd/projects/test_data/test_f1_mod_test_vcf_case.vcf"); 
     /// let res_path=Path::new("/Users/heshamelabd/projects/test_data/test_f1_mod_test_vcf_res.txt");
     /// let records=readers::vcf_helpers::read_file(case_path).unwrap(); 
@@ -363,7 +363,7 @@ pub struct AltTranscript
     /// Create a new instance from a transcript name and a vector of Consequences string
     /// ## Example 
     ///```
-    /// use ppgg_rust::data_structures::vcf_ds::AltTranscript; 
+    /// use ppg_rust::data_structures::vcf_ds::AltTranscript; 
     /// let name="ENST00000406869".to_string(); 
     /// let mutations=vec!["*missense|MAD1L1|ENST00000406869|protein_coding|-|1R>1H|1936821C>T".to_string(),
     ///            "*missense|MAD1L1|ENST00000406869|protein_coding|-|10R>10H|1936821C>T".to_string(),
@@ -397,7 +397,7 @@ pub struct AltTranscript
     /// add an alteration i.e. a genetic mutation, to the current instance of mutations, 
     /// ## Example 
     ///```
-    /// use ppgg_rust::data_structures::vcf_ds::AltTranscript; 
+    /// use ppg_rust::data_structures::vcf_ds::AltTranscript; 
     /// let name="ENST00000406869".to_string(); 
     /// let mutations=vec!["*missense|MAD1L1|ENST00000406869|protein_coding|-|1R>1H|1936821C>T".to_string(),
     ///            "*missense|MAD1L1|ENST00000406869|protein_coding|-|10R>10H|1936821C>T".to_string(),
@@ -421,7 +421,7 @@ pub struct AltTranscript
     /// add an alteration i.e. a genetic mutation, to the current instance of mutations, 
     /// ## Example 
     ///```
-    /// use ppgg_rust::data_structures::vcf_ds::AltTranscript; 
+    /// use ppg_rust::data_structures::vcf_ds::AltTranscript; 
     /// let name="ENST00000406869".to_string(); 
     ///    let mutations=vec!["*missense|MAD1L1|ENST00000406869|protein_coding|-|1R>1H|1936821C>T".to_string(),
     ///            "*missense|MAD1L1|ENST00000406869|protein_coding|-|10R>10H|1936821C>T".to_string(),

@@ -61,7 +61,7 @@ impl EarlyMap
     /// and a second vector represent the consequences of the second haplotypes 
     /// ## Examples 
     ///``` 
-    /// use ppgg_rust::data_structures::Map::EarlyMap;
+    /// use ppg_rust::data_structures::Map::EarlyMap;
     /// let proband_name="Test_name".to_string(); 
     /// let mutations1="mutation1_1,mutation1_3".split(",").map(|elem| elem.to_string()).collect::<Vec<String>>(); 
     /// let mutations2="mutation1_2,mutation1_4".split(",").map(|elem| elem.to_string()).collect::<Vec<String>>(); 
@@ -78,7 +78,7 @@ impl EarlyMap
     /// determined by the parameter, expected_number 
     /// ## Examples 
     ///``` 
-    /// use ppgg_rust::data_structures::Map::EarlyMap;
+    /// use ppg_rust::data_structures::Map::EarlyMap;
     /// let proband_name="Test_name".to_string(); 
     /// let num_mutation=10; 
     /// let results=EarlyMap::with_capacity(proband_name.clone(),10); 
@@ -97,7 +97,7 @@ impl EarlyMap
     /// add a new mutation to the current instance
     /// ## Examples 
     ///``` 
-    /// use ppgg_rust::data_structures::Map::EarlyMap;
+    /// use ppg_rust::data_structures::Map::EarlyMap;
     /// let proband_name="Test_name".to_string(); 
     /// let num_mutation=10; 
     /// let mut results=EarlyMap::with_capacity(proband_name.clone(),10); 
@@ -121,7 +121,7 @@ impl EarlyMap
     /// return a tuple that contain reference to the instances vector of string 
     /// ## Examples 
     ///``` 
-    /// use ppgg_rust::data_structures::Map::EarlyMap;
+    /// use ppg_rust::data_structures::Map::EarlyMap;
     /// let proband_name="Test_name".to_string(); 
     /// let num_mutation=10; 
     /// let mut results=EarlyMap::with_capacity(proband_name.clone(),10); 
@@ -137,7 +137,7 @@ impl EarlyMap
     /// return a reference to the proband names 
     /// ## Examples 
     ///``` 
-    /// use ppgg_rust::data_structures::Map::EarlyMap;
+    /// use ppg_rust::data_structures::Map::EarlyMap;
     /// let proband_name="Test_name".to_string(); 
     /// let num_mutation=10; 
     /// let mut results=EarlyMap::with_capacity(proband_name.clone(),10); 

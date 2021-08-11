@@ -28,7 +28,7 @@ impl PersonalizedGenome
     /// write the personlized proteome to the results directory 
     /// ## Example 
     ///``` 
-    /// use ppgg_rust::data_structures::InternalRep::{sequence_tape::SequenceTape,personalized_genome::PersonalizedGenome}; 
+    /// use ppg_rust::data_structures::InternalRep::{sequence_tape::SequenceTape,personalized_genome::PersonalizedGenome}; 
     /// use std::collections::HashMap; 
     /// let code_string1="SEQ1_SEQ2_SEQ3_SEQ4_SEQ5_SEQ6".to_string(); 
     /// let code_string2="SEQ1_SEQ2_SEQ3_SEQ4_SEQ5_SEQ6".to_string(); 

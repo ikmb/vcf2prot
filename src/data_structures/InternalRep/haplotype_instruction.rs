@@ -21,7 +21,7 @@ impl HaplotypeInstruction
     /// ##Example 
     /// ```rust
     /// // let's load the modules 
-    /// use ppgg_rust::data_structures::{haplotype_instruction::TranscriptInstruction,
+    /// use ppg_rust::data_structures::{haplotype_instruction::TranscriptInstruction,
     ///                                 transcript_instruction::TranscriptInstruction}
     /// // define an empty vec of transcript instance 
     /// let vec_ins: Vec<TranscriptInstruction> = Vec::new(); 

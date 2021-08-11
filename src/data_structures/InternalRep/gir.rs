@@ -29,7 +29,7 @@ impl GIR
     /// ## Examples 
     /// ```rust
     /// // let's load the need modules first 
-    /// use ppgg_rust::data_structures::internal_representation::task; 
+    /// use ppg_rust::data_structures::internal_representation::task; 
     /// use std::collections::HashMap; 
     /// // let's define some place holders for a task 
     /// let g_rep:Vec<Task>=Vec::new(); 
@@ -50,7 +50,7 @@ impl GIR
     /// ## Examples 
     /// ```rust
     /// // let's load the need modules first 
-    /// use ppgg_rust::data_structures::internal_representation::task; 
+    /// use ppg_rust::data_structures::internal_representation::task; 
     /// use std::collections::HashMap; 
     /// // let's define some place holders for a task 
     /// let g_rep:Vec<Task>=Vec::new(); 
@@ -72,7 +72,7 @@ impl GIR
     /// ## Examples 
     /// ```rust
     /// // let's load the need modules first 
-    /// use ppgg_rust::data_structures::internal_representation::task; 
+    /// use ppg_rust::data_structures::internal_representation::task; 
     /// use std::collections::HashMap; 
     /// // let's define some place holders for a task 
     /// let g_rep:Vec<Task>=Vec::new(); 
@@ -95,7 +95,7 @@ impl GIR
     /// ## Examples 
     /// ```rust
     /// // let's load the need modules first 
-    /// use ppgg_rust::data_structures::internal_representation::task; 
+    /// use ppg_rust::data_structures::internal_representation::task; 
     /// use std::collections::HashMap; 
     /// // let's define some place holders for a task 
     /// let g_rep:Vec<Task>=Vec::new(); 
@@ -117,7 +117,7 @@ impl GIR
     /// ## Examples 
     /// ```rust
     /// // let's load the need modules first 
-    /// use ppgg_rust::data_structures::internal_representation::task; 
+    /// use ppg_rust::data_structures::internal_representation::task; 
     /// use std::collections::HashMap; 
     /// // let's define some place holders for a task 
     /// let g_rep:Vec<Task>=Vec::new(); 
@@ -139,7 +139,7 @@ impl GIR
     /// ## Examples 
     /// ```rust
     /// // let's load the need modules first 
-    /// use ppgg_rust::data_structures::internal_representation::task; 
+    /// use ppg_rust::data_structures::internal_representation::task; 
     /// use std::collections::HashMap; 
     /// // let's define some place holders for a task 
     /// let g_rep:Vec<Task>=Vec::new(); 
@@ -172,7 +172,7 @@ impl GIR
     /// ## Example 
     /// ```rust
     /// // let's load the need modules first 
-    /// use ppgg_rust::data_structures::internal_representation::{task,engines}; 
+    /// use ppg_rust::data_structures::internal_representation::{task,engines}; 
     /// use std::collections::HashMap;
     /// // let's define some dummy example data
     /// let g_rep=Vec::new(); 
@@ -301,7 +301,7 @@ impl GIR
     /// ## Example 
     /// ```rust
     /// // let's load the need modules first 
-    /// use ppgg_rust::data_structures::internal_representation::{task,engines}; 
+    /// use ppg_rust::data_structures::internal_representation::{task,engines}; 
     /// use std::collections::HashMap;
     /// // let's define some dummy example data
     /// let g_rep=Vec::new(); 

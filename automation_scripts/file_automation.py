@@ -2,7 +2,7 @@
 """
 @author: Hesham ElAnd
 @contact: h.elabd@ikmb.uni-kiel.de 
-@brief: A Python script that acts as a wrapper for the underlining executable, i.e. PPGG,
+@brief: A Python script that acts as a wrapper for the underlining executable, i.e. ppg,
 This can be used to automate the execution across multiple file where all the input BCF 
 files are defined in one directory
 @version: 0.0.1 alpha 
@@ -15,7 +15,7 @@ import os
 import argparse
 ## Define the argument parsers
 #-----------------------------
-parser=argparse.ArgumentParser(description="A Python script that acts as a wrapper for the underlining executable, i.e. PPGG\
+parser=argparse.ArgumentParser(description="A Python script that acts as a wrapper for the underlining executable, i.e. ppg\
  This can be used to automate the execution across multiple file where all the input BCF")
 
 parser.add_argument('--input_path',help="The path to a collection of BCF file that will be sequentially used to generated personalized proteomes.",
@@ -46,7 +46,7 @@ no_module=args.no_module
 ## GET NAMES OF THE INPUT FILES
 #------------------------------
 input_files=[input_file for input_file in os.listdir(input_path_base) if ('bcf.gz' in input_file and 'csi' not in input_file)]
-## LOOP OVER THE INPUT FILE AND CALL PPGG
+## LOOP OVER THE INPUT FILE AND CALL ppg
 #----------------------------------------
 for input_file in input_files:
     print(f'Generatating personalized proteomes from: {input_file} ...')
@@ -71,9 +71,9 @@ for input_file in input_files:
     except sp.SubprocessError as exp: 
         print(f'Trying to generate the vcf file failed with the following error: {str(exp)}')
         continue
-    # call PPGG
+    # call ppg
     try: 
-        sp.run(f"./ppgg_rust -f {os.path.join(output_path_base,vcf_file_name)} -r {Reference_name} -o {output_path+'_protoems'} -g mt -vs &> {os.path.join(output_path_base,vcf_file_name+'Debug_logs')} ", 
+        sp.run(f"./ppg_rust -f {os.path.join(output_path_base,vcf_file_name)} -r {Reference_name} -o {output_path+'_protoems'} -g mt -vs &> {os.path.join(output_path_base,vcf_file_name+'Debug_logs')} ", 
             check=True, shell=True)
     except sp.SubprocessError as exp: 
         print(f'Trying to generate the personalized proteomes failed with the following error:{str(exp)}')

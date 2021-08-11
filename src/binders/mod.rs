@@ -1,3 +1,3 @@
 /// ## Summary
-/// Binds PPGG code to the CUDA kernel using a C wrapper function  
+/// Binds ppg code to the CUDA kernel using a C wrapper function  
 pub mod binderCUDA; 
