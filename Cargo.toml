@@ -8,7 +8,7 @@ edition = "2018"
 readme = "README.md"
 homepage = "https://github.com/ikmb/ppg"
 repository = "https://github.com/ikmb/ppg"
-keywords = ["cli", "genetics", "protein-sequences","Proteomics","VCF-files","VCF-converter","VCF-files","bioinformatics"]
+keywords = ["genetics", "protein-sequences","Proteomics","VCF-files","VCF-converter","bioinformatics"]
 categories = ["command-line-utilities","data-structures","science","parsing"]
 exclude = [
     "examples/*",
