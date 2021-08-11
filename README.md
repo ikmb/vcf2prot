@@ -217,11 +217,21 @@ cd ppg
 cargo build --release 
 ```
 
-5. Access the binary executable from the target directory
+5. Access the binary executable from the target directory 
 
 ```bash
 cd target/release
 ./ppg -h # This print the help statement 
+```
+
+## PPGG Crate ##
+
+The library used for building PPG is also available at  <a href= "https://crates.io"> crates.io </a> while the documentation along  with use case example
+is available here <a href= "https://docs.rs/ppgg/0.1.4/ppgg/index.html"> crates.io </a> to use the library in your code please the following lines to the Cargo.toml file of your project:
+
+```rust
+[dependencies]
+ppgg = "0.1.4"
 ```
 
 ## Troubleshooting ##
