@@ -2,7 +2,6 @@
 use std::collections::HashMap; 
 use super::task::Task; 
 use super::engines::Engine; 
-use crate::binders::binderCUDA; 
 
 
 /// GIRL: Genomic intermediate representation language (GIRL) which us derived from sequence intermediate representation (SIR)
@@ -236,56 +235,7 @@ impl GIR
             },
             Engine::GPU => 
             {
-                let (exec_code,start_pos,length,start_pos_res,res_array,
-                    ref_array,alt_array,  annotation )= self.consume_and_produce_produce_content(); 
-                // cast as u8; define the results array 
-                let mut res_array=res_array.into_iter().map(|val|val as u8).collect::<Vec<_>>(); 
-                let ref_array=ref_array.into_iter().map(|val|val as u8).collect::<Vec<_>>(); 
-                let alt_array=alt_array.into_iter().map(|val|val as u8).collect::<Vec<_>>(); 
-                let err_code; 
-                // validate the execution before  
-                match std::env::var("DEBUG_GPU")
-                {
-                    Ok(_)=>
-                    {
-                        println!("Validating the execution tasks ....");
-                        for idx in 1..exec_code.len()
-                        {
-                            if start_pos_res[idx]!=start_pos_res[idx-1]+length[idx-1]
-                            {
-                                println!("************ GPU Execution Table *********");
-                                println!("index\tstream\tstart_position\tlength\tposition_results\t");
-                                for idx in 0..exec_code.len()
-                                {
-                                    println!("{}\t{}\t{}\t{}\t{}\t",idx,exec_code[idx],start_pos[idx],length[idx],start_pos_res[idx]);
-                                }
-                                panic!("Critical failure in the calculations was encountered: position: {} the sum {} does not equal previous inputs: {} and {} \n",
-                                idx,start_pos_res[idx],start_pos_res[idx-1],length[idx-1]);
-                            }
-                        }
-                    },
-                    Err(_)=>()
-                }
-                unsafe
-                {
-                    err_code=binderCUDA::kernel_wrapper(res_array.as_mut_ptr(),
-                    ref_array.as_ptr(),alt_array.as_ptr(),
-                    exec_code.as_ptr(), start_pos.as_ptr(), length.as_ptr(), 
-                    start_pos_res.as_ptr(), exec_code.len(), res_array.len(), 
-                    ref_array.len(), alt_array.len()); 
-                }
-                match err_code
-                {
-                    0=>(), 
-                    1=>panic!("Allocating arrays on the GPU failed"),
-                    2=>panic!("Failure with copying the data to the GPU"), 
-                    3=>panic!("Launching the kernel failed"), 
-                    4=>panic!("Kernel execution failed"),
-                    5=>panic!("Copying the results array to the host failed"),
-                    _=>panic!("Unknown error was encountered")
-                }
-                let res_array=res_array.into_iter().map(|elem| elem as char).collect::<Vec<_>>(); 
-                (res_array, annotation)
+                panic!("You are on the CPU version and GPU is not supported !!!")   
             }
         }
     }   

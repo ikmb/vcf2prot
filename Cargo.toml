@@ -3,9 +3,16 @@ name = "ppg"
 version = "0.1.4"
 authors = ["Hesham ElAbd"]
 edition = "2018"
-build="build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "ppg"
+path = "src/lib.rs"
+
+[[bin]]
+name = "ppg"
+path = "src/main.rs"
 
 [dependencies]
 rayon = "1.5"

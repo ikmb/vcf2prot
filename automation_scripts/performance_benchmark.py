@@ -18,6 +18,7 @@ except ModuleNotFoundError:
 #---------------------------------------
 NUM_RUNS_PER_TRIAL=10 
 NUM_DISK_WARM_UP=2
+BASE_DIR='/work_ifs/sukmb418/ppg_paper/'
 INPUT_VCF='/work_ifs/sukmb418/ppg_paper/Test_case_chromsome1.vcf'
 INPUT_REF='/work_ifs/sukmb418/ppg_paper/References_sequences.fasta'
 TEMP_WORK_DIR='/work_ifs/sukmb418/ppg_paper/temp_work'
@@ -58,10 +59,10 @@ for num_pat in tqdm(num_patients):
                     state_time=time.time()
                     sp.run(f"export DEBUG_GPU=TRUE &&\
                         export INSPECT_TXP=TRUE&&\
-                        export INSPECT_INS_GEN=TRUE&&\
-                        ./ppgg_rust -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
-                             -r {INPUT_REF}, -o {TEMP_RESULTS_PATH} -g {engine} -wv",
-                                stdout=sp.DEVNULL,check=True) # incase execution failed for whatever reason the whole script shall fail 
+                        export INSPECT_INS_GEN=TRUE &&\
+                             {os.path.join(BASE_DIR,'ppgg_rust')} -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
+                             -r {INPUT_REF} -o {TEMP_RESULTS_PATH} -g {engine} -wv",
+                                stdout=sp.DEVNULL,check=True,shell=True) # incase execution failed for whatever reason the whole script shall fail 
                     end_time=time.time()
                 else:
                     state_time=time.time()
@@ -69,8 +70,8 @@ for num_pat in tqdm(num_patients):
                         export INSPECT_TXP=TRUE&&\
                         export INSPECT_INS_GEN=TRUE&&\
                         ./ppgg_rust -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
-                             -r {INPUT_REF}, -o {TEMP_RESULTS_PATH} -g {engine} -wv",
-                                stdout=sp.DEVNULL,check=True)
+                             -r {INPUT_REF} -o {TEMP_RESULTS_PATH} -g {engine} -wv",
+                                stdout=sp.DEVNULL,check=True,shell=True)
                     end_time=time.time()
                 bench_mark_results[num_pat][engine]['single_thread_state'+str(use_single_write)].append(end_time-state_time)
                 counter+=1

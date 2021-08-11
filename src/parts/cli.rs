@@ -56,7 +56,17 @@ impl ParsedInput
         // now store the value of the flags
         let engine= match args.value_of("engine") 
         {
-            Some(engine)=> Engine::from_str(engine).unwrap(),
+            Some(engine)=> 
+            {
+                let engine=Engine::from_str(engine).unwrap(); 
+                match engine
+                {
+                    Engine::MT | Engine::ST =>engine,
+                    Engine::GPU=> panic!("The current version is a CPU-only version with a single-thread (st) and multi-thread (mt) versions only,\
+                     however, you asked for a GPU engine, which is not supported in this version. check the project web-page at: https://github.com/ikmb/ppg for more details.")
+                }
+            
+            },
             None=>panic!("The value of engine has not been provided")          
         };
         /* write_e_map:bool, write_i_map:bool */

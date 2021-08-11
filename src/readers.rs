@@ -10,7 +10,7 @@ use crate::data_structures::InternalRep::engines::Engine;
 ///  ## Example 
 ///``` 
 /// use std::path::Path;
-/// use ppgg_rust::readers;
+/// use ppg::readers;
 /// let path=Path::new("/Users/heshamelabd/projects/test_data/dev_case_long_and_short.vcf");
 /// let (probands, records)= match readers::read_vcf(path)
 /// {
@@ -46,7 +46,7 @@ pub fn read_vcf(path2load:&Path, engine:Engine)->Result<(vcf_ds::Probands,vcf_ds
 /// Takes as an input the path to a fasta file and return a FastaFile or an error message 
 ///  ## Example 
 ///``` 
-/// use ppgg_rust::data_structures::FastaFile; 
+/// use ppg::data_structures::FastaFile; 
 /// use ppgg_rust::readers::read_fasta_file; 
 /// use std::path::Path; 
 /// let path2file=Path::new("test_data/test_fasta_data1.fasta");
