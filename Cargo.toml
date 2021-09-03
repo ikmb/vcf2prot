@@ -6,8 +6,8 @@ license = "MIT OR Apache-2.0"
 description = "A library and an associated executable, the library provides tools for building tools that can parse and work for VCF and FASTA files while the associated executable is a command line tool for generating protein sequences from a reference FASTA file and a VCF file"
 edition = "2018"
 readme = "README.md"
-homepage = "https://github.com/ikmb/ppg"
-repository = "https://github.com/ikmb/ppg"
+homepage = "https://github.com/ikmb/vcf2prot"
+repository = "https://github.com/ikmb/vcf2prot"
 keywords = ["genetics", "Proteomics","VCF-files","bioinformatics"]
 categories = ["command-line-utilities","data-structures","science","parsing"]
 exclude = [
@@ -22,7 +22,7 @@ name = "ppgg"
 path = "src/lib.rs"
 
 [[bin]]
-name = "ppg"
+name = "vcf2prot"
 path = "src/main.rs"
 
 [dependencies]

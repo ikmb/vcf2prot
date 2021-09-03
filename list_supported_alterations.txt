@@ -1,0 +1,25 @@
+Mutation Name	Code
+*frameshift	R
+*frameshift&stop_retained	Q
+*inframe_deletion	C
+*inframe_insertion	J
+*missense	N
+*missense&inframe_altering	K
+*stop_gained	X
+*stop_gained&inframe_altering	A
+frameshift	F
+frameshift&start_lost	V
+frameshift&stop_retained	B
+inframe_deletion	D
+inframe_deletion&stop_retained	P
+inframe_insertion	I
+inframe_insertion&stop_retained	Z
+missense	M
+missense&inframe_altering	Y
+phi Ê	E
+start_lost	0
+start_lost&splice_region	U
+stop_gained	G
+stop_gained&inframe_altering	T
+stop_lost	L
+stop_lost&frameshift	W
