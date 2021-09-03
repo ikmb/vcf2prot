@@ -1,8 +1,0 @@
-version: '3.4'
-
-services:
-  ppg:
-    image: ppg
-    build:
-      context: .
-      dockerfile: ./Dockerfile

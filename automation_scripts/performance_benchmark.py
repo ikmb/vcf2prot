@@ -48,7 +48,7 @@ print(f"Starting the benchmarking loop: time is --> {time.ctime()}")
 counter=0
 for num_pat in tqdm(num_patients):
     # cut the number of patient from the vcf file 
-    os.system(f"cut -f 1-9,{9+num_pat} {INPUT_VCF} > {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}") # files will be override so we can clean once at the end
+    os.system(f"cut -f 1-{9+num_pat} {INPUT_VCF} > {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}") # files will be override so we can clean once at the end
     logging.info(f"Creating the runs input VCF file, the file contains: {num_pat} patients")
     for engine in engines:
         logging.info("Benchmarking with engine {engine}")
@@ -59,26 +59,30 @@ for num_pat in tqdm(num_patients):
                     sp.run(f"export DEBUG_GPU=TRUE &&\
                         export INSPECT_TXP=TRUE&&\
                         export INSPECT_INS_GEN=TRUE&&\
-                        ./ppg_rust -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
-                             -r {INPUT_REF}, -o {TEMP_RESULTS_PATH} -g {engine} -wv",
-                                stdout=sp.DEVNULL,check=True) # incase execution failed for whatever reason the whole script shall fail 
+                        ./ppgg_rust -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
+                             -r {INPUT_REF} -o {TEMP_RESULTS_PATH} -g {engine} -wv",
+                                stdout=sp.DEVNULL,check=True,shell=True) # incase execution failed for whatever reason the whole script shall fail 
                     end_time=time.time()
                 else:
                     state_time=time.time()
                     sp.run(f"export DEBUG_GPU=TRUE &&\
                         export INSPECT_TXP=TRUE&&\
                         export INSPECT_INS_GEN=TRUE&&\
-                        ./ppg_rust -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
-                             -r {INPUT_REF}, -o {TEMP_RESULTS_PATH} -g {engine} -wv",
-                                stdout=sp.DEVNULL,check=True)
+                        ./ppgg_rust -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
+                             -r {INPUT_REF} -o {TEMP_RESULTS_PATH} -g {engine} -wv",
+                                stdout=sp.DEVNULL,check=True,shell=True)
                     end_time=time.time()
                 bench_mark_results[num_pat][engine]['single_thread_state'+str(use_single_write)].append(end_time-state_time)
                 counter+=1
                 if counter%20==0:
                     print(f"Current number of iterations is: {counter}, expected number of iterations is: 1080, progress is: {(counter/1080)*100}%")
-                elif counter%100==0:
+                if counter%100==0: ## This is 
                     with open(f"{os.path.join(RESULT_PATH,f'results_at_{counter}_cycle.pickle')}",'wb') as writer_stream:
                         pickle.dump(bench_mark_results,writer_stream)                         
+## Write the final results 
+with open(f"{os.path.join(RESULT_PATH,f'results_at_{counter}_cycle.pickle')}",'wb') as writer_stream:
+                        pickle.dump(bench_mark_results,writer_stream)   
+## Print a final progress statement and clean up the temp results 
 print(f"The benchmark finished at: {time.ctime()}")
 print(f"Cleaning temp results and directories ...")
 print(f"removing the temp work directory ... starting at {time.ctime()}")

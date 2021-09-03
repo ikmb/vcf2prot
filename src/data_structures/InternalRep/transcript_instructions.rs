@@ -415,9 +415,6 @@ impl TranscriptInstruction
             Err(_)=>()
         }
 
-
-
-
         Ok(gir::GIR::new(vec_tasks, annotations,alt_array,ref_stream,res_array))
     }
     /// Takes an instruction and returns two tasks, the first is the  execution task for the instruction

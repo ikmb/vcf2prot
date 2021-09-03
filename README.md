@@ -1,6 +1,6 @@
 ![IKMB_LOGO](/media/IKMB_LOGO.png)
 
-# ppg: Personalized Proteome Generation using Graphical Processing Cards (GPUs) #
+# VCF2Prot #
 
 ## Project Aim ##
 
