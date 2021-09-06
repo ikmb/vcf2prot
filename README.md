@@ -161,13 +161,13 @@ git clone https://github.com/ikmb/vcf2prot
 3. Change the directory to vcf2prot
 
 ```bash
-cd ppg
+cd vcf2prot
 ```
 
-4. Change to the cpu-only branch
+4. Change to the cpu_only branch
 
 ```bash
-git checkout cpu-only
+git checkout cpu_only
 ```
 
 5. build the project
@@ -180,7 +180,7 @@ cargo build --release
 
 ```bash
 cd target/release
-./ppg -h # This print the help statement 
+./vcf2prot -h # This print the help statement 
 ```
 
 7. add the binary to your PATH
@@ -200,10 +200,10 @@ git clone https://github.com/ikmb/vcf2prot
 3. Change the direction to vcf2prot
 
 ```bash
-cd ppg
+cd vcf2prot
 ```
 
-4. Make sure the following environmental variable are set CUDA_HOME and LD_LIBRARY_PATH, please set the value of these according to your system. 
+4. Make sure the following environmental variable are set CUDA_HOME and LD_LIBRARY_PATH, please set the value of these according to your system.
 
 5. Use any text editor and update the following information in the build script, *build.rs* which is located the at the root directory,
 
@@ -222,7 +222,7 @@ cargo build --release
 
 ```bash
 cd target/release
-./ppg -h # This print the help statement 
+./vcf2prot -h # This print the help statement 
 ```
 
 ## Troubleshooting ##
@@ -234,6 +234,26 @@ cd target/release
 ### solution ###
 
 <p> This problem will be encountered in case any of the two environmental variable, CUDA_HOME and LD_LIBRARY_PATH, are not defined or set. For a permanent solution please update your .bashrc to have these two variables exported.</p>
+
+### Problem ###
+
+<p> Calling Cargo build produce, error: Permission denied (os error 13) </p>
+
+### solution ###
+
+<p> This problem usually happens when there is problem with access permission and can solved with by: </p>
+
+```bash
+cargo clean && cargo build --release
+```
+
+<p> or using </p>
+
+```bash
+sudo chown -R $(whoami) PATH_TO_PROJECT
+```
+
+where path PATH_TO_PROJECT points to the project directory, i.e. the directory where the file has been cloned into. 
 
 ## Contact ##
 
