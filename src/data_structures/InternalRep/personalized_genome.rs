@@ -136,23 +136,35 @@ impl PersonalizedGenome
             {
                 let mut encoder=GzEncoder::new(file_handle,Compression::best());
                 let mut altered=HashSet::new(); 
+                // write the content of the first haplotype 
+                //-----------------------------------------
                 for (key,_) in self.seq_tape1.get_annotation().iter()
                 {
                     altered.insert(key); 
-                    write!(&mut encoder,">{}\n{}\n", key, self.seq_tape1.get_seq(key).unwrap()).unwrap();
-                }
-                // write the content of the first sequence tape
-                for (key,_) in self.seq_tape2.get_annotation().iter()
-                {
-                    altered.insert(key); 
-                    write!(&mut encoder,">{}\n{}\n", key, self.seq_tape2.get_seq(key).unwrap()).unwrap();
+                    write!(&mut encoder,">{}_1\n{}\n", key, self.seq_tape1.get_seq(key).unwrap()).unwrap();
                 }
                 for (key,value) in ref_seq.iter()
                 {
                     match altered.get(key)
                     {
                         Some(_)=>(), // if the sequence is in altered, then it has been already written as an altered form  
-                        None=>write!(&mut encoder,">{}\n{}\n", key, value).unwrap(), // sequence has not been altered and we write the reference form
+                        None=>write!(&mut encoder,">{}_1\n{}\n", key, value).unwrap(), // sequence has not been altered and we write the reference form
+                    }
+                }
+                altered.clear(); 
+                // write the content of the first sequence tape
+                //---------------------------------------------
+                for (key,_) in self.seq_tape2.get_annotation().iter()
+                {
+                    altered.insert(key); 
+                    write!(&mut encoder,">{}_2\n{}\n", key, self.seq_tape2.get_seq(key).unwrap()).unwrap();
+                }
+                for (key,value) in ref_seq.iter()
+                {
+                    match altered.get(key)
+                    {
+                        Some(_)=>(), // if the sequence is in altered, then it has been already written as an altered form  
+                        None=>write!(&mut encoder,">{}_2\n{}\n", key, value).unwrap(), // sequence has not been altered and we write the reference form
                     }
                 }
                 Ok(())
@@ -164,26 +176,36 @@ impl PersonalizedGenome
                 for (key,_) in self.seq_tape1.get_annotation().iter()
                 {
                     altered.insert(key); 
-                    write!(&mut file_handle,">{}\n{}\n", key, self.seq_tape1.get_seq(key).unwrap()).unwrap();
-                }
-                // write the content of the first sequence tape
-                for (key,_) in self.seq_tape2.get_annotation().iter()
-                {
-                    altered.insert(key); 
-                    write!(&mut file_handle,">{}\n{}\n", key, self.seq_tape2.get_seq(key).unwrap()).unwrap();
+                    write!(&mut file_handle,">{}_1\n{}\n", key, self.seq_tape1.get_seq(key).unwrap()).unwrap();
                 }
                 for (key,value) in ref_seq.iter()
                 {
                     match altered.get(key)
                     {
                         Some(_)=>(), // if the sequence is in altered, then it has been already written as an altered form  
-                        None=>write!(&mut file_handle,">{}\n{}\n", key, value).unwrap(), // sequence has not been altered and we write the reference form
+                        None=>write!(&mut file_handle,">{}_1\n{}\n", key, value).unwrap(), // sequence has not been altered and we write the reference form
+                    }
+                }
+                altered.clear(); 
+                // clear the first room 
+                //----------------------
+                // write the content of the first sequence tape
+                for (key,_) in self.seq_tape2.get_annotation().iter()
+                {
+                    altered.insert(key); 
+                    write!(&mut file_handle,">{}_2\n{}\n", key, self.seq_tape2.get_seq(key).unwrap()).unwrap();
+                }
+                for (key,value) in ref_seq.iter()
+                {
+                    match altered.get(key)
+                    {
+                        Some(_)=>(), // if the sequence is in altered, then it has been already written as an altered form  
+                        None=>write!(&mut file_handle,">{}_2\n{}\n", key, value).unwrap(), // sequence has not been altered and we write the reference form
                     }
                 }
                 Ok(())
             }
         }
-
     }
 }
 #[cfg(test)]

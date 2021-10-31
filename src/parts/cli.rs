@@ -73,7 +73,7 @@ impl ParsedInput
 pub fn parse_command_line()->ArgMatches
 {
     App::new("vcf2prot")
-    .version("0.1.2")
+    .version("0.1.5")
     .author("Hesham ElAbd <h.elabd@ikmb.uni-kiel.de>")
     .about("A rust binary that takes as input a fasta file containing the reference proteome and\
      a vcf file containing the consequence calling and apply the mutations of each patient\
