@@ -89,12 +89,12 @@ impl PersonalizedGenome
                 let mut encoder=GzEncoder::new(file_handle,Compression::best());
                 for (key,_) in self.seq_tape1.get_annotation().iter()
                 {
-                    write!(&mut encoder,">{}\n{}\n", key, self.seq_tape1.get_seq(key).unwrap()).unwrap();
+                    write!(&mut encoder,">{}_1\n{}\n", key, self.seq_tape1.get_seq(key).unwrap()).unwrap();
                 }
                 // write the content of the first sequence tape
                 for (key,_) in self.seq_tape2.get_annotation().iter()
                 {
-                    write!(&mut encoder,">{}\n{}\n", key, self.seq_tape2.get_seq(key).unwrap()).unwrap();
+                    write!(&mut encoder,">{}_2\n{}\n", key, self.seq_tape2.get_seq(key).unwrap()).unwrap();
                 }
 
                 Ok(())
@@ -104,12 +104,12 @@ impl PersonalizedGenome
                 // write the content of the first sequence tape
                 for (key,_) in self.seq_tape1.get_annotation().iter()
                 {
-                    write!(&mut file_handle,">{}\n{}\n", key, self.seq_tape1.get_seq(key).unwrap()).unwrap();
+                    write!(&mut file_handle,">{}_1\n{}\n", key, self.seq_tape1.get_seq(key).unwrap()).unwrap();
                 }
                 // write the content of the first sequence tape
                 for (key,_) in self.seq_tape2.get_annotation().iter()
                 {
-                    write!(&mut file_handle,">{}\n{}\n", key, self.seq_tape2.get_seq(key).unwrap()).unwrap();
+                    write!(&mut file_handle,">{}_2\n{}\n", key, self.seq_tape2.get_seq(key).unwrap()).unwrap();
                 }
                 Ok(())
             }
