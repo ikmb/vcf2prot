@@ -606,7 +606,7 @@ impl TranscriptInstruction
                     {
                         Task::new(0, ins.get_position_ref()+1 as usize,
                     next_ins.get_position_ref() - (1 as usize) - ins.get_position_ref(),
-                    last_task.get_start_pos_res()+last_task.get_length())
+                    last_task.get_start_pos_res() + last_task.get_length())
                     }); 
                     match res {
                         Ok(task)=>task,
@@ -652,11 +652,8 @@ impl TranscriptInstruction
         let last_task=vec_tasks.last().unwrap(); 
         let pos_result=last_task.get_start_pos_res() + last_task.get_length() ;
         alt_stream.extend(instruction.get_data().iter());
-        let pos_altstream= match alt_stream.len()
-        {
-            0=>0,
-            _=>alt_stream.len()-1
-        }; 
+        alt_stream.extend(instruction.get_data().iter());
+        let pos_altstream=alt_stream.len()-instruction.get_data().len(); 
         Task::new(1, pos_altstream, 1,pos_result)
     }
     /// ## Summary 
@@ -664,16 +661,16 @@ impl TranscriptInstruction
     fn get_task_from_frameshift(instruction:&instruction::Instruction, alt_stream:&mut Vec<char>,
         vec_tasks:&Vec<Task>)->Task
     {
-        let pos_altstream= match alt_stream.len()
+        /*let pos_altstream= match alt_stream.len()
         {
             0=>0,
             _=>alt_stream.len()-1
-        }; 
+        }; */
         let last_task=vec_tasks.last().unwrap(); 
         let pos_result=last_task.get_start_pos_res() + last_task.get_length() ;
         alt_stream.extend(instruction.get_data().iter());
+        let pos_altstream=alt_stream.len()-instruction.get_data().len(); 
         Task::new(1, pos_altstream, instruction.get_length(),pos_result)
-
     }
     /// ## Summary 
     /// returns a Task from a stop-gained mutation encoded as an instruction 
@@ -694,14 +691,18 @@ impl TranscriptInstruction
     fn get_task_from_stop_lost(instruction:&instruction::Instruction, alt_stream:&mut Vec<char>,
         vec_tasks:&Vec<Task>)->Task
     {
-        let pos_altstream= match alt_stream.len()
+        
+        let last_task=vec_tasks.last().unwrap(); 
+        let pos_result=last_task.get_start_pos_res()+ last_task.get_length();
+        println!("Alternative stream before addition is : {}",alt_stream.len());
+        alt_stream.extend(instruction.get_data().iter());
+        println!("Alternative stream after addition is : {}",alt_stream.len());
+        let pos_altstream=alt_stream.len()-instruction.get_data().len(); 
+        /*let pos_altstream= match alt_stream.len()
         {
             0=>0,
             _=>alt_stream.len()-1
-        }; 
-        let last_task=vec_tasks.last().unwrap(); 
-        let pos_result=last_task.get_start_pos_res()+ last_task.get_length() ;
-        alt_stream.extend(instruction.get_data().iter());
+        };*/
         Task::new(1, pos_altstream, instruction.get_data().len(),pos_result)
     }
     /// ## Summary 

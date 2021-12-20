@@ -35,7 +35,7 @@ pub fn execute(vec_int_repr:Vec<IntMap>, exec_engine:Engine, ref_seq:&HashMap<St
         {
             vec_int_repr.into_par_iter()
             .map(|proband_map|ProbandInstruction::from_intmap(proband_map, exec_engine.clone(),ref_seq))
-            .map(|probandMap|PersonalizedGenome::from_proband_instruction(probandMap,exec_engine.clone(),ref_seq))
+            .map(|proband_map|PersonalizedGenome::from_proband_instruction(proband_map,exec_engine.clone(),ref_seq))
             .collect::<Vec<PersonalizedGenome>>()
         }
     }

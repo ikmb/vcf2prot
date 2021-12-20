@@ -1,4 +1,4 @@
-use crate::data_structures::mutation_ds::{MutationInfo,MutatedString}; 
+use crate::data_structures::mutation_ds::MutationInfo; 
 use crate::data_structures::Constants; 
 /// The function takes the consequence string and returned a Result enum either containing an Ok or Err type.
 /// # Ok
