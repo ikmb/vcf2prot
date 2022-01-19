@@ -83,42 +83,46 @@ impl ParsedInput
 pub fn parse_command_line()->ArgMatches
 {
     App::new("Vcf2prot")
-    .version("0.1.3")
+    .version("0.1.4")
     .author("Hesham ElAbd <h.elabd@ikmb.uni-kiel.de>")
-    .about("A rust binary that takes as input a fasta file containing the reference proteome and\
-     a vcf file containing the consequence calling and apply the mutations of each patient\
-     to the reference file to generate a fasta file per proband containing the personalized proteome of that individual.\
-     The behavior of the tool can controlled using environmental variables currently 4 variables are used:\n\
-     1. DEBUG_GPU => Inspect the input arrays to the GPU are inspected for indexing error.\n\
-     2. DEBUG_CPU_EXEC => Inspect the vector of tasks provided to the input CPU execution engine.\n\
-     3. DEBUG_TXP=Transcript_ID => This flag exports a transcript id that will be used for debugging.\n\
-     4. INSPECT_TXP => If set, after each transcript is translated into instruction an inspection function will be called to check the correctness of translation\n\
-     5. INSPECT_INS_GEN => Inspect the translation process from mutations to instructions and print detailed error messages incase inspection failed.\n 
-     6. PANIC_INSPECT_ERR => If set the code will panic if inspecting the translation from mutation to instruction failed.\n\
+    .about("A rust binary that takes as input a FASTA file containing the reference proteome and\
+     a VCF file containing the consequence calling and apply the mutations of each patient\
+     to the reference file to generate a FASTA file per sample containing the personalized proteome of that individual.\
+     The behavior of the tool can controlled using environmental variables currently\n\
+     The main environmental variable is the 'NO_TEST' variable which is used to disable other tests and allow the code to run without\
+     the runtime cost of the QC. Otherwise all tests will be run. You can selectively run some tests by first exporting the environmental\
+     flag 'RUN_SELECTED_TEST' and the export any of the following test FLAGS:
+     1. DEBUG_GPU => Inspect the input arrays to the GPU are inspected for indexing error.
+     2. DEBUG_CPU_EXEC => Inspect the vector of tasks provided to the input CPU execution engine.
+     3. DEBUG_TXP=Transcript_ID => This flag exports a transcript id that will be used for debugging.
+     4. INSPECT_TXP => If set, after each transcript is translated into instruction an inspection function will be called to check the correctness of translation
+     5. INSPECT_INS_GEN => Inspect the translation process from mutations to instructions and print detailed error messages incase inspection failed.
+     6. PANIC_INSPECT_ERR => If set the code will panic if inspecting the translation from mutation to instruction failed.
+     
      For more details, see the project webpage at: https://github.com/ikmb/ppg")
     .arg(Arg::new("vcf_file")
         .short('f')
         .long("vcf_file")
         .value_name("FILE")
-        .help("A VCF File containing the consequences calling for each proband.")
+        .about("A VCF File containing the consequences calling for each sample.")
         .required(true))
     .arg(Arg::new("fasta_ref")
         .short('r')
         .long("fasta_ref")
         .value_name("FILE")
-        .help("A VCF File containing the reference proteome with transcript id as identifiers and protein sequences as the body.")
+        .about("A VCF File containing the reference proteome with transcript id as identifiers and protein sequences as the body.")
         .required(true))
     .arg(Arg::new("output_path")
         .short('o')
         .long("output_path")
         .value_name("PATH")
-        .help("The path to a directory where fasta files will be written.")
+        .about("The path to a directory where fasta files will be written.")
         .required(true))
     .arg(Arg::new("engine")
         .short('g')
         .long("engine")
         .value_name("VALUE")
-        .help("The Execution engine, can be any of three values, 'st' for single thread, 'mt' for multiple threads and 'gpu' for\
+        .about("The Execution engine, can be any of three values, 'st' for single thread, 'mt' for multiple threads and 'gpu' for\
          for using GPU accelerators.")
         .required(true))
     .arg(Arg::new("verbose")
@@ -126,19 +130,19 @@ pub fn parse_command_line()->ArgMatches
         .long("verbose")
         .required(false)
         .takes_value(false)
-        .help("If set, print a verbose output about the program state."))
+        .about("If set, print a verbose output about the program state."))
     .arg(Arg::new("stats")
         .short('s')
         .long("stats")
         .required(false)
         .takes_value(false)
-        .help("If set, stats are computed and are written to the output directory along with the fasta file"))
+        .about("If set, stats are computed and are written to the output directory along with the fasta file"))
     .arg(Arg::new("write_int_map")
         .short('i')
         .long("write_int_map")
         .required(false)
         .takes_value(false)
-        .help("Write an intermediate map containing the observed mutation per transcript per patient to sub directory in the provided output\
+        .about("Write an intermediate map containing the observed mutation per transcript per patient to sub directory in the provided output\
         directory, the directory has a predefined name of 'int_maps'. Inside the directory a JSON file containing the\
         intermediate map of each patient is written."))      
     .arg(Arg::new("write_all_proteins")
@@ -146,7 +150,7 @@ pub fn parse_command_line()->ArgMatches
         .long("write_all_proteins")
         .required(false)
         .takes_value(false)
-        .help("An optional control flag to control the writing behavior of Vcf2prot, if set Vcf2prot will write the altered and the non-altered, i.e.\
+        .about("An optional control flag to control the writing behavior of Vcf2prot, if set Vcf2prot will write the altered and the non-altered, i.e.\
         reference sequences, to the fasta file of each proband. This might increase the size of the generated files considerably.\
         By default this option is switched off."))
     .arg(Arg::new("write_compressed")
@@ -154,7 +158,7 @@ pub fn parse_command_line()->ArgMatches
         .long("write_compressed")
         .required(false)
         .takes_value(false)
-        .help("An optional control flag to control the writing behavior of Vcf2prot, if set Vcf2prot will write the generated fasta files as g-zipped\
+        .about("An optional control flag to control the writing behavior of Vcf2prot, if set Vcf2prot will write the generated fasta files as g-zipped\
         files, i.e. with the extension .fasta.gz, this can be used to decrease the disk space needed by the generated files, especially, \
         when generating 1000s of files.By default this option is switched off. "))    
     .arg(Arg::new("write_single_thread")
@@ -162,10 +166,112 @@ pub fn parse_command_line()->ArgMatches
         .long("write_single_thread")
         .required(false)
         .takes_value(false)
-        .help("An optional control flag to control the writing behavior of Vcf2prot, if set only one thread is used to write all generated fasta files,\
+        .about("An optional control flag to control the writing behavior of Vcf2prot, if set only one thread is used to write all generated fasta files,\
         by default, this is the case with a single thread engine, i.e. g st, however, this parameter can be used to overwrite this parameter and \
         to enable a single threaded writing of files when a multi-threaded or a GPU engines have been used for parsing and generating the sequences. "))       
     .get_matches()
+}
+
+pub fn check_test_state()
+{
+    println!("Checking the test state ...");
+    match std::env::var("NO_TEST") // disable all tests, nno  test is enabled, all other variables are turned off 
+    {
+        Ok(_)=>
+        {
+            // disable DEBUG_GPU even if it was exported 
+            match std::env::var("DEBUG_GPU")
+            {
+                Ok(_)=>
+                {
+                    println!("WARRING:: Conflicting environmental variables found. NO_TEST is True while DEBUG_GPU IS ALSO True ...");
+                    println!("INFO:: NO_TEST has a higher precedence ... removing DEBUG_GPU from the list of environment variables"); 
+                    std::env::remove_var("DEBUG_GPU");
+                },
+                Err(_)=>()
+            }
+            // disabling DEBUG_CPU_EXEC
+            match std::env::var("DEBUG_CPU_EXEC")
+            {
+                Ok(_)=>
+                {
+                    println!("WARRING:: Conflicting environmental variables found. NO_TEST is True while DEBUG_CPU_EXEC IS ALSO True ...");
+                    println!("INFO:: NO_TEST has a higher precedence ... removing DEBUG_CPU_EXEC from the list of environment variables"); 
+                    std::env::remove_var("DEBUG_CPU_EXEC");
+                },
+                Err(_)=>()
+            }
+            // disabling DEBUG_TXP
+            match std::env::var("INSPECT_TXP")
+            {
+                Ok(_)=>
+                {
+                    println!("WARRING:: Conflicting environmental variables found. NO_TEST is True while INSPECT_TXP IS ALSO True ...");
+                    println!("INFO:: NO_TEST has a higher precedence ... removing INSPECT_TXP from the list of environment variables"); 
+                    std::env::remove_var("INSPECT_TXP");
+                },
+                Err(_)=>()
+            }
+            // disabling INSPECT_INS_GEN
+            match std::env::var("INSPECT_INS_GEN")
+            {
+                Ok(_)=>
+                {
+                    println!("WARRING:: Conflicting environmental variables found. NO_TEST is True while INSPECT_INS_GEN IS ALSO True ...");
+                    println!("INFO:: NO_TEST has a higher precedence ... removing INSPECT_INS_GEN from the list of environment variables"); 
+                    std::env::remove_var("INSPECT_INS_GEN");
+                },
+                Err(_)=>()
+            }
+            // disabling PANIC_INSPECT_ERR
+            match std::env::var("PANIC_INSPECT_ERR")
+            {
+                Ok(_)=>
+                {
+                    println!("WARRING:: Conflicting environmental variables found. NO_TEST is True while PANIC_INSPECT_ERR IS ALSO True ...");
+                    println!("INFO:: NO_TEST has a higher precedence ... removing PANIC_INSPECT_ERR from the list of environment variables"); 
+                    std::env::remove_var("PANIC_INSPECT_ERR");
+                },
+                Err(_)=>()
+            }
+        },
+        Err(_)=>
+        {
+            match std::env::var("RUN_SELECTED_TEST")
+            {
+                Ok(_)=>state_env_var(),
+                Err(_)=>
+                {
+                    println!("Enabling All Quality Control Tests ... ");
+                    match std::env::var("DEBUG_GPU")
+                    {
+                        Ok(_)=>(),
+                        Err(_)=>std::env::set_var("DEBUG_GPU","TRUE")
+                    };
+                    match std::env::var("DEBUG_CPU_EXEC")
+                    {
+                        Ok(_)=>(),
+                        Err(_)=>std::env::set_var("DEBUG_CPU_EXEC","TRUE")
+                    };
+                    match std::env::var("INSPECT_TXP")
+                    {
+                        Ok(_)=>(),
+                        Err(_)=>std::env::set_var("INSPECT_TXP","TRUE")
+                    };
+                    match std::env::var("INSPECT_INS_GEN")
+                    {
+                        Ok(_)=>(),
+                        Err(_)=>std::env::set_var("INSPECT_INS_GEN","TRUE")
+                    };
+                    match std::env::var("PANIC_INSPECT_ERR")
+                    {
+                        Ok(_)=>(),
+                        Err(_)=>std::env::set_var("PANIC_INSPECT_ERR","TRUE")
+                    };
+                }
+            }   
+        }
+    }
 }
 
 pub fn state_env_var()

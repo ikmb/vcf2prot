@@ -102,7 +102,7 @@ impl TranscriptInstruction
                             .collect::<Vec<_>>(); 
                     for (ins1,ins2) in consequent_pairs
                     {
-                        if ins2.get_position_res()<=(ins1.get_position_res()+ins1.get_data().len()+1)
+                        if ins2.get_position_res()<=(ins1.get_position_res()+ins1.get_data().len()-1)
                         {
                             match std::env::var("PANIC_INSPECT_ERR")
                             {
@@ -124,7 +124,7 @@ impl TranscriptInstruction
                         // add a conditional state for handling inframe_deletion 
                         if ins1.get_code()=='C' || ins1.get_code()=='D'
                         {
-                            if ins2.get_position_ref()<=(ins1.get_position_res()+ins1.get_length()+1) // for example a deletion at position 84 with length 5 (ins1) and ins2 is a mutation at site 88 
+                            if ins2.get_position_ref()<=(ins1.get_position_res()+ins1.get_length()-1) // for example a deletion at position 84 with length 5 (ins1) and ins2 is a mutation at site 88 
                             {
                                 match std::env::var("PANIC_INSPECT_ERR")
                                 {
@@ -694,9 +694,7 @@ impl TranscriptInstruction
         
         let last_task=vec_tasks.last().unwrap(); 
         let pos_result=last_task.get_start_pos_res()+ last_task.get_length();
-        println!("Alternative stream before addition is : {}",alt_stream.len());
         alt_stream.extend(instruction.get_data().iter());
-        println!("Alternative stream after addition is : {}",alt_stream.len());
         let pos_altstream=alt_stream.len()-instruction.get_data().len(); 
         /*let pos_altstream= match alt_stream.len()
         {

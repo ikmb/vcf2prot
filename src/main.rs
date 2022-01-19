@@ -5,7 +5,8 @@ use chrono::Utc;
 fn main()
 {
     let args = cli::ParsedInput::new(cli::parse_command_line());
-    cli::state_env_var(); // print the state of environmental variables 
+
+    cli::check_test_state(); // print the state of environmental variables 
     if args.is_verbose
     {
         println!("Reading and loading the VCF file, starting time is: {}",Utc::now())

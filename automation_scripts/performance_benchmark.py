@@ -1,89 +1,101 @@
 #!/usr/bin/env python  
 """
 @author: Hesham ElAbd
-@brief: A simple performance script for benchmarking the rust implementation of SIR, PPGG
-@date: 11.08.2021
+@brief: A simple performance script for benchmarking the vcf2prot against PercisionProDB
+@version [script]: 0.2 
+@version [vcf2prot]: 0.1.3 
+@version [PrecisionProDB]: 1.1.2 
+@date [version 0.1] : 11.08.2021
+@date [version 0.2]: 20.12.2021
+@platform: mac OS/Linux 
 """
-## import the modules 
+## Import the modules
+#--------------------  
 import os 
 import time 
-import logging
 import subprocess as sp 
-import pickle
+import pandas as pd 
 try:
     from tqdm import tqdm
 except ModuleNotFoundError:
     os.system("pip install tqdm")
 ## define constant parameters 
 #---------------------------------------
-NUM_RUNS_PER_TRIAL=10 
-NUM_DISK_WARM_UP=2
-BASE_DIR='/work_ifs/sukmb418/ppg_paper/'
-INPUT_VCF='/work_ifs/sukmb418/ppg_paper/Test_case_chromsome1.vcf'
-INPUT_REF='/work_ifs/sukmb418/ppg_paper/References_sequences.fasta'
-TEMP_WORK_DIR='/work_ifs/sukmb418/ppg_paper/temp_work'
-TEMP_RESULTS_PATH='/work_ifs/sukmb418/ppg_paper/res'
-RESULT_PATH='/work_ifs/sukmb418/ppg_paper/benchmark_results'
+BASE_DIR='/work_ifs/sukmb418/vcf2prot/'
+INPUT_VCF='/work_ifs/sukmb418/vcf2prot/Test_case_chromsome1.vcf'
+INPUT_REF='/work_ifs/sukmb418/vcf2prot/References_sequences.fasta'
+WRITE_RESULTS_PERCISION_PRO_DB='/work_ifs/sukmb418/vcf2prot/PERCISION_PRO_DB_RESULTS'
+VCF2PROT_RES='/work_ifs/sukmb418/vcf2prot/VCF2PROT_RES'
+TEMP_WORK_DIR='/work_ifs/sukmb418/vcf2prot/temp_work'
+RESULT_PATH='/work_ifs/sukmb418/vcf2prot/benchmark_results'
 #---------------------------------------
-## variable parameter
-engines=['st','mt','gpu']
-num_patients=[1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384]
-use_single_thread_write=[True,False]
-print(f"Number of runs is: {(NUM_RUNS_PER_TRIAL+NUM_DISK_WARM_UP)*len(engines)*len(num_patients)*len(use_single_thread_write)}")
+# PercisionProDB is slow and hence we limit the performance to 128 patient only 
+num_patients=[1,2,4,8,16,32,64,128] 
 #------------------------------------------
-## create an initialize a dictionary to store the results 
-bench_mark_results={  ## loop over the number of patient  
-                    elem:{ ## for each trial we loop over engines 
-                            eng:{ ## for each engine we loop over wether or not a single thread are used for writting 
-                                'single_thread_state'+str(state): []  for state in  use_single_thread_write ## finally we store the number of state in a single thread
-                                } for eng in engines 
-                            } 
-                        for elem in num_patients
-                    }
-#------------------------------------------
-## create a logging file 
-logging.basicConfig(filename='runs_log.log',encoding='utf-8',
-                    level=logging.DEBUG,format='%(asctime)s %(message)s')
+# make output directories to store the results 
+#---------------------------------------------
+try:
+    os.mkdir(WRITE_RESULTS_PERCISION_PRO_DB)
+except:pass 
+
+try: 
+    os.mkdir(VCF2PROT_RES)
+except:pass 
+
+try: 
+    os.mkdir(TEMP_WORK_DIR)
+except:pass 
+
+try: 
+    os.mkdir(RESULT_PATH)
+except:pass
+## create a logging file
+#-----------------------
 print(f"Starting the benchmarking loop: time is --> {time.ctime()}")
 #------------------------------------------
+## allocate some arrays to hold the results 
+#------------------------------------------
+tool_name,input_size,runtime=[],[],[]
 counter=0
 for num_pat in tqdm(num_patients):
     # cut the number of patient from the vcf file 
-    os.system(f"cut -f 1-9,{9+num_pat} {INPUT_VCF} > {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}") # files will be override so we can clean once at the end
-    logging.info(f"Creating the runs input VCF file, the file contains: {num_pat} patients")
-    for engine in engines:
-        logging.info("Benchmarking with engine {engine}")
-        for use_single_write in use_single_thread_write:
-            for idx in range(NUM_DISK_WARM_UP+NUM_RUNS_PER_TRIAL): 
-                if use_single_write:
-                    state_time=time.time()
-                    sp.run(f"export DEBUG_GPU=TRUE &&\
-                        export INSPECT_TXP=TRUE&&\
-                        export INSPECT_INS_GEN=TRUE &&\
-                             {os.path.join(BASE_DIR,'ppgg_rust')} -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
-                             -r {INPUT_REF} -o {TEMP_RESULTS_PATH} -g {engine} -wv",
-                                stdout=sp.DEVNULL,check=True,shell=True) # incase execution failed for whatever reason the whole script shall fail 
-                    end_time=time.time()
-                else:
-                    state_time=time.time()
-                    sp.run(f"export DEBUG_GPU=TRUE &&\
-                        export INSPECT_TXP=TRUE&&\
-                        export INSPECT_INS_GEN=TRUE&&\
-                        ./ppgg_rust -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
-                             -r {INPUT_REF} -o {TEMP_RESULTS_PATH} -g {engine} -wv",
-                                stdout=sp.DEVNULL,check=True,shell=True)
-                    end_time=time.time()
-                bench_mark_results[num_pat][engine]['single_thread_state'+str(use_single_write)].append(end_time-state_time)
-                counter+=1
-                if counter%20==0:
-                    print(f"Current number of iterations is: {counter}, expected number of iterations is: 1080, progress is: {(counter/1080)*100}%")
-                elif counter%100==0:
-                    with open(f"{os.path.join(RESULT_PATH,f'results_at_{counter}_cycle.pickle')}",'wb') as writer_stream:
-                        pickle.dump(bench_mark_results,writer_stream)                         
-print(f"The benchmark finished at: {time.ctime()}")
-print(f"Cleaning temp results and directories ...")
-print(f"removing the temp work directory ... starting at {time.ctime()}")
-os.system(f"rm -rf {TEMP_WORK_DIR}/*")
-print(f"removing the generated fasta files ... starting at  {time.ctime()}")
-os.system(f"rm -rf {TEMP_RESULTS_PATH}/*")
+    os.system(f"cut -f 1-9,10-{9+num_pat} {INPUT_VCF} > {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}") # files will be overwritten so we can clean once at the end of the script 
+    ## we need to warm up our hard-disk so we run cat on the file and we direct the output into dev null 
+    os.system(f" cat {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')} > /dev/null")
+    # start the benchmarking by calling vcf2prot 
+    ## benchmark vcf2prot        
+    start_time=time.time()
+    sp.run(f"{os.path.join(BASE_DIR,'vcf2prot')} -f {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
+            -r {INPUT_REF} -o {VCF2PROT_RES} -g mt -v",
+            stdout=sp.DEVNULL,check=True,shell=True) # incase execution failed for whatever reason the whole script shall fail 
+    end_time=time.time()
+    ## add the result to the list 
+    tool_name.append('Vcf2prot')
+    input_size.append(num_pat)
+    runtime.append(end_time-start_time)
+    ## run percision pro database 
+    #----------------------------
+    samples=['sample'+str(idx+1) for idx in range(num_pat)]
+    print(f"Started measuring the performance with precision protein database, starting at: {time.ctime()}")
+    start_time=time.time()
+    for sample in tqdm(samples):
+        sp.run(f"python PrecisionProDB/src/PrecisionProDB.py -m {os.path.join(TEMP_WORK_DIR,f'run_file_with_{num_pat}_patient.vcf')}\
+             -D GENCODE -o {WRITE_RESULTS_PERCISION_PRO_DB} -s {sample} -g GRCh38.p13.genome.fa.gz -f gencode.v39.chr_patch_hapl_scaff.annotation.gtf.gz -p gencode.v39.pc_translations.fa.gz",
+        stdout=sp.DEVNULL,check=True,shell=True)
+    end_time=time.time()
+    ## add the result to the list 
+    tool_name.append('PercisionProDB')
+    input_size.append(num_pat)
+    runtime.append(end_time-start_time)
+    counter+=1
+    print(f"Current number of iterations is: {counter}, expected number of iterations is: 8, progress is: {(counter/8)*100}%")
+
+# Create a data frame of the results
+#-----------------------------------
+results_df=pd.DataFrame({
+    'tool_name':tool_name,
+    'input_size':input_size,
+    'runtime':runtime
+})
+results_df.to_csv(os.path.join(RESULT_PATH,'Performance_Results.tsv'),sep='\t',index=False)
 print(f"Execution finished at: {time.ctime()}")
