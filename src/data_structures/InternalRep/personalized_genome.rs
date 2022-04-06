@@ -224,9 +224,13 @@ mod test_personalized_proteome
         res_map.insert("1".to_string(), (0,4)); 
         res_map.insert("2".to_string(), (5,9)); 
         res_map.insert("3".to_string(), (10,14)); 
+        let mut seq_map=HashMap::new();
+        seq_map.insert("1".to_string(), "AKLMNOPQTRST".to_string());
+        seq_map.insert("2".to_string(), "DEVELEOPMNKO".to_string()); 
+        
         let seq_tape1=SequenceTape::new(code_string1, res_map.clone()).unwrap(); // this panic incase of length mismatch 
         let seq_tape2=SequenceTape::new(code_string2, res_map).unwrap(); 
         let personalized_proteome=PersonalizedGenome::new(proband_name, seq_tape1, seq_tape2); 
-        personalized_proteome.write(&"test_data".to_string(),false,false,&res_map)
+        personalized_proteome.write(&"test_data".to_string(),&false,&false,&seq_map)
     }
 }

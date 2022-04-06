@@ -784,9 +784,13 @@ pub mod test_transcript_instruction
     #[test]
     pub fn test_expected_result_array_length()
     {
+        // define previous mutation
+        let prev_mutation=vec!["missense".to_string(),"ENST00000510017".to_string(), "40V>40N".to_string()]; 
+        let prev_mutation_vec=vec![Mutation::new(Ok(prev_mutation)).unwrap()];
+        // Define the test case 
         let test_case=vec!["frameshift".to_string(),"ENST00000510017".to_string(), "40VGLHFWTM*>40VDSTFGQC".to_string()];
-        let test_mutation=Mutation::new(test_case).unwrap();
-        let ins=instruction::Instruction::from_mutation(&test_mutation); 
+        let test_mutation=Mutation::new(Ok(test_case)).unwrap();
+        let ins=instruction::Instruction::from_mutation(&test_mutation,&prev_mutation_vec); 
         let mut ins_vec=Vec::with_capacity(2);
         ins_vec.push(ins);
         let test_alt_transcript=TranscriptInstruction::new("Test1".to_string(), 50, ins_vec);
@@ -796,9 +800,13 @@ pub mod test_transcript_instruction
     #[test]
     pub fn test_get_task_from_frameshift()
     {
+        // define previous mutation
+        let prev_mutation=vec!["missense".to_string(),"ENST00000510017".to_string(), "40V>40N".to_string()]; 
+        let prev_mutation_vec=vec![Mutation::new(Ok(prev_mutation)).unwrap()];
+        // Define the test case 
         let test_case=vec!["frameshift".to_string(),"ENST00000510017".to_string(), "40VGLHFWTM*>40VDSTFGQC".to_string()];
-        let test_mutation=Mutation::new(test_case).unwrap();
-        let ins=instruction::Instruction::from_mutation(&test_mutation); 
+        let test_mutation=Mutation::new(Ok(test_case)).unwrap();
+        let ins=instruction::Instruction::from_mutation(&test_mutation,&prev_mutation_vec); 
         let mut vec_tasks=Vec::with_capacity(2);
         vec_tasks.push(Task::new(0, 1, 15, 15));
         let mut alt_stream=Vec::with_capacity(100);
@@ -810,9 +818,13 @@ pub mod test_transcript_instruction
     #[test]
     pub fn test_get_task_from_stop_gained()
     {
+        // define previous mutation
+        let prev_mutation=vec!["missense".to_string(),"ENST00000510017".to_string(), "40V>40N".to_string()]; 
+        let prev_mutation_vec=vec![Mutation::new(Ok(prev_mutation)).unwrap()];
+        // define the test case 
         let test_case=vec!["stop_gained".to_string(),"ENST00000510017".to_string(), "40VGLHFWTM*>40*".to_string()];
-        let test_mutation=Mutation::new(test_case).unwrap();
-        let ins=instruction::Instruction::from_mutation(&test_mutation); 
+        let test_mutation=Mutation::new(Ok(test_case)).unwrap();
+        let ins=instruction::Instruction::from_mutation(&test_mutation,&prev_mutation_vec); 
         let mut vec_taks=Vec::with_capacity(2);
         vec_taks.push(Task::new(0, 0, 39, 0));
         let mut alt_stream=Vec::with_capacity(100);
@@ -824,9 +836,13 @@ pub mod test_transcript_instruction
     #[test]
     pub fn test_get_task_from_stop_lost() 
     {
+        // define previous mutation
+        let prev_mutation=vec!["missense".to_string(),"ENST00000510017".to_string(), "40V>40N".to_string()]; 
+        let prev_mutation_vec=vec![Mutation::new(Ok(prev_mutation)).unwrap()];
+        // define the test case 
         let test_case=vec!["stop_lost".to_string(),"ENST00000650310".to_string(), "489*>489S".to_string()];
-        let test_mutation=Mutation::new(test_case).unwrap();
-        let ins=instruction::Instruction::from_mutation(&test_mutation); 
+        let test_mutation=Mutation::new(Ok(test_case)).unwrap();
+        let ins=instruction::Instruction::from_mutation(&test_mutation,&prev_mutation_vec); 
         let mut vec_taks=Vec::with_capacity(2);
         vec_taks.push(Task::new(0, 0, 488, 0));
         let mut alt_stream=Vec::with_capacity(100);
@@ -840,8 +856,13 @@ pub mod test_transcript_instruction
     #[test]
     pub fn test_get_task_from_inframe_insersion() 
     {
-        let test_case=vec!["inframe_insertion".to_string(),"ENST00000484547".to_string(), "125Y>125YRR".to_string()];        let test_mutation=Mutation::new(test_case).unwrap();
-        let ins=instruction::Instruction::from_mutation(&test_mutation); 
+        // define previous mutation
+        let prev_mutation=vec!["missense".to_string(),"ENST00000510017".to_string(), "40V>40N".to_string()]; 
+        let prev_mutation_vec=vec![Mutation::new(Ok(prev_mutation)).unwrap()];
+        // define the test case 
+        let test_case=vec!["inframe_insertion".to_string(),"ENST00000484547".to_string(), "125Y>125YRR".to_string()]; 
+        let test_mutation=Mutation::new(Ok(test_case)).unwrap();
+        let ins=instruction::Instruction::from_mutation(&test_mutation,&prev_mutation_vec); 
         let mut vec_taks=Vec::with_capacity(2);
         vec_taks.push(Task::new(0, 0, 124, 0));
         let mut alt_stream=Vec::with_capacity(10);
@@ -857,6 +878,7 @@ pub mod test_transcript_instruction
     #[test]
     pub fn test_correct_translation_1()
     {
+        // define the test case 
         let name="ENST00000406869".to_string(); 
         let mutations=vec!["*missense|MAD1L1|ENST00000406869|protein_coding|-|5G>5H|1936821C>T".to_string()]; 
         let alt_transcript= vcf_ds::AltTranscript::new(name, mutations);
@@ -866,7 +888,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, res_map)=test_gir.execute(Engine::ST);
+        let (res_array, res_map)=test_gir.unwrap().execute(Engine::ST);
         println!("Res");
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
@@ -900,7 +922,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, res_map)=test_gir.execute(Engine::ST);
+        let (res_array, res_map)=test_gir.unwrap().execute(Engine::ST);
         println!("Res");
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
@@ -923,7 +945,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -948,7 +970,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -970,7 +992,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -992,7 +1014,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1015,7 +1037,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1036,7 +1058,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1057,7 +1079,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1078,7 +1100,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1100,7 +1122,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1121,7 +1143,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1142,7 +1164,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1163,7 +1185,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1184,7 +1206,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1205,7 +1227,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1226,7 +1248,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1247,7 +1269,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1268,7 +1290,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1289,7 +1311,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1310,7 +1332,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1331,7 +1353,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1352,7 +1374,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1373,7 +1395,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string="MEDLGENTMVLSTLRSLNNFISQRVEGGSGLEELERGG".to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1404,7 +1426,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string=ref_seq_array.to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1439,7 +1461,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string=ref_seq_array.to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1474,7 +1496,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string=ref_seq_array.to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1509,7 +1531,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string=ref_seq_array.to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1536,7 +1558,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string=ref_seq_array.to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();
@@ -1558,7 +1580,7 @@ pub mod test_transcript_instruction
         let res=TranscriptInstruction::from_alt_transcript(alt_transcript, &reference).unwrap(); 
         let test_gir=res.get_g_rep(&reference); 
         println!("{:#?}",test_gir); 
-        let (res_array, _)=test_gir.execute(Engine::ST);
+        let (res_array, _)=test_gir.unwrap().execute(Engine::ST);
         let ref_string=ref_seq_array.to_string();
         println!("Input Sequence is:  ==>{:#?}",&ref_string);
         let res_string=res_array.iter().collect::<String>();

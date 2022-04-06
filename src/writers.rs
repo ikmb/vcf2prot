@@ -5,6 +5,7 @@ use crate::data_structures::Map;
 use serde_json; 
 use std::io::Write;
 use std::fs::{File,create_dir};
+
 /// ## Summary 
 /// Write the provided earlymap representation into a json file, the function create a directory and write 
 /// a JSON file per patient in the directory, the function returns an error if the directory already exists.
@@ -152,32 +153,33 @@ pub fn write_number_of_mutations_per_transcript(path2file:&Path,stats_table:Hash
 pub mod test_json_parsing
 {
     use super::*; 
+    use crate::data_structures::InternalRep::engines::Engine;
     use crate::parts::io::parse_vcf; 
     use crate::functions::summary;  
     #[test]
     fn test_intmap2json()
     {
-        let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf")).unwrap();
+        let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf"),Engine::ST).unwrap();
         write_intmap2json(Path::new("test_data/test_writer"),&int_map_test).unwrap();
     }
     #[test]
     fn test_num_number_mutation_per_proband()
     {
-        let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf")).unwrap();
+        let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf"),Engine::ST).unwrap();
         let test_case=summary::compute_number_mutation_per_proband(&int_map_test); 
         write_num_number_mutation_per_proband(&Path::new("test_data/number_mut_per_proband.tsv"), test_case).unwrap();
     }
     #[test]
     fn test_type_mutations_per_patient()
     {
-        let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf")).unwrap();
+        let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf"),Engine::ST).unwrap();
         let test_case=summary::compute_type_mutations_per_patient(&int_map_test); 
         write_type_mutations_per_patient(&Path::new("test_data/type_mutation_per_proband.tsv"), test_case).unwrap();
     }
     #[test]
     fn test_num_mut_per_transcript()
     {
-        let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf")).unwrap();
+        let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf"),Engine::ST).unwrap();
         let test_case=summary::compute_number_of_mutations_per_transcript(&int_map_test); 
         write_number_of_mutations_per_transcript(&Path::new("test_data/num_mutation_per_transcript.tsv"), test_case).unwrap();
     }

@@ -212,7 +212,7 @@ impl VCFRecords
 
     pub fn decode_back(consequences:&Vec<String>,proband_fields:&Vec<String>,engine:Engine)->(Vec<String>,Vec<String>)
     {
-        // get index of each conseuqences 
+        // get index of each consequences 
         let mut bitmasks= match engine 
         {
             Engine::ST=>
@@ -507,8 +507,8 @@ mod test_vcf
         //------------------------------------
         let case_path=Path::new("/Users/heshamelabd/projects/test_data/test_f1_mod_test_vcf_case.vcf"); 
         let res_path=Path::new("/Users/heshamelabd/projects/test_data/test_f1_mod_test_vcf_res.txt");
-        let records=readers::vcf_helpers::read_file(case_path).unwrap(); 
-        let resullts=readers::vcf_helpers::read_file(res_path)
+        let records=readers::vcf_helpers::read_file(case_path,Engine::MT).unwrap(); 
+        let resullts=readers::vcf_helpers::read_file(res_path,Engine::MT)
                                         .unwrap()
                                         .iter()
                                         .map(|elem| elem.split("=").map(|elem| elem.to_string()).collect::<Vec<String>>().last().unwrap().clone())
@@ -516,7 +516,7 @@ mod test_vcf
         // Parse the input and check the correctness 
         //------------------------------------------
         let vcf_records=VCFRecords::new(records);
-        assert_eq!(resullts,vcf_records.get_consequences_vector());
+        assert_eq!(resullts,vcf_records.get_consequences_vector(Engine::MT));
     }
     #[test]
     fn test_get_patient_fields1()
@@ -544,11 +544,11 @@ mod test_vcf
                             "Field1.4", "Field2.4", "Field3.4", "Field4.4", "Field5.4"].
                             iter().map(|elem |elem.to_string()).collect::<Vec<String>>();
         let mut vcf_records=VCFRecords::new(test_case1);
-        assert_eq!(test_result1,vcf_records.get_patient_fields(8)[0]);
-        assert_eq!(test_result2,vcf_records.get_patient_fields(8)[1]);
-        assert_eq!(test_result3,vcf_records.get_patient_fields(8)[2]);
-        assert_eq!(test_result4,vcf_records.get_patient_fields(8)[3]);
-        assert_eq!(test_result5,vcf_records.get_patient_fields(8)[4]);
+        assert_eq!(test_result1,vcf_records.get_patient_fields(8,Engine::MT)[0]);
+        assert_eq!(test_result2,vcf_records.get_patient_fields(8,Engine::MT)[1]);
+        assert_eq!(test_result3,vcf_records.get_patient_fields(8,Engine::MT)[2]);
+        assert_eq!(test_result4,vcf_records.get_patient_fields(8,Engine::MT)[3]);
+        assert_eq!(test_result5,vcf_records.get_patient_fields(8,Engine::MT)[4]);
     }
     #[test]
     fn test_extract_effects1()

@@ -278,13 +278,15 @@ pub mod vcf_helpers
 #[cfg(test)]
 pub mod test_vcf_helpers
 {
+    use crate::data_structures::InternalRep::engines::Engine;
+
     use super::{Path, read_vcf, read_fasta_file}; 
     use super::vcf_helpers; 
     #[test]
     fn test_read_file1()->Result<(),String>
     {
         let path = Path::new("/Users/heshamelabd/projects/test_data/dev_file.vcf"); 
-        match vcf_helpers::read_file(&path)
+        match vcf_helpers::read_file(&path,Engine::ST)
         {
             Ok(res)=>
             {   
@@ -299,7 +301,7 @@ pub mod test_vcf_helpers
     fn test_read_file2()->Result<(),()>
     {
         let not_define_path=Path::new("not_present_file.vcf");
-        match vcf_helpers::read_file(&not_define_path)
+        match vcf_helpers::read_file(&not_define_path,Engine::ST)
         {
             Ok(_)=>
             {   
@@ -313,7 +315,7 @@ pub mod test_vcf_helpers
     fn test_read_file3()->Result<(),()>
     {
         let path=Path::new("/Users/heshamelabd/projects/test_data/wrong_file.vcf");
-        match vcf_helpers::read_file(&path)
+        match vcf_helpers::read_file(&path,Engine::ST)
         {
             Ok(_)=>Err(()),
             Err(_)=>Ok(())
@@ -323,7 +325,7 @@ pub mod test_vcf_helpers
     fn test_get_proband_names()->Result<(),String>
     {
         let path=Path::new("/Users/heshamelabd/projects/test_data/test_file1.vcf");
-        let mut results = match vcf_helpers::read_file(&path)
+        let mut results = match vcf_helpers::read_file(&path,Engine::ST)
         {
             Ok(res)=>
             {
@@ -331,7 +333,7 @@ pub mod test_vcf_helpers
             },
             Err(err_msg)=>return Err(err_msg)
         }; 
-        match vcf_helpers::get_probands_names(&mut results)
+        match vcf_helpers::get_probands_names(&mut results,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>return Ok(())
@@ -343,7 +345,7 @@ pub mod test_vcf_helpers
     {
         let case_cor_res="KIEL_ADC00143_0219294502".to_string();
         let file_path= Path::new("/Users/heshamelabd/projects/test_data/test_file2.vcf");
-        let mut results = match vcf_helpers::read_file(&file_path)
+        let mut results = match vcf_helpers::read_file(&file_path,Engine::ST)
         {
             Ok(res)=>
             {
@@ -351,7 +353,7 @@ pub mod test_vcf_helpers
             },
             Err(_)=>return Err(())
         }; 
-        let res_vec=match vcf_helpers::get_probands_names(&mut results)
+        let res_vec=match vcf_helpers::get_probands_names(&mut results,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>return Err(())
@@ -365,7 +367,7 @@ pub mod test_vcf_helpers
     {
         let res=16460; // number of patient 
         let file_path= Path::new("/Users/heshamelabd/projects/test_data/test_case3.vcf");
-        let mut results = match vcf_helpers::read_file(&file_path)
+        let mut results = match vcf_helpers::read_file(&file_path,Engine::ST)
         {
             Ok(res)=>
             {
@@ -373,7 +375,7 @@ pub mod test_vcf_helpers
             },
             Err(_)=>return Err(())
         }; 
-        let res_vec=match vcf_helpers::get_probands_names(&mut results)
+        let res_vec=match vcf_helpers::get_probands_names(&mut results,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>return Err(())
@@ -386,7 +388,7 @@ pub mod test_vcf_helpers
     {
         let res=16460; // number of patient 
         let file_path= Path::new("/Users/heshamelabd/projects/test_data/test_case4.vcf");
-        let mut results = match vcf_helpers::read_file(&file_path)
+        let mut results = match vcf_helpers::read_file(&file_path,Engine::ST)
         {
             Ok(res)=>
             {
@@ -394,7 +396,7 @@ pub mod test_vcf_helpers
             },
             Err(_)=>return Err(())
         }; 
-        let res_vec=match vcf_helpers::get_probands_names(&mut results)
+        let res_vec=match vcf_helpers::get_probands_names(&mut results,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>return Err(())
@@ -407,7 +409,7 @@ pub mod test_vcf_helpers
     {
         let res=16460; // number of patient 
         let file_path= Path::new("/Users/heshamelabd/projects/test_data/dev_file.vcf");
-        let mut results = match vcf_helpers::read_file(&file_path)
+        let mut results = match vcf_helpers::read_file(&file_path,Engine::ST)
         {
             Ok(res)=>
             {
@@ -415,7 +417,7 @@ pub mod test_vcf_helpers
             },
             Err(_)=>return Err(())
         }; 
-        let res_vec=match vcf_helpers::get_probands_names(&mut results)
+        let res_vec=match vcf_helpers::get_probands_names(&mut results,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>return Err(())
@@ -428,7 +430,7 @@ pub mod test_vcf_helpers
     {
         let first_line="##fileformat=VCFv4.2".to_string();
         let file_path= Path::new("/Users/heshamelabd/projects/test_data/dev_file.vcf");
-        let mut results = match vcf_helpers::read_file(&file_path)
+        let mut results = match vcf_helpers::read_file(&file_path,Engine::ST)
         {
             Ok(res)=>
             {
@@ -436,7 +438,7 @@ pub mod test_vcf_helpers
             },
             Err(_)=>return Err(())
         }; 
-        match vcf_helpers::get_probands_names(&mut results)
+        match vcf_helpers::get_probands_names(&mut results,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>return Err(())
@@ -520,13 +522,13 @@ pub mod test_vcf_helpers
     fn test_get_records()->Result<(),String>
     {
         let path=Path::new("/Users/heshamelabd/projects/test_data/test_case5.vcf");
-        let records= match vcf_helpers::read_file(path)
+        let records= match vcf_helpers::read_file(path,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>{return Err("Something went wrong!".to_string());} 
             
         };
-        match vcf_helpers::get_records(records)
+        match vcf_helpers::get_records(records,Engine::ST)
         {
             Ok(_)=>Err("The function should have failed".to_string()),
             Err(_)=>Ok(())
@@ -536,12 +538,12 @@ pub mod test_vcf_helpers
     fn test_get_records2()->Result<(),String>
     {
         let path=Path::new("/Users/heshamelabd/projects/test_data/test_case6.vcf");
-        let records= match vcf_helpers::read_file(path)
+        let records= match vcf_helpers::read_file(path,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>{return Err("Something went wrong!".to_string());}   
         };
-        match vcf_helpers::get_records(records)
+        match vcf_helpers::get_records(records,Engine::ST)
         {
             Ok(parsed_records)=>
             {
@@ -555,12 +557,12 @@ pub mod test_vcf_helpers
     fn test_get_records3()->Result<(),String>
     {
         let path=Path::new("/Users/heshamelabd/projects/test_data/test_case7.vcf");
-        let records= match vcf_helpers::read_file(path)
+        let records= match vcf_helpers::read_file(path,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>{return Err("Something went wrong!".to_string());}   
         };
-        match vcf_helpers::get_records(records)
+        match vcf_helpers::get_records(records,Engine::ST)
         {
             Ok(parsed_records)=>
             {
@@ -574,12 +576,12 @@ pub mod test_vcf_helpers
     fn test_get_records4()->Result<(),String>
     {
         let path=Path::new("/Users/heshamelabd/projects/test_data/test_case9.vcf");
-        let records= match vcf_helpers::read_file(path)
+        let records= match vcf_helpers::read_file(path,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>{return Err("Something went wrong!".to_string());}   
         };
-        match vcf_helpers::get_records(records)
+        match vcf_helpers::get_records(records,Engine::ST)
         {
             Ok(parsed_records)=>
             {
@@ -593,12 +595,12 @@ pub mod test_vcf_helpers
     fn test_get_records5()->Result<(),String>
     {
         let path=Path::new("/Users/heshamelabd/projects/test_data/test_case10.vcf");
-        let records= match vcf_helpers::read_file(path)
+        let records= match vcf_helpers::read_file(path,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>{return Err("Something went wrong!".to_string());}   
         };
-        match vcf_helpers::get_records(records)
+        match vcf_helpers::get_records(records,Engine::ST)
         {
             Ok(parsed_records)=>
             {
@@ -612,12 +614,12 @@ pub mod test_vcf_helpers
     fn test_get_records6()->Result<(),String>
     {
         let path=Path::new("/Users/heshamelabd/projects/test_data/test_case11.vcf");
-        let records= match vcf_helpers::read_file(path)
+        let records= match vcf_helpers::read_file(path,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>{return Err("Something went wrong!".to_string());}   
         };
-        match vcf_helpers::get_records(records)
+        match vcf_helpers::get_records(records,Engine::ST)
         {
             Ok(parsed_records)=>
             {
@@ -631,12 +633,12 @@ pub mod test_vcf_helpers
     fn test_get_records7()->Result<(),String>
     {
         let path=Path::new("/Users/heshamelabd/projects/test_data/test_case12.vcf");
-        let records= match vcf_helpers::read_file(path)
+        let records= match vcf_helpers::read_file(path,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>{return Err("Something went wrong!".to_string());}   
         };
-        match vcf_helpers::get_records(records)
+        match vcf_helpers::get_records(records,Engine::ST)
         {
             Ok(parsed_records)=>
             {
@@ -650,7 +652,7 @@ pub mod test_vcf_helpers
     fn test_read_vcf()->Result<(),String>
     {
         let path=Path::new("/Users/heshamelabd/projects/test_data/dev_file.vcf");
-        match read_vcf(path)
+        match read_vcf(path,Engine::ST)
         {
             Ok(_)=>Ok(()),
             Err(_)=>Err("Failed !!1".to_string())
@@ -666,7 +668,7 @@ pub mod test_vcf_helpers
         let results = cases.iter().map(|line| line.to_string()).collect::<Vec<String>>(); 
 
         let path=Path::new("/Users/heshamelabd/projects/test_data/dev_case_long_and_short.vcf");
-        let (probands, _)= match read_vcf(path)
+        let (probands, _)= match read_vcf(path,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=> panic!("Failed !!1")
@@ -678,7 +680,7 @@ pub mod test_vcf_helpers
     fn test_fasta_reader1()->Result<(),String>
     {
         let test_case=Path::new("test_data/test_fasta_data1.fasta");
-        let records = match read_fasta_file(test_case)
+        let records = match read_fasta_file(test_case,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>return Err("Error in reading the file".to_string())
@@ -697,7 +699,7 @@ pub mod test_vcf_helpers
     fn test_fasta_reader2()->Result<(),String>
     {
         let test_case=Path::new("test_data/test_fasta_data2.fasta");
-        let records = match read_fasta_file(test_case)
+        let records = match read_fasta_file(test_case,Engine::ST)
         {
             Ok(res)=>res,
             Err(_)=>return Err("Error in reading the file".to_string())

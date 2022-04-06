@@ -1,6 +1,7 @@
 use std::{cmp::Ordering, str::FromStr}; 
 use crate::functions::text_parser; 
-/// an enumarator that contain the supported mutation, namely, MisSense for missense mutations, 
+
+/// an enumerator that contain the supported mutation, namely, MisSense for missense mutations, 
 /// InframeInsertion, i.e. inserions,  InframeDeletion, i.e deletion, FrameShift for frameshifts,
 /// StopGain, i.e. stop gain and StopLost, i.e. stop lost.
 /// it derives the Debug, Clone, PartialEq trait and impelement FromStr trait.
@@ -11,6 +12,7 @@ use crate::functions::text_parser;
 /// use ppgg_rust::data_structures::mutation_ds::MutationType;
 /// assert_eq!(MutationType::MisSense, MutationType::from_str(test_case).unwrap());
 ///``` 
+
 #[derive(Debug,Clone,PartialEq,Eq,Serialize,Deserialize)]
 pub enum MutationType{
                     MisSense,InframeInsertion,InframeDeletion,FrameShift,StopGained,StopLost,
@@ -139,9 +141,9 @@ impl MutationInfo
         }
     }
 }
-/// An abstract representation for a mutation that is composite mainly of 4 componants 
-/// 1. transcrit_name a *String* containing the transcript name 
-/// 2. len an i16 int containg the  length of the mutation
+/// An abstract representation for a mutation that is composite mainly of 4 components 
+/// 1. transcript_name a *String* containing the transcript name 
+/// 2. len an i16 int containing the  length of the mutation
 /// 3. mut_type  a *MutationType* enum coding for the mutational type the mutational type s
 /// 4. mut_info a *MutationInfo* struct summarizing all the mutational info 
 ///``` 
@@ -150,7 +152,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug,Clone,Eq,Serialize,Deserialize)]
 pub struct Mutation
 {
-    pub transcrit_name:String,
+    pub transcript_name:String,
     pub mut_type:MutationType,
     pub mut_info:MutationInfo
 }
@@ -183,7 +185,7 @@ impl Mutation
                 return Err(format!("Parsing the provided info field: {} failed with the following error message : {}", &info_vec[2], err_msg));
             }
         };
-        Ok(Mutation{mut_type:mut_type,mut_info:mut_info,transcrit_name:info_vec[1].clone()})
+        Ok(Mutation{mut_type:mut_type,mut_info:mut_info,transcript_name:info_vec[1].clone()})
     }
 }
 impl Ord for Mutation
@@ -249,10 +251,10 @@ mod test_mutationds
     {
         // define a test-case
         let test_case=vec!["stop_gained".to_string(),"ENST00000484547".to_string(), "32Q>32*".to_string()];
-        let test_mutation=Mutation::new(test_case).unwrap();
+        let test_mutation=Mutation::new(Ok(test_case)).unwrap();
         // assert that it produce the correct results 
         assert_eq!(MutationType::StopGained,test_mutation.mut_type);
-        assert_eq!("ENST00000484547".to_string(),test_mutation.transcrit_name);
+        assert_eq!("ENST00000484547".to_string(),test_mutation.transcript_name);
         assert_eq!(MutationInfo::new(32, 32, "Q".to_string(), "*".to_string()),test_mutation.mut_info);
     } 
     #[test]
@@ -260,7 +262,7 @@ mod test_mutationds
     {
         // define a test-case
         let test_case=vec!["stop_gained".to_string(),"ENST00000484547".to_string(), "32Q>32*".to_string(), "Gene".to_string()];
-        let test_mutation=Mutation::new(test_case);
+        let test_mutation=Mutation::new(Ok(test_case));
         // check that the function failed 
         match test_mutation
         {
@@ -273,7 +275,7 @@ mod test_mutationds
     {
         // define a test-case
         let test_case=vec!["stop_gainedd".to_string(),"ENST00000484547".to_string(), "32Q>32*".to_string()];
-        let test_mutation=Mutation::new(test_case);
+        let test_mutation=Mutation::new(Ok(test_case));
         // check that the function failed 
         match test_mutation
         {
@@ -286,7 +288,7 @@ mod test_mutationds
     {
         // define a test-case
         let test_case=vec!["stop_gainedd".to_string(),"ENST00000484547".to_string(), "32Q32*".to_string()];
-        let test_mutation=Mutation::new(test_case);
+        let test_mutation=Mutation::new(Ok(test_case));
         // check that the function failed 
         match test_mutation
         {
@@ -299,7 +301,7 @@ mod test_mutationds
     {
         // define a test-case
         let test_case=vec!["stop_gainedd".to_string(),"ENST00000484547".to_string(), "".to_string()];
-        let test_mutation=Mutation::new(test_case);
+        let test_mutation=Mutation::new(Ok(test_case));
         // check that the function failed 
         match test_mutation
         {
@@ -308,6 +310,3 @@ mod test_mutationds
         }    
     }
 }
-
-
-

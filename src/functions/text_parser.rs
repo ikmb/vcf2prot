@@ -262,6 +262,8 @@ pub fn get_type(mut_type:&String)->&str
 #[cfg(test)]
 mod test_text_parser
 {
+    use crate::data_structures::mutation_ds::MutatedString;
+
     use super::*; // make the content of the file public  
     #[test]
     /// The function test that the function produce the correct results when given a default correct string 

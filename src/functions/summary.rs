@@ -120,11 +120,11 @@ mod stat_helper
 pub mod test_summary_function
 {
     use super::*; 
-    use crate::parts::io::parse_vcf; 
+    use crate::{parts::io::parse_vcf, data_structures::InternalRep::engines::Engine}; 
     fn generate_default_internal_representation()->Vec<Map::IntMap>
     {      
         use std::path::Path; 
-        match parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf"))
+        match parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf"),Engine::MT)
         {
             Ok(res)=>res,
             Err(err_msg)=>panic!("{}",err_msg)
