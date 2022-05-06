@@ -2,6 +2,11 @@ use ppgg::parts::{cli,io,exec};
 use std::path::{Path, PathBuf}; 
 use ppgg::writers::write_intmap2json; 
 use chrono::Utc;
+
+/// ## Summary
+/// The main execution logic of the program which is based on the modular units provided by the ppgg library
+
+
 fn main()
 {
     let args = cli::ParsedInput::new(cli::parse_command_line());

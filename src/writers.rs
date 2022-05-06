@@ -65,7 +65,7 @@ pub fn write_intmap2json(path2write:&Path, vec_intmap: &Vec<Map::IntMap> )->Resu
 ///```rust 
 /// let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf")).unwrap();
 /// let test_case=summary::compute_number_mutation_per_proband(&int_map_test); 
-/// write_num_number_mutation_per_proband(&Path::new("test_data/number_mut_per_proband.tsv"), test_case).unwrap();
+/// write_num_number_mutation_per_proband(&Path::new("/Users/heshamelabd/projects/test_data/number_mut_per_proband.tsv"), test_case).unwrap();
 ///```
 pub fn write_num_number_mutation_per_proband(path2file:&Path,stats_table:HashMap<String,u64>)->Result<(),String>
 {
@@ -92,7 +92,7 @@ pub fn write_num_number_mutation_per_proband(path2file:&Path,stats_table:HashMap
 ///```rust
 /// let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf")).unwrap();
 /// let test_case=summary::compute_number_mutation_per_proband(&int_map_test); 
-/// write_num_number_mutation_per_proband(&Path::new("test_data/number_mut_per_proband.tsv"), test_case).unwrap();
+/// write_num_number_mutation_per_proband(&Path::new("/Users/heshamelabd/projects/test_data/number_mut_per_proband.tsv"), test_case).unwrap();
 ///```
 pub fn write_type_mutations_per_patient(path2file:&Path,stats_table:HashMap<String,Vec<u64>>)->Result<(),String>
 {
@@ -127,7 +127,7 @@ pub fn write_type_mutations_per_patient(path2file:&Path,stats_table:HashMap<Stri
 ///```rust
 /// let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf")).unwrap();
 /// let test_case=summary::compute_number_of_mutations_per_transcript(&int_map_test); 
-/// write_number_of_mutations_per_transcript(&Path::new("test_data/type_mutation_per_proband.tsv"), test_case).unwrap();
+/// write_number_of_mutations_per_transcript(&Path::new("/Users/heshamelabd/projects/test_data/type_mutation_per_proband.tsv"), test_case).unwrap();
 ///```
 pub fn write_number_of_mutations_per_transcript(path2file:&Path,stats_table:HashMap<String,u64>)->Result<(),String>
 {
@@ -160,27 +160,27 @@ pub mod test_json_parsing
     fn test_intmap2json()
     {
         let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf"),Engine::ST).unwrap();
-        write_intmap2json(Path::new("test_data/test_writer"),&int_map_test).unwrap();
+        write_intmap2json(Path::new("/Users/heshamelabd/projects/test_data/test_writer"),&int_map_test).unwrap();
     }
     #[test]
     fn test_num_number_mutation_per_proband()
     {
         let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf"),Engine::ST).unwrap();
         let test_case=summary::compute_number_mutation_per_proband(&int_map_test); 
-        write_num_number_mutation_per_proband(&Path::new("test_data/number_mut_per_proband.tsv"), test_case).unwrap();
+        write_num_number_mutation_per_proband(&Path::new("/Users/heshamelabd/projects/test_data"), test_case).unwrap();
     }
     #[test]
     fn test_type_mutations_per_patient()
     {
         let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf"),Engine::ST).unwrap();
         let test_case=summary::compute_type_mutations_per_patient(&int_map_test); 
-        write_type_mutations_per_patient(&Path::new("test_data/type_mutation_per_proband.tsv"), test_case).unwrap();
+        write_type_mutations_per_patient(&Path::new("/Users/heshamelabd/projects/test_data"), test_case).unwrap();
     }
     #[test]
     fn test_num_mut_per_transcript()
     {
         let int_map_test=parse_vcf(&Path::new("/Users/heshamelabd/projects/test_data/test_case_int1.vcf"),Engine::ST).unwrap();
         let test_case=summary::compute_number_of_mutations_per_transcript(&int_map_test); 
-        write_number_of_mutations_per_transcript(&Path::new("test_data/num_mutation_per_transcript.tsv"), test_case).unwrap();
+        write_number_of_mutations_per_transcript(&Path::new("/Users/heshamelabd/projects/test_data"), test_case).unwrap();
     }
 }

@@ -4,14 +4,15 @@ use rayon::prelude::*;
 use std::collections::HashMap; 
 use crate::data_structures::{vcf_ds,FastaFile,Constants}; 
 use crate::data_structures::InternalRep::engines::Engine;
+
 /// Building a VCF reader that reads an input VCF file and returns a results enums, 
 /// the Ok branch contains the probands name and the VCF records that contain the supported mutations
 /// while the Err branch contain an error string message.
 ///  ## Example 
-///``` 
+///```rust 
 /// use std::path::Path;
 /// use ppg::readers;
-/// let path=Path::new("/Users/heshamelabd/projects/test_data/dev_case_long_and_short.vcf");
+/// let path=Path::new("/Users/heshamelabd/projects/test_data/dev_case_long_and_short.vcf"); // this shall be replaced with your VCF file
 /// let (probands, records)= match readers::read_vcf(path)
 /// {
 ///    Ok(res)=>res,
@@ -49,7 +50,7 @@ pub fn read_vcf(path2load:&Path, engine:Engine)->Result<(vcf_ds::Probands,vcf_ds
 /// use ppg::data_structures::FastaFile; 
 /// use ppgg_rust::readers::read_fasta_file; 
 /// use std::path::Path; 
-/// let path2file=Path::new("test_data/test_fasta_data1.fasta");
+/// let path2file=Path::new("test_data/test_fasta_data1.fasta"); // this shall be replaced by a FASTA file in the working directory 
 /// let fasta_file=read_fasta_file(path2file).unwrap(); 
 /// assert_eq!(fasta_file.get_records().len(),3); 
 /// assert!(fasta_file.is_in_records(&"seq1".to_string()));
@@ -99,14 +100,16 @@ pub fn read_fasta_file(path2load:&Path,engine:Engine)->Result<FastaFile::FastaFi
 pub mod vcf_helpers
 {
     use super::*;
+
+    /// ## Summary
     /// The function takes the path to a VCF file as an input and returns a vector of strings as an output, 
     /// each string is a line in the input file. 
-    ///### Error
+    /// ## Error
     /// incase reading the file failed, the function returns a String containing the error message
-    ///## Example 
+    /// ## Example 
     ///``` 
     /// use std::path::Path; 
-    /// let path = Path::new("/Users/heshamelabd/projects/test_data/dev_file.vcf"); 
+    /// let path = Path::new("/Users/heshamelabd/projects/test_data/dev_file.vcf"); // replace this with your VCF file
     /// let lines= ppgg_rust::readers::vcf_helpers::read_file(&path).unwrap();
     /// for line in lines
     /// {
@@ -134,12 +137,13 @@ pub mod vcf_helpers
             Engine::MT | Engine::GPU => Ok(file_string.par_lines().map(|line| line.to_owned()).collect::<Vec<String>>())
         }
     }
-    /// Extract the probands name from the VCF file, return a vector of string contain the probands names
+    /// ## Summary
+    ///  Extract the probands name from the VCF file, return a vector of string contain the probands names
     /// ## Example 
     ///``` 
     /// use std::path::Path; 
     /// use ppgg_rust::readers::vcf_helpers; 
-    /// let file_path= Path::new("/Users/heshamelabd/projects/test_data/test_file2.vcf");
+    /// let file_path= Path::new("/Users/heshamelabd/projects/test_data/test_file2.vcf"); // replace this with your VCF file
     /// let mut results = vcf_helpers::read_file(&file_path).unwrap(); 
     /// let res_vec=vcf_helpers::get_probands_names(&mut results).unwrap(); 
     /// for proband in res_vec.iter() {println!("{}",proband)} // print the probands name 
@@ -181,8 +185,10 @@ pub mod vcf_helpers
         }
         Ok(res)
     }
-    // the warper for the parallelization using massage passing 
-    pub fn get_records(lines:Vec<String>, engine:Engine)->Result<Vec<String>,String>
+    /// ## Summary 
+    ///  extract the records from a file read VCF file
+    pub fn get_records(lines:Vec<String> /* A vector of records containing the records in the VCF file*/, 
+        engine:Engine /* The execution engine which can be single-threaded or multi-threaded.*/)->Result<Vec<String>,String>
     {
         let  res=match engine
         {
@@ -206,6 +212,7 @@ pub mod vcf_helpers
         Ok(res)
     }
 
+    /// ## Summary
     /// A helper function that inspect the input record, i.e. one line in the body of the VCF line\
     /// and return the true if it contains at least one supported mutation, otherwise  it returns false which signals\
     /// that the line should not be skipped 
@@ -247,7 +254,8 @@ pub mod vcf_helpers
         }
     }
 
-    /// A helper function that inspect the input string and return True if it can be interpreted by the program or False otherwise 
+    /// ## Summary
+    ///  A helper function that inspect the input string and return True if it can be interpreted by the program or False otherwise 
     /// ## Example 
     ///``` 
     /// use ppgg_rust::readers::vcf_helpers; 
@@ -674,45 +682,6 @@ pub mod test_vcf_helpers
             Err(_)=> panic!("Failed !!1")
         }; 
         assert_eq!(results.len(),probands.get_num_probands());
-
-    }
-    #[test]
-    fn test_fasta_reader1()->Result<(),String>
-    {
-        let test_case=Path::new("test_data/test_fasta_data1.fasta");
-        let records = match read_fasta_file(test_case,Engine::ST)
-        {
-            Ok(res)=>res,
-            Err(_)=>return Err("Error in reading the file".to_string())
-        };
-        // check with a results query 
-        let res1="testseq1".to_string(); 
-        let res2="testseq2".to_string();
-        let res3="testseq3".to_string();
-        // assert equal the results 
-        assert_eq!(records.get_record(&"seq1".to_string())?,&res1);
-        assert_eq!(records.get_record(&"seq2".to_string())?,&res2);
-        assert_eq!(records.get_record(&"seq3".to_string())?,&res3);
-        Ok(())
-    }
-    #[test]
-    fn test_fasta_reader2()->Result<(),String>
-    {
-        let test_case=Path::new("test_data/test_fasta_data2.fasta");
-        let records = match read_fasta_file(test_case,Engine::ST)
-        {
-            Ok(res)=>res,
-            Err(_)=>return Err("Error in reading the file".to_string())
-        };
-        // check with a results query 
-        let res1="testseq1testseq1.1testseq1.2".to_string(); 
-        let res2="testseq2".to_string();
-        let res3="testseq3testseq3.1testseq3.2".to_string();
-        // assert equal the results 
-        assert_eq!(records.get_record(&"seq1".to_string())?,&res1);
-        assert_eq!(records.get_record(&"seq2".to_string())?,&res2);
-        assert_eq!(records.get_record(&"seq3".to_string())?,&res3);
-        Ok(())
     }
 }
 
