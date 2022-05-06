@@ -1,6 +1,6 @@
 [package]
 name = "ppgg"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Hesham ElAbd <h.elabd@ikmb.uni-kiel.de>"]
 license = "MIT OR Apache-2.0"
 description = "A library and an associated executable, the library provides tools for building tools that can parse and work for VCF and FASTA files while the associated executable is a command line tool for generating protein sequences from a reference FASTA file and a VCF file"
@@ -41,4 +41,3 @@ flate2 = "1.0"
 
 [build-dependencies]
 cc = "1.0"
-
