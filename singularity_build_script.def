@@ -5,9 +5,8 @@
 ################################################
 
 ## Notes: 
-# This script shall be called from the ROOT directory of the project, specifically,
-# the cargo.toml and the source directory, i.e. src. should be in the current work directory.
-#*********************************************************************** 
+# Compile the file locally and then copy it to the container
+#***********************************************************
 
 ## First define the header files
 ## BASE::Ubuntu 20.04
@@ -20,27 +19,9 @@ From: ubuntu:20.04
 ## Copy data from the host to the container 
 %setup 
 	# move the source code for HDF5 library to the Downloads directory in the container
-    mkdir ${SINGULARITY_ROOTFS}/home/vcf2prot 
-	cp -r Cargo.toml src ${SINGULARITY_ROOTFS}/home/vcf2prot  
-%post
-# Update and install g++ compiler libraries
-	apt-get update -y 
-	apt-get install g++ -y
-	apt-get install build-essential -y
-	apt-get install curl -y 
-
-# Install Rust 
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-# Configure the shell, so cargo can be called
-	exec bash   
-
-# Build VCF2Prot in the singularity 
-	cd /home/vcf2prot
-	cargo build --release 
-
-    cp /home/vcf2prot/target/release/vcf2prot ${SINGULARITY_ROOTFS}/usr/bin
-
+    mkdir ${SINGULARITY_ROOTFS}/home/vcf2prot
+    cp -r  target/release/vcf2prot ${SINGULARITY_ROOTFS}/usr/bin
+	
 %runscript
 	vcf2prot $*
 
