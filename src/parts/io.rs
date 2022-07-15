@@ -20,7 +20,7 @@ pub fn parse_vcf(path2load:&Path, engine:Engine)->Result<Vec<Map::IntMap>,String
         Err(err_msg)=>return Err(format!(" reading the file failed: \n {} \n, formatting the string failed",err_msg))
     }; 
     // Get an early map from the generate probands and records 
-    let vec_early_map=vcf_tools::get_early_map(probands, records, engine.clone()); 
+    let vec_early_map=vcf_tools::get_early_map(probands, records, engine.clone());    
     // generate an intermediate map 
     Ok(vcf_tools::early_to_intermediate_repr(vec_early_map,engine.clone()))
 }

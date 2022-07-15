@@ -4,4 +4,4 @@
 ///``` 
 pub mod text_parser; 
 pub mod vcf_tools; 
-pub mod summary; 
+pub mod summary;

@@ -29,7 +29,7 @@ TRANS_SEQ_LINE1
 
 #### Notes ####
 
-1. The only exception is when the python wrapper is used which work directly with BCF tabix indexed files. 
+1. The only exception is when the python wrapper is used which work directly with BCF tabix indexed files.
 
 2. You can decode a BCF file into a VCF using the following command:
 
@@ -212,7 +212,7 @@ cd vcf2prot
     println!("cargo:rustc-link-search=native=/path two cuda lib64 directory"); // 8th line in the updated version
 ```
 
-6. Build the project 
+6. Build the project
 
 ```bash
 cargo build --release 
@@ -253,7 +253,69 @@ cargo clean && cargo build --release
 sudo chown -R $(whoami) PATH_TO_PROJECT
 ```
 
-where path PATH_TO_PROJECT points to the project directory, i.e. the directory where the file has been cloned into. 
+where path PATH_TO_PROJECT points to the project directory, i.e. the directory where the file has been cloned into.
+
+## Docker Image ##
+
+### using DockerHub ###
+
+VCF2Prot is currently available at [DockerHub](https://hub.docker.com) [Here](https://hub.docker.com/r/ikmb/vcf2prot). This image can be build locally using docker as follow:
+
+```bash
+docker pull ikmb/vcf2prot
+```
+
+This automatically, download the latest version, to use a specific version, the following command shall be used:
+
+```bash
+docker pull ikmb/vcf2prot:0.1.4
+```
+
+### Building locally ###
+
+The container for VCF2Prot can be build as follow
+
+1. make sure the docker is installed and it running using, the installation details is available [here](https://docs.docker.com/get-docker/)
+
+```bash
+docker run --rm hello-world
+```
+
+If this worked out correctly and printed the help "Hello from Docker!" then feel free to jump to step number 2, otherwise, depending on the error message two things can be done. First, the error message was permission denied then try running the same command above as a sudo user, i.e.
+
+```bash
+sudo docker run --rm hello-world
+```
+
+Otherwise if the message was unable to connect to the daemon and you are working on a mac OS then start first docker image and then start first the docker desktop application from the application pad then try again using
+
+```bash
+docker run --rm hello-world
+```
+
+2. Clone the repository
+
+```bash
+git clone https://github.com/ikmb/vcf2prot
+```
+
+3. Change the directory to vcf2prot
+
+```bash
+cd vcf2prot
+```
+
+4. Build the container
+
+```bash
+docker build -t vcf2prot . 
+```
+
+5. Run the container
+
+```bash
+docker run vcf2prot -h 
+```
 
 ## Contact ##
 

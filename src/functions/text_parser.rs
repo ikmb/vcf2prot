@@ -26,12 +26,15 @@ pub fn split_csq_string(input_string:&String)->Result<Vec<String>,String>
     {
         6=>
         {
-            if res[3].as_str()!="protein_coding"
+            match res[3].as_str()
             {
-                return Err("Skipping this transcript as it is not a protein coding transcript".to_string())   
+                "protein_coding" | "NMD"=>
+                {
+                    let index:Vec<usize>=vec![0,2,5];
+                    Ok(index.iter().map(|i| res[*i].clone()).collect::<Vec<String>>())
+                },
+                _=>Err("Skipping this transcript as it is not a protein coding transcript".to_string())
             }
-            let index:Vec<usize>=vec![0,2,5];
-            Ok(index.iter().map(|i| res[*i].clone()).collect::<Vec<String>>())
         }, 
         _=>
         {

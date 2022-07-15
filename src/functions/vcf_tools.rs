@@ -82,6 +82,8 @@ pub fn build_int_map_from_early(early_map:&EarlyMap)->IntMap
 pub fn group_muts_per_transcript(vec_mut:&Vec<String>)->Vec<AltTranscript>
 {
     let mut res=Vec::new(); 
+    // define the unique transcripts
+    //------------------------------
     for transcript in get_unique_transcript(vec_mut)
     {
         let muts_in_transcript=vec_mut.iter()
@@ -127,6 +129,7 @@ pub fn get_unique_transcript(vec_mut:&Vec<String>)->Vec<String>
     uniuqe_muts.sort(); 
     uniuqe_muts.dedup(); 
     uniuqe_muts
+
 }
  
 #[cfg(test)]
