@@ -148,9 +148,16 @@ of the row with the first indexing error is also printed to the standard output 
 
 6. PANIC_INSPECT_ERR => If set the code will panic if inspecting the translation from mutation to instruction failed. This is an override of the default behavior were an error message is generated and printed to the output stream.
 
-### Use VCFtools 
+## Using BCFtools/csq ##
 
+As stated above, VCF2Prot can be only used with BCFtools/CSQ called VCF files, files can be called with CSQ as follow
 
+```bash
+bcftools csq -g Homo_sapiens.GRCh38.106.chromosome.1.gff3  -f Homo_sapiens.GRCh38.dna.chromosome.1.fa input_phased_file.vcf\
+ -O v\ -o input_phased_called_file.vcf -n 64
+```
+
+Here, n represent the number consequences, kindly, check [BCFtools/csq](https://github.com/samtools/bcftools/csq.c) repository for more details.
 
 ## Compilation from source ##
 
