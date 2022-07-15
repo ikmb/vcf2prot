@@ -109,6 +109,12 @@ export INSPECT_INS_GEN=TRUE
 
 <p> for more details about the meaning of the exported variables, check the Environment Variables section below </p>
 
+##### Unzipped the example file and reference sequences #####
+
+```bash
+gunzip examples/*.gz 
+```
+
 ##### Create a new directory to store the results #####
 
 ```bash
@@ -118,7 +124,7 @@ mkdir results
 ##### Call vcf2prot with some example data #####
 
 ```bash
-ppg -f examples/example_file.vcf -r examples/References_sequences.fasta -vs -g st -o results
+vcf2prot -f examples/example.vcf -r examples/References_sequences.fasta -vs -g st -o results
 ```
 
 <p> Where the o flag determines the path to write the fasta files, the s guides the program to write stats and v for printing log statement. </p>
@@ -141,6 +147,10 @@ of the row with the first indexing error is also printed to the standard output 
  multiple annotations, where more than one mutation are observed at the same position in the protein backbone, or through mutational overlap and engulfment where two mutations overlap in length, for example, insertion at position 60 with 7 amino acids and then a missense mutation at position 64.
 
 6. PANIC_INSPECT_ERR => If set the code will panic if inspecting the translation from mutation to instruction failed. This is an override of the default behavior were an error message is generated and printed to the output stream.
+
+### Use VCFtools 
+
+
 
 ## Compilation from source ##
 
