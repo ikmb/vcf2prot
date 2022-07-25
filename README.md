@@ -33,7 +33,7 @@ TRANS_SEQ_LINE1
 
 2. You can decode a BCF file into a VCF using the following command:
 
-```
+```bash
 bcftools view PATH_TO_BCF -O v -o PATH_TO_VCF
 ```
 
@@ -128,10 +128,10 @@ mkdir results
 A pre-compiled versions of VCF2Prot for MacOS and Linux can be found at the bins directory, choose the correct version for your operator system, *i.e.* Linux and MacOS, and then call VCF2Prot accordingly
 
 ```bash
-vcf2prot -f examples/example.vcf -r examples/references_sequences.fasta -vs -g st -o results
+vcf2prot -f examples/example.vcf -r examples/references_sequences.fasta -v -g st -o results
 ```
 
-<p> Where the o flag determines the path to write the FASTA files, the s guides the program to write stats and v for printing log statement. </p>
+<p> Where the o flag determines the path to write the FASTA files, and the v for printing log statement. </p>
 
 #### Environment Variables ####  
 
