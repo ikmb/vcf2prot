@@ -29,7 +29,7 @@ TRANS_SEQ_LINE1
 
 #### Notes ####
 
-1. The only exception is when the python wrapper is used which work directly with BCF tabix indexed files. 
+1. The only exception is when the python wrapper is used which work directly with BCF tabix indexed files.
 
 2. You can decode a BCF file into a VCF using the following command:
 
@@ -117,8 +117,20 @@ mkdir results
 
 ##### Call vcf2prot with some example data #####
 
+###### Note
+
+Before proceeding select the VCF2PROT version matching you machine. Currently, there is versions available for MacOS and for Linux based system. For Mac OS system, there is only CPU-based version meaning the execution of the SIR is done using the CPU. Meanwhile, for the Linux based system two versions are available:
+
+1. CPU-based version
+    This version is similar to MacOS version, it is just build for Linux systems.
+
+2. GPU-based version
+    This version have an experimental GPU execution engine that can be used along the single-threaded and the multithreaded version with the CPU-based version. Nevertheless, the current version can only work **ONLY** with NVIDIA GPUs as it contains code written in CUDA.
+
+###### Calling the Software 
+
 ```bash
-ppg -f examples/example_file.vcf -r examples/References_sequences.fasta -vs -g st -o results
+vcf2prot -f examples/example_file.vcf -r examples/References_sequences.fasta -vs -g st -o results
 ```
 
 <p> Where the o flag determines the path to write the fasta files, the s guides the program to write stats and v for printing log statement. </p>
@@ -212,7 +224,7 @@ cd vcf2prot
     println!("cargo:rustc-link-search=native=/path two cuda lib64 directory"); // 8th line in the updated version
 ```
 
-6. Build the project 
+6. Build the project
 
 ```bash
 cargo build --release 
@@ -253,7 +265,7 @@ cargo clean && cargo build --release
 sudo chown -R $(whoami) PATH_TO_PROJECT
 ```
 
-where path PATH_TO_PROJECT points to the project directory, i.e. the directory where the file has been cloned into. 
+where path PATH_TO_PROJECT points to the project directory, i.e. the directory where the file has been cloned into.
 
 ## Contact ##
 
