@@ -115,10 +115,16 @@ export INSPECT_INS_GEN=TRUE
 mkdir results 
 ```
 
+##### Unzipping the results 
+
+```bash
+gunzip examples/*.gz 
+```
+
 ##### Call vcf2prot with some example data #####
 
 ```bash
-ppg -f examples/example_file.vcf -r examples/References_sequences.fasta -vs -g st -o results
+vcf2prot -f examples/example_file.vcf -r examples/References_sequences.fasta -vs -g st -o results
 ```
 
 <p> Where the o flag determines the path to write the fasta files, the s guides the program to write stats and v for printing log statement. </p>
