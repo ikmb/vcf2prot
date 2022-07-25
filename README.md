@@ -124,10 +124,10 @@ gunzip examples/*.gz
 ##### Call vcf2prot with some example data #####
 
 ```bash
-vcf2prot -f examples/example_file.vcf -r examples/References_sequences.fasta -vs -g st -o results
+vcf2prot -f examples/example_file.vcf -r examples/references_sequences.fasta -v -g st -o results
 ```
 
-<p> Where the o flag determines the path to write the fasta files, the s guides the program to write stats and v for printing log statement. </p>
+<p> Where the o flag determines the path to write the FASTA files, the s guides the program to write stats and v for printing log statement. </p>
 
 #### Environment Variables ####  
 
@@ -200,7 +200,7 @@ cd target/release
 2. Clone the current repository or Download the source code using the project Github page
 
 ```bash
-git clone https://github.com/ikmb/vcf2prot
+git clone https://github.com/ikmb/vcf2prot && git checkout gpu_code
 ```
 
 3. Change the direction to vcf2prot
@@ -218,7 +218,7 @@ cd vcf2prot
     println!("cargo:rustc-link-search=native=/path two cuda lib64 directory"); // 8th line in the updated version
 ```
 
-6. Build the project 
+6. Build the project
 
 ```bash
 cargo build --release 
