@@ -99,10 +99,10 @@ To follow along, make sure the executable vcf2prot has been installed on your sy
 
 ##### Export Env variables #####
 
-<p> Let's  Inspect the GPU arrays, instruction's generation and the Task's arrays </p>
+<p> Let's  Inspect the SIR on the CPU before execution, instruction's generation and the Task's arrays </p>
 
 ```bash
-export DEBUG_GPU=TRUE
+export DEBUG_CPU_EXEC=TRUE
 export INSPECT_TXP=TRUE
 export INSPECT_INS_GEN=TRUE
 ```
@@ -123,11 +123,15 @@ mkdir results
 
 ##### Call vcf2prot with some example data #####
 
+##### Note:
+
+A pre-compiled versions of VCF2Prot for MacOS and Linux can be found at the bins directory, choose the correct version for your operator system, *i.e.* Linux and MacOS, and then call VCF2Prot accordingly
+
 ```bash
 vcf2prot -f examples/example.vcf -r examples/references_sequences.fasta -vs -g st -o results
 ```
 
-<p> Where the o flag determines the path to write the fasta files, the s guides the program to write stats and v for printing log statement. </p>
+<p> Where the o flag determines the path to write the FASTA files, the s guides the program to write stats and v for printing log statement. </p>
 
 #### Environment Variables ####  
 
