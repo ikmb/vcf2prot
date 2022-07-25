@@ -1,11 +1,29 @@
 [package]
-name = "ppg"
+name = "ppgg"
 version = "0.1.5"
-authors = ["Hesham ElAbd"]
+authors = ["Hesham ElAbd <h.elabd@ikmb.uni-kiel.de>"]
+license = "MIT OR Apache-2.0"
+description = "A library and an associated executable, the library provides tools for building tools that can parse and work for VCF and FASTA files while the associated executable is a command line tool for generating protein sequences from a reference FASTA file and a VCF file"
 edition = "2018"
-build="build.rs"
+readme = "README.md"
+homepage = "https://github.com/ikmb/vcf2prot"
+repository = "https://github.com/ikmb/vcf2prot"
+keywords = ["genetics", "Proteomics","VCF-files","bioinformatics"]
+categories = ["command-line-utilities","data-structures","science","parsing"]
+exclude = [
+    "examples/*",
+    "automation_scripts/*",
+    ".github/*",
+    "Dockerfile"
+]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "ppgg"
+path = "src/lib.rs"
+
+[[bin]]
+name = "vcf2prot"
+path = "src/main.rs"
 
 [dependencies]
 rayon = "1.5"
