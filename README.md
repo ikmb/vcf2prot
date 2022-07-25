@@ -99,10 +99,10 @@ To follow along, make sure the executable vcf2prot has been installed on your sy
 
 ##### Export Env variables #####
 
-<p> Let's  Inspect the GPU arrays, instruction's generation and the Task's arrays </p>
+<p> Let's  Inspect the SIR before executing it on the CPU, instruction's generation and the Task's arrays </p>
 
 ```bash
-export DEBUG_GPU=TRUE
+export DEBUG_CPU_EXEC=TRUE
 export INSPECT_TXP=TRUE
 export INSPECT_INS_GEN=TRUE
 ```
@@ -115,22 +115,22 @@ export INSPECT_INS_GEN=TRUE
 mkdir results 
 ```
 
+##### Unzipped the example file and reference sequences
+
+```bash
+gunzip examples/*.gz 
+```
+
 ##### Call vcf2prot with some example data #####
 
 ###### Note
 
-Before proceeding select the VCF2PROT version matching you machine. Currently, there is versions available for MacOS and for Linux based system. For Mac OS system, there is only CPU-based version meaning the execution of the SIR is done using the CPU. Meanwhile, for the Linux based system two versions are available:
+A pre-compiled versions of VCF2Prot for MacOS and Linux can be found at the bins directory, choose the correct version for your operator system, i.e. Linux and MacOS, and then call VCF2Prot accordingly.
 
-1. CPU-based version
-    This version is similar to MacOS version, it is just build for Linux systems.
-
-2. GPU-based version
-    This version have an experimental GPU execution engine that can be used along the single-threaded and the multithreaded version with the CPU-based version. Nevertheless, the current version can only work **ONLY** with NVIDIA GPUs as it contains code written in CUDA.
-
-###### Calling the Software 
+###### Calling the Software
 
 ```bash
-vcf2prot -f examples/example_file.vcf -r examples/References_sequences.fasta -vs -g st -o results
+vcf2prot -f examples/example_file.vcf -r examples/references_sequences.fasta -vs -g st -o results
 ```
 
 <p> Where the o flag determines the path to write the fasta files, the s guides the program to write stats and v for printing log statement. </p>
