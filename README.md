@@ -130,10 +130,10 @@ A pre-compiled versions of VCF2Prot for MacOS and Linux can be found at the bins
 ###### Calling the Software
 
 ```bash
-vcf2prot -f examples/example_file.vcf -r examples/references_sequences.fasta -vs -g st -o results
+vcf2prot -f examples/example_file.vcf -r examples/references_sequences.fasta -v -g st -o results
 ```
 
-<p> Where the o flag determines the path to write the fasta files, the s guides the program to write stats and v for printing log statement. </p>
+<p> Where the o flag determines the path to write the fasta files, and the v for printing log statement. </p>
 
 #### Environment Variables ####  
 
