@@ -90,7 +90,7 @@ pub fn group_muts_per_transcript(vec_mut:&Vec<String>)->Vec<AltTranscript>
                                         .filter(|&file|file.contains(&transcript))
                                         .map(|input_string| input_string.clone())
                                         .collect::<Vec<String>>(); 
-        res.push(AltTranscript::new(transcript.clone(), muts_in_transcript))
+        res.push(AltTranscript::new(transcript.clone(), muts_in_transcript).drop_replicate())
     }
     res
 }

@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+use chrono::format::format;
 use rayon::prelude::*; 
 use crate::functions::text_parser; 
 use crate::data_structures::{MaskDecoder::BitMask,
@@ -440,6 +442,40 @@ pub struct AltTranscript
     pub fn sort_alterations(&mut self)
     {
         self.alts.sort_unstable_by(|mut1, mut2| mut1.mut_info.mut_aa_position.partial_cmp(&mut2.mut_info.mut_aa_position).unwrap()); 
+    }
+
+    pub fn drop_replicate(mut self)->Self
+    {
+        // Sort the vector
+        self.sort_alterations();  
+        // Get unique starting position 
+        let unique_position= self.alts.iter().map(|mutation| mutation.mut_info.ref_aa_position).collect::<HashSet<_>>();
+        // If we have duplicates, then the set will be smaller than the vector as it contains only unique elements 
+        if unique_position.len() < self.alts.len()
+        {
+            // Now, we have a problem that we have two mutations at the same location in the reference, this can be classified into two small problems:
+            // 1. identical mutations at the same position, can be a calling error or parsing error, here the aim is to remove duplicates
+            self.alts.dedup_by(|mut1, mut2|
+                {
+                    mut1.mut_type == mut2.mut_type && 
+                    mut1.mut_info.ref_aa_position==mut2.mut_info.ref_aa_position && 
+                    mut1.mut_info.mut_aa_position==mut2.mut_info.mut_aa_position && 
+                    mut1.mut_info.ref_aa == mut2.mut_info.ref_aa && 
+                    mut1.mut_info.mut_aa == mut2.mut_info.mut_aa
+                }); 
+            
+            // 2. different mutations, here we are going to panic! because the user or the developer has to investigate the source of this problem 
+            if unique_position.len() != self.alts.len()
+            {
+                panic!("Encountered a logical error with analyzing mutations in transcript: {} with the following mutations: {:#?}",self.name, self.alts);
+            }
+            else
+            {
+                return self
+            }
+        }
+        self
+        // Otherwise we are good, we do not have replicates. 
     }
  }
 
