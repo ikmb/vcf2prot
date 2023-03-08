@@ -114,7 +114,7 @@ export INSPECT_INS_GEN=TRUE
 ##### Unzipped the example file and reference sequences #####
 
 ```bash
-gunzip examples/*.gz 
+gunzip examples/*
 ```
 
 ##### Create a new directory to store the results #####
@@ -132,19 +132,19 @@ A pre-compiled versions of VCF2Prot for MacOS and Linux can be found at the bins
 ###### Pre-compiled Linux version
 
 ```bash
-./bins/Linux/vcf2prot -f examples/example.vcf -r examples/references_sequences.fasta -v -g st -o results
+./bins/Linux/vcf2prot -f examples/example.vcf -r examples/reference_sequences.fasta -v -g st -o results
 ```
 
 ###### Pre-compiled MacOS version
 
 ```bash
-./bins/MacOS/vcf2prot -f examples/example.vcf -r examples/references_sequences.fasta -v -g st -o results
+./bins/MacOS/vcf2prot -f examples/example.vcf -r examples/reference_sequences.fasta -v -g st -o results
 ```
 
 ###### Locally-built version
 
 ```bash
-./target/release/vcf2prot -f examples/example.vcf -r examples/references_sequences.fasta -v -g st -o results
+./target/release/vcf2prot -f examples/example.vcf -r examples/reference_sequences.fasta -v -g st -o results
 ```
 
 
