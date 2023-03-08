@@ -147,7 +147,6 @@ A pre-compiled versions of VCF2Prot for MacOS and Linux can be found at the bins
 ./target/release/vcf2prot -f examples/example.vcf -r examples/reference_sequences.fasta -v -g st -o results
 ```
 
-
 <p> Where the o flag determines the path to write the FASTA files, and the v for printing log statement. </p>
 
 #### Environment Variables ####  
@@ -358,6 +357,14 @@ docker build -t vcf2prot .
 ```bash
 docker run vcf2prot -h 
 ```
+
+## Output format ##
+
+The generated FASTA files by VCF2Prot has the following format:
+
+1. Header: which is made up of the transcript name and either '_1' to represent transcript containing alterations arising from the first haplotype or '_2' to represent alterations arising from the second haplotype.
+
+2. body: which contain the generated personalized protein sequences
 
 ## Contact ##
 
