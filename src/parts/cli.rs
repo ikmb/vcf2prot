@@ -80,7 +80,7 @@ impl ParsedInput
     }
 }
 
-#[cfg(target_os="macos")]
+//#[cfg(target_os="macos")]
 pub fn parse_command_line()->ArgMatches
 {
     App::new("Vcf2prot")
@@ -173,6 +173,7 @@ pub fn parse_command_line()->ArgMatches
     .get_matches()
 }
 
+/* 
 #[cfg(target_os="linux")]
 pub fn parse_command_line()->ArgMatches
 {
@@ -265,6 +266,7 @@ pub fn parse_command_line()->ArgMatches
         to enable a single threaded writing of files when a multi-threaded or a GPU engines have been used for parsing and generating the sequences. "))       
     .get_matches()
 }
+*/
 
 
 pub fn check_test_state()
