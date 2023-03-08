@@ -51,7 +51,9 @@ bcftools view PATH_TO_BCF -O v -o PATH_TO_VCF
 
 The GPU version of the code can be compiled on a Linux-system with an available NVCC compiler and an Nvidia GPU.
 
-The CPU version of the code can be compiled on a Linux and Mac OS system with Cargo.  
+The CPU version of the code can be compiled on a Linux and Mac OS system with Cargo.
+
+To ensure a correct code compilation, make sure you are using Rust version 1.65.0 or higher.
 
 ### Execution Logic ###
 
@@ -206,7 +208,12 @@ cd target/release
 
 7. add the binary to your PATH
 
-### GPU Version ###
+### GPU Version (Experimental) ###
+
+#### Note
+
+<p> <b> The GPU version still experimental and shall only be used for software development purposes </b> </p>
+
 
 <p> The following GPU code is only compatible with CUDA and NVIDIA GPUs</p>
 
