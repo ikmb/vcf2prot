@@ -125,13 +125,28 @@ mkdir results
 
 ##### Call vcf2prot with some example data #####
 
-##### Note:
+###### Note
 
-A pre-compiled versions of VCF2Prot for MacOS and Linux can be found at the bins directory, choose the correct version for your operator system, *i.e.* Linux and MacOS, and then call VCF2Prot accordingly
+A pre-compiled versions of VCF2Prot for MacOS and Linux can be found at the bins directory, choose the correct version for your operator system, *i.e.* Linux and MacOS, and then call VCF2Prot accordingly.
+
+###### Pre-compiled Linux version
 
 ```bash
-vcf2prot -f examples/example.vcf -r examples/references_sequences.fasta -v -g st -o results
+./bins/Linux/vcf2prot -f examples/example.vcf -r examples/references_sequences.fasta -v -g st -o results
 ```
+
+###### Pre-compiled MacOS version
+
+```bash
+./bins/MacOS/vcf2prot -f examples/example.vcf -r examples/references_sequences.fasta -v -g st -o results
+```
+
+###### Locally-built version
+
+```bash
+./target/release/vcf2prot -f examples/example.vcf -r examples/references_sequences.fasta -v -g st -o results
+```
+
 
 <p> Where the o flag determines the path to write the FASTA files, and the v for printing log statement. </p>
 
@@ -212,8 +227,7 @@ cd target/release
 
 #### Note
 
-<p> <b> The GPU version still experimental and shall only be used for software development purposes </b> </p>
-
+<p> <b> The GPU version is an experimental version and shall only be used for software development purposes </b> </p>
 
 <p> The following GPU code is only compatible with CUDA and NVIDIA GPUs</p>
 
