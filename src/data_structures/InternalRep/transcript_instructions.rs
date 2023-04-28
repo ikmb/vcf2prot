@@ -95,6 +95,10 @@ impl TranscriptInstruction
                 //-------------------------------------------
                 if instructions.len()>1
                 {
+                    if instructions.iter().any(|ins|ins.get_code()=='0')
+                    {
+                        return Ok(TranscriptInstruction::new(transcript_name,ref_len,instructions))
+                    }
                     let consequent_pairs=instructions[..instructions.len()-1]
                             .iter()
                             .enumerate()
@@ -102,7 +106,8 @@ impl TranscriptInstruction
                             .collect::<Vec<_>>(); 
                     for (ins1,ins2) in consequent_pairs
                     {
-                        if ins2.get_position_res()<=(ins1.get_position_res()+ins1.get_data().len()-1)
+                        
+                        if ins2.get_position_res()<=(ins1.get_position_res()+ins1.get_data().len()-1) // This is causing us problems and headache 
                         {
                             match std::env::var("PANIC_INSPECT_ERR")
                             {
